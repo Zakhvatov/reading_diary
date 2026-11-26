@@ -11,6 +11,20 @@ const OL_DOC = {
   language: ['rus'],
 }
 
+const FEED = {
+  feed: {
+    entry: [
+      {
+        id: { $t: 'https://www.google.com/books/feeds/volumes/feed-1' },
+        title: { type: 'text', $t: 'Мастер и Маргарита' },
+        dc$creator: [{ $t: 'Михаил Булгаков' }],
+        dc$identifier: [{ $t: 'ISBN:9785170902583' }],
+        dc$language: [{ $t: 'ru' }],
+      },
+    ],
+  },
+}
+
 const GB_ITEM = {
   id: 'google-1',
   volumeInfo: {
@@ -52,41 +66,41 @@ afterAll(() => {
 
 describe('searchBooks', () => {
   it('fetches once and serves repeated searches from the cache', async () => {
-    const fetchMock = stubFetch(() => jsonResponse({ docs: [OL_DOC] }))
+    const fetchMock = stubFetch(() => jsonResponse(FEED))
 
-    const first = await searchBooks('Пикник')
+    const first = await searchBooks('Мастер')
     expect(first).toHaveLength(1)
-    expect(first[0]?.title).toBe('Пикник на обочине')
+    expect(first[0]).toMatchObject({ source: 'googlebooks', title: 'Мастер и Маргарита' })
     expect(fetchMock).toHaveBeenCalledTimes(1)
 
     const url = requestedUrl(fetchMock, 0)
-    expect(url).toContain('openlibrary.org/search.json')
-    expect(url).toContain('limit=20')
-    expect(url).toContain('fields=')
+    expect(url).toContain('books.google.com/books/feeds/volumes')
+    expect(url).toContain('alt=json')
+    expect(url).toContain('max-results=20')
 
-    const second = await searchBooks('  ПИКНИК ')
+    const second = await searchBooks('  МАСТЕР ')
     expect(second).toEqual(first)
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('returns an empty list for queries shorter than two characters', async () => {
-    const fetchMock = stubFetch(() => jsonResponse({ docs: [] }))
+    const fetchMock = stubFetch(() => jsonResponse(FEED))
 
     expect(await searchBooks(' я ')).toEqual([])
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('falls back to Google Books when Open Library has no results', async () => {
-    const fetchMock = stubFetch((url) =>
-      url.includes('openlibrary.org')
-        ? jsonResponse({ docs: [] })
-        : jsonResponse({ items: [GB_ITEM] }),
-    )
+  it('falls back to the Books API, then Open Library', async () => {
+    const fetchMock = stubFetch((url) => {
+      if (url.includes('books.google.com/books/feeds')) return jsonResponse({ feed: {} })
+      if (url.includes('googleapis.com')) return jsonResponse({ items: [GB_ITEM] })
+      return jsonResponse({ docs: [OL_DOC] })
+    })
 
     const results = await searchBooks('Дюна')
     expect(results[0]).toMatchObject({ source: 'googlebooks', title: 'Дюна' })
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(requestedUrl(fetchMock, 0)).toContain('openlibrary.org')
+    expect(requestedUrl(fetchMock, 0)).toContain('books.google.com/books/feeds')
     expect(requestedUrl(fetchMock, 1)).toContain('googleapis.com')
 
     const cached = await searchBooks('дюна')
@@ -94,11 +108,22 @@ describe('searchBooks', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
+  it('uses Open Library when both Google sources are empty', async () => {
+    const fetchMock = stubFetch((url) =>
+      url.includes('openlibrary.org') ? jsonResponse({ docs: [OL_DOC] }) : jsonResponse({}),
+    )
+
+    const results = await searchBooks('Пикник')
+    expect(results[0]).toMatchObject({ source: 'openlibrary', title: 'Пикник на обочине' })
+    expect(fetchMock).toHaveBeenCalledTimes(3)
+    expect(requestedUrl(fetchMock, 2)).toContain('openlibrary.org/search.json')
+  })
+
   it('refetches when the cached entry is older than its TTL', async () => {
-    const fetchMock = stubFetch(() => jsonResponse({ docs: [OL_DOC] }))
+    const fetchMock = stubFetch(() => jsonResponse(FEED))
 
     await db.meta.put({
-      key: 'search:пикник',
+      key: 'search:мастер',
       kind: 'search',
       payload: [
         { source: 'openlibrary', sourceId: '/works/OLD', title: 'Старое', authors: [], genres: [] },
@@ -107,13 +132,13 @@ describe('searchBooks', () => {
       ttlDays: 30,
     })
 
-    const results = await searchBooks('пикник')
-    expect(results[0]?.title).toBe('Пикник на обочине')
+    const results = await searchBooks('мастер')
+    expect(results[0]?.title).toBe('Мастер и Маргарита')
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('drops malformed cache entries and refetches', async () => {
-    const fetchMock = stubFetch(() => jsonResponse({ docs: [OL_DOC] }))
+    const fetchMock = stubFetch(() => jsonResponse(FEED))
 
     await db.meta.put({
       key: 'search:тест',
@@ -124,14 +149,14 @@ describe('searchBooks', () => {
     })
 
     const results = await searchBooks('тест')
-    expect(results[0]?.title).toBe('Пикник на обочине')
+    expect(results[0]?.title).toBe('Мастер и Маргарита')
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 })
 
 describe('lookupIsbn', () => {
   it('looks up a normalized ISBN-13 and caches the result', async () => {
-    const fetchMock = stubFetch(() => jsonResponse({ docs: [OL_DOC] }))
+    const fetchMock = stubFetch(() => jsonResponse(FEED))
 
     const results = await lookupIsbn('978-5-17-090258-3')
     expect(results).toHaveLength(1)

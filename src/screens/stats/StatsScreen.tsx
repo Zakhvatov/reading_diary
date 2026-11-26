@@ -409,7 +409,7 @@ export function StatsScreen() {
             icon={<ChartBar size={28} />}
             title="Пока нет цифр"
             description="Первая сессия — и здесь появятся минуты, страницы и серии дней."
-            action={<Button to="/timer">Запустить таймер</Button>}
+            action={<Button to="/shelves">Выбрать книгу</Button>}
           />
         </div>
       ) : (

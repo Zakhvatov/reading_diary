@@ -1,4 +1,4 @@
-import { ChartBar, Notebook, Books, Sun, Timer } from '@phosphor-icons/react'
+import { ChartBar, Notebook, Books, Sun } from '@phosphor-icons/react'
 import type { Icon } from '@phosphor-icons/react'
 import { NavLink } from 'react-router-dom'
 
@@ -11,7 +11,6 @@ type Tab = {
 const tabs: Tab[] = [
   { to: '/home', label: 'Сегодня', icon: Sun },
   { to: '/shelves', label: 'Библиотека', icon: Books },
-  { to: '/timer', label: 'Таймер', icon: Timer },
   { to: '/journals', label: 'Дневник', icon: Notebook },
   { to: '/stats', label: 'Статистика', icon: ChartBar },
 ]

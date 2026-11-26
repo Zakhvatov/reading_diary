@@ -19,7 +19,6 @@ import { SettingsScreen } from '@/screens/SettingsScreen'
 import { ShelfDetailScreen } from '@/screens/shelves/ShelfDetailScreen'
 import { ShelvesScreen } from '@/screens/shelves/ShelvesScreen'
 import { StatsScreen } from '@/screens/stats/StatsScreen'
-import { TimerScreen } from '@/screens/timer/TimerScreen'
 import { RouteError } from './RouteError'
 import { routerBasename } from './basePath'
 
@@ -59,14 +58,6 @@ export const router = createBrowserRouter(
         {
           path: 'books/:bookId/diary',
           element: <DiaryScreen />,
-        },
-        {
-          path: 'timer',
-          element: <TimerScreen />,
-        },
-        {
-          path: 'timer/:bookId',
-          element: <TimerScreen />,
         },
         {
           path: 'journals',

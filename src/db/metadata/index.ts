@@ -1,5 +1,6 @@
 import { db } from '@/db/db'
 import { normalizeIsbn } from '@/lib/isbn'
+import { searchGoogleFeed } from './googleFeed'
 import { searchGoogleBooks } from './googleBooks'
 import { searchOpenLibrary } from './openLibrary'
 import type { BookDraft, MetadataSource } from './types'
@@ -82,20 +83,20 @@ async function writeCache(key: string, kind: CacheKind, drafts: BookDraft[]): Pr
 }
 
 async function fetchDrafts(query: string, signal?: AbortSignal): Promise<BookDraft[]> {
-  let openLibraryError: unknown
+  let firstError: unknown
 
-  try {
-    const drafts = await searchOpenLibrary(query, signal)
-    if (drafts.length > 0) return drafts
-  } catch (error) {
-    openLibraryError = error
+  for (const search of [searchGoogleFeed, searchGoogleBooks, searchOpenLibrary]) {
+    try {
+      const drafts = await search(query, signal)
+      if (drafts.length > 0) return drafts
+    } catch (error) {
+      if (signal?.aborted) throw error
+      firstError ??= error
+    }
   }
 
-  try {
-    return await searchGoogleBooks(query, signal)
-  } catch (error) {
-    throw openLibraryError ?? error
-  }
+  if (firstError) throw firstError
+  return []
 }
 
 export async function searchBooks(query: string, signal?: AbortSignal): Promise<BookDraft[]> {

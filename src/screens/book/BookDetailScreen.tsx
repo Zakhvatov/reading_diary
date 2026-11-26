@@ -227,7 +227,7 @@ export function BookDetailScreen() {
       </div>
 
       <div className="mt-6 flex flex-col gap-3">
-        <Button to={`/timer?book=${book.id}`}>Продолжить</Button>
+        <Button onClick={() => setSheet('session')}>Записать сессию</Button>
         {book.status !== 'finished' ? (
           <Button variant="outline" onClick={openFinish}>
             Дочитано
