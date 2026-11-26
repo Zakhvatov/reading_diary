@@ -6,32 +6,23 @@ import type { Book } from '@/db/types'
 type CoverBook = Pick<Book, 'title' | 'authors' | 'coverId'>
 
 const placeholderTones = [
-  ['bg-lilac', 'text-lilac-ink'],
-  ['bg-peach', 'text-peach-ink'],
-  ['bg-butter', 'text-butter-ink'],
-  ['bg-sage', 'text-sage-ink'],
-  ['bg-sky', 'text-sky-ink'],
-  ['bg-rose', 'text-rose-ink'],
+  'bg-cover-forest',
+  'bg-cover-clay',
+  'bg-cover-navy',
+  'bg-cover-ochre',
+  'bg-cover-plum',
+  'bg-cover-teal',
+  'bg-cover-slate',
+  'bg-cover-wine',
 ] as const
 
 function hash(value: string): number {
-  let result = 0
-  for (const character of value) {
-    result = (result * 31 + character.charCodeAt(0)) % 997
+  let result = 2166136261
+  for (let index = 0; index < value.length; index += 1) {
+    result ^= value.charCodeAt(index)
+    result = Math.imul(result, 16777619)
   }
-  return result
-}
-
-function initials(book: CoverBook): string {
-  const stopWords = new Set(['и', 'в', 'на', 'с', 'о', 'the', 'a', 'of'])
-  const words = [...book.title.split(/\s+/), ...book.authors]
-    .map((word) => word.replace(/[^\p{L}\p{N}]/gu, ''))
-    .filter((word) => word.length > 0 && !stopWords.has(word.toLowerCase()))
-
-  return words
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() ?? '')
-    .join('')
+  return result >>> 0
 }
 
 type BookCoverProps = {
@@ -52,13 +43,15 @@ export function BookCover({ book, className }: BookCoverProps) {
     }
   }, [url])
 
-  const [tone, toneInk] =
-    placeholderTones[hash(book.title) % placeholderTones.length] ?? placeholderTones[0]
+  const tone =
+    placeholderTones[hash(book.title + book.authors[0]) % placeholderTones.length] ??
+    placeholderTones[0]
+  const label = book.title.trim() || book.authors[0] || 'Книга'
 
   return (
     <div
       className={[
-        'relative aspect-[2/3] overflow-hidden rounded-[10px]',
+        'relative aspect-[2/3] overflow-hidden rounded-[6px] border border-black/10',
         url ? 'bg-line/60' : tone,
         className,
       ]
@@ -68,18 +61,21 @@ export function BookCover({ book, className }: BookCoverProps) {
       {url ? (
         <img src={url} alt="" className="h-full w-full object-cover" />
       ) : (
-        <div
-          className={['relative flex h-full flex-col justify-between p-2 pl-3', toneInk].join(' ')}
-        >
-          <span className="absolute inset-y-0 left-0 w-[5px] bg-current opacity-20" aria-hidden />
-          <span className="font-display text-[26px] leading-none font-semibold">
-            {initials(book)}
-          </span>
+        <div className="relative flex h-full flex-col justify-between gap-2 p-2.5 pl-3 text-cover-ink [container-type:inline-size]">
+          <span className="absolute inset-y-0 left-0 w-[4px] bg-cover-ink/25" aria-hidden />
           {book.authors[0] ? (
-            <span className="line-clamp-2 text-[9px] leading-[11px] opacity-70">
+            <span className="line-clamp-1 text-[clamp(6.5px,3.1cqw,10px)] tracking-[0.08em] uppercase text-cover-ink/60">
               {book.authors[0]}
             </span>
-          ) : null}
+          ) : (
+            <span aria-hidden />
+          )}
+          <span
+            className="line-clamp-4 font-display font-medium tracking-[-0.01em] text-cover-ink"
+            style={{ fontSize: 'clamp(10px, 8.2cqw, 19px)', lineHeight: 1.15 }}
+          >
+            {label}
+          </span>
         </div>
       )}
     </div>

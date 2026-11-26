@@ -1,37 +1,47 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-paper: #f4f1e9;
-  --color-surface: #fffdf7;
-  --color-ink: #1c241e;
-  --color-muted: #6a7167;
-  --color-line: #ded9cc;
-  --color-accent: #1e5c45;
-  --color-accent-ink: #f4f8f3;
-  --color-accent-soft: #d9e7de;
-  --color-gold: #c9962f;
-  --color-signal: #b8452b;
-  --color-signal-soft: #f6e0d7;
-  --color-on-signal: #fdf6f3;
+  --color-paper: #f6f6f2;
+  --color-surface: #ffffff;
+  --color-ink: #15181a;
+  --color-muted: #6c7077;
+  --color-line: #e5e3dd;
+  --color-accent: #16543e;
+  --color-accent-ink: #f5faf6;
+  --color-accent-soft: #e4efe8;
+  --color-gold: #b0842c;
+  --color-signal: #b7412d;
+  --color-signal-soft: #f9e7e1;
+  --color-on-signal: #fffaf8;
 
-  --color-sage: #dbe7dc;
-  --color-sage-ink: #2f5240;
-  --color-butter: #f6ebc8;
-  --color-butter-ink: #6a5718;
-  --color-sky: #dbe6ef;
-  --color-sky-ink: #2f4f66;
-  --color-peach: #f6e1d0;
-  --color-peach-ink: #7a4526;
-  --color-lilac: #e6e2f1;
-  --color-lilac-ink: #4a416d;
-  --color-rose: #f2dfe0;
-  --color-rose-ink: #6d3a41;
+  --color-sage: #e8f0ea;
+  --color-sage-ink: #23553d;
+  --color-butter: #faf1d8;
+  --color-butter-ink: #6b5211;
+  --color-sky: #e7eff6;
+  --color-sky-ink: #234a64;
+  --color-peach: #faede3;
+  --color-peach-ink: #7a452a;
+  --color-lilac: #edeaf7;
+  --color-lilac-ink: #483d74;
+  --color-rose: #f9e8ea;
+  --color-rose-ink: #763740;
+
+  --color-cover-forest: #2f4d3f;
+  --color-cover-clay: #8a4b38;
+  --color-cover-navy: #33486b;
+  --color-cover-ochre: #87662d;
+  --color-cover-plum: #5c3f55;
+  --color-cover-teal: #2f5a5c;
+  --color-cover-slate: #454d55;
+  --color-cover-wine: #6b3040;
+  --color-cover-ink: #f7f4ea;
 
   --font-display: 'Literata', ui-serif, Georgia, serif;
   --font-sans: 'Golos Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
-  --radius-card: 16px;
-  --radius-control: 12px;
+  --radius-card: 14px;
+  --radius-control: 10px;
   --radius-pill: 999px;
 }
 
@@ -48,10 +58,10 @@
   --signal: var(--color-signal);
   --signal-soft: var(--color-signal-soft);
 
-  --mark-red: #a9503c;
-  --mark-amber: #b8853c;
-  --mark-green: #4e7a5c;
-  --mark-blue: #4c6e85;
+  --mark-red: #b7412d;
+  --mark-amber: #b0842c;
+  --mark-green: #23553d;
+  --mark-blue: #234a64;
 
   --tab-h: 64px;
   --safe-top: env(safe-area-inset-top, 0px);

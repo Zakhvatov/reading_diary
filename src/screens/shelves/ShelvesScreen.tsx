@@ -1,5 +1,5 @@
-import { BookOpen, MagnifyingGlass } from '@phosphor-icons/react'
-import { Fragment, useState } from 'react'
+import { BookOpen, CaretRight, MagnifyingGlass } from '@phosphor-icons/react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookGrid } from '@/components/book/BookGrid'
 import { STATUS_TONE } from '@/components/book/statusTone'
@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { useBooks } from '@/db/live'
 import type { Book, BookStatus } from '@/db/types'
-import { BOOK_STATUSES, SHELF_TITLES, shelfOf, STATUS_SHORT } from '@/lib/bookStatus'
+import { BOOK_STATUSES, SHELF_TITLES, shelfOf } from '@/lib/bookStatus'
 import { pluralRu } from '@/lib/format'
 import { normalizeText } from '@/lib/text'
 
@@ -27,7 +27,7 @@ function SkeletonGrid() {
     <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-7" aria-hidden>
       {SKELETON_KEYS.map((key) => (
         <div key={key} className="animate-pulse">
-          <div className="aspect-[2/3] rounded-[10px] bg-line/60" />
+          <div className="aspect-[2/3] rounded-[6px] bg-line/60" />
           <div className="mt-2 h-4 w-3/4 rounded bg-line/60" />
           <div className="mt-2 h-3 w-1/2 rounded bg-line/60" />
         </div>
@@ -36,67 +36,25 @@ function SkeletonGrid() {
   )
 }
 
-function SummaryStrip({ books }: { books: Book[] }) {
-  const rows = BOOK_STATUSES.map((status) => ({
-    status,
-    count: books.filter((book) => shelfOf(book.status) === status).length,
-  })).filter((row) => row.status !== 'dnf' && row.count > 0)
-
-  if (rows.length === 0) return null
+function ShelfRow({ status, books }: { status: BookStatus; books: Book[] }) {
+  const count = books.length
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-x-0.5 rounded-[var(--radius-control)] border border-line bg-surface px-2 py-1">
-      {rows.map(({ status, count }, index) => (
-        <Fragment key={status}>
-          {index > 0 ? (
-            <span className="px-0.5 text-[12px] text-muted" aria-hidden>
-              ·
-            </span>
-          ) : null}
-          <Link
-            to={`/shelves/${status}`}
-            className="flex h-11 items-center gap-1.5 rounded-full px-2.5 active:bg-accent-soft"
-          >
-            <span className={`size-1.5 rounded-full ${STATUS_TONE[status].dot}`} aria-hidden />
-            <span className="text-[13px] leading-[18px] text-muted">{STATUS_SHORT[status]}</span>
-            <span className="text-[13px] leading-[18px] font-medium text-ink tabular-nums">
-              {count}
-            </span>
-          </Link>
-        </Fragment>
-      ))}
-    </div>
-  )
-}
-
-function ShelfSection({ status, books }: { status: BookStatus; books: Book[] }) {
-  return (
-    <section className="mt-8">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className={`size-2 shrink-0 rounded-full ${STATUS_TONE[status].dot}`} aria-hidden />
-          <h2 className="truncate font-display text-[22px] leading-[28px] font-medium">
-            {SHELF_TITLES[status]}
-          </h2>
-          <span
-            className={`inline-flex h-6 shrink-0 items-center rounded-[var(--radius-pill)] px-2.5 text-[12px] leading-none font-medium ${STATUS_TONE[status].chip}`}
-          >
-            {bookCount(books.length)}
-          </span>
-        </div>
-        {books.length > 4 ? (
-          <Link
-            to={`/shelves/${status}`}
-            className="flex h-11 shrink-0 items-center text-[14px] leading-[20px] font-medium text-accent"
-          >
-            Все
-          </Link>
-        ) : null}
-      </div>
-      <div className="mt-3">
-        <BookGrid books={books.slice(0, 4)} />
-      </div>
-    </section>
+    <Link
+      to={`/shelves/${status}`}
+      className="flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface px-4 py-3.5 active:bg-accent-soft/40"
+    >
+      <span className={`size-2.5 shrink-0 rounded-full ${STATUS_TONE[status].dot}`} aria-hidden />
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[16px] leading-[22px] font-medium text-ink">
+          {SHELF_TITLES[status]}
+        </span>
+        <span className="mt-0.5 block text-[12px] leading-[16px] text-muted">
+          {count > 0 ? bookCount(count) : 'Пусто'}
+        </span>
+      </span>
+      <CaretRight size={16} className="shrink-0 text-muted" aria-hidden />
+    </Link>
   )
 }
 
@@ -111,9 +69,9 @@ export function ShelvesScreen() {
 
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title="Библиотека" caption="Полки" />
+      <ScreenHeader title="Библиотека" />
 
-      <div className="relative mt-6">
+      <div className="relative mt-5">
         <MagnifyingGlass
           size={18}
           aria-hidden
@@ -129,25 +87,23 @@ export function ShelvesScreen() {
         />
       </div>
 
-      {hasBooks && !hasSearch ? <SummaryStrip books={allBooks} /> : null}
-
       {books === undefined ? <SkeletonGrid /> : null}
 
-      {books !== undefined && allBooks.length === 0 ? (
-        <div className="mt-8">
+      {books !== undefined && !hasBooks ? (
+        <div className="mt-6">
           <EmptyState
             icon={<BookOpen size={28} />}
-            title="Полка пока пуста"
-            description="Добавьте первую книгу — она появится на полке."
+            title="Библиотека пуста"
+            description="Добавьте первую книгу — она появится на нужной полке."
             action={<Button to="/add">Добавить книгу</Button>}
           />
         </div>
       ) : null}
 
       {hasBooks && hasSearch ? (
-        <section className="mt-8">
+        <section className="mt-7">
           <div className="flex items-baseline gap-2">
-            <h2 className="font-display text-[22px] leading-[28px] font-medium">Найдено</h2>
+            <h2 className="font-display text-[21px] leading-[27px] font-medium">Найдено</h2>
             <span className="text-[13px] leading-[18px] text-muted">{bookCount(found.length)}</span>
           </div>
           {found.length > 0 ? (
@@ -165,14 +121,44 @@ export function ShelvesScreen() {
         </section>
       ) : null}
 
-      {hasBooks && !hasSearch
-        ? BOOK_STATUSES.map((status) => {
-            const shelfBooks = allBooks.filter((book) => shelfOf(book.status) === status)
-            return shelfBooks.length > 0 ? (
-              <ShelfSection key={status} status={status} books={shelfBooks} />
-            ) : null
-          })
-        : null}
+      {hasBooks && !hasSearch ? (
+        <>
+          <section className="mt-7" aria-labelledby="shelves-title">
+            <h2
+              id="shelves-title"
+              className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted"
+            >
+              Полки
+            </h2>
+            <div className="mt-2.5 flex flex-col gap-2">
+              {BOOK_STATUSES.map((status) => (
+                <ShelfRow
+                  key={status}
+                  status={status}
+                  books={allBooks.filter((book) => shelfOf(book.status) === status)}
+                />
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-8" aria-labelledby="all-books-title">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2
+                id="all-books-title"
+                className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted"
+              >
+                Все книги
+              </h2>
+              <span className="text-[12px] leading-[16px] text-muted tabular-nums">
+                {allBooks.length}
+              </span>
+            </div>
+            <div className="mt-3">
+              <BookGrid books={allBooks} />
+            </div>
+          </section>
+        </>
+      ) : null}
     </div>
   )
 }
