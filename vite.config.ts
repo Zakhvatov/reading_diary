@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         injectRegister: 'auto',
         manifestFilename: 'manifest.webmanifest',
         injectManifest: {
-          globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
+          globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest,wasm}'],
           maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         },
         manifest: {

@@ -15,11 +15,14 @@ export type BookFormValues = {
   isbn13?: string
   isbn10?: string
   description?: string
+  language?: string
   status: BookStatus
 }
 
 type BookFormProps = {
   initial?: Book
+  initialValues?: Partial<BookFormValues>
+  coverPreviewUrl?: string
   defaultStatus?: BookStatus
   submitLabel: string
   busy?: boolean
@@ -61,6 +64,8 @@ function Field({ label, error, hint, children }: FieldProps) {
 
 export function BookForm({
   initial,
+  initialValues,
+  coverPreviewUrl,
   defaultStatus,
   submitLabel,
   busy = false,
@@ -68,19 +73,34 @@ export function BookForm({
   onSubmit,
   onCancel,
 }: BookFormProps) {
-  const [title, setTitle] = useState(initial?.title ?? '')
-  const [authors, setAuthors] = useState(initial?.authors.join(', ') ?? '')
-  const [genres, setGenres] = useState(initial?.genres.join(', ') ?? '')
-  const [pages, setPages] = useState(initial?.pageCount?.toString() ?? '')
-  const [year, setYear] = useState(initial?.publishedYear?.toString() ?? '')
-  const [publisher, setPublisher] = useState(initial?.publisher ?? '')
-  const [isbn, setIsbn] = useState(initial?.isbn13 ?? initial?.isbn10 ?? '')
-  const [note, setNote] = useState(initial?.description ?? '')
-  const [status, setStatus] = useState<BookStatus>(initial?.status ?? defaultStatus ?? 'want')
+  const [title, setTitle] = useState(initial?.title ?? initialValues?.title ?? '')
+  const [authors, setAuthors] = useState(
+    initial?.authors.join(', ') ?? initialValues?.authors?.join(', ') ?? '',
+  )
+  const [genres, setGenres] = useState(
+    initial?.genres.join(', ') ?? initialValues?.genres?.join(', ') ?? '',
+  )
+  const [pages, setPages] = useState(
+    initial?.pageCount?.toString() ?? initialValues?.pageCount?.toString() ?? '',
+  )
+  const [year, setYear] = useState(
+    initial?.publishedYear?.toString() ?? initialValues?.publishedYear?.toString() ?? '',
+  )
+  const [publisher, setPublisher] = useState(initial?.publisher ?? initialValues?.publisher ?? '')
+  const [isbn, setIsbn] = useState(
+    initial?.isbn13 ?? initial?.isbn10 ?? initialValues?.isbn13 ?? initialValues?.isbn10 ?? '',
+  )
+  const [note, setNote] = useState(initial?.description ?? initialValues?.description ?? '')
+  const [status, setStatus] = useState<BookStatus>(
+    initial?.status ?? initialValues?.status ?? defaultStatus ?? 'want',
+  )
+  const [language] = useState(initial?.language ?? initialValues?.language ?? '')
   const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [remoteCoverFailed, setRemoteCoverFailed] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const previewUrl = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : null), [coverFile])
+  const shownCover = previewUrl ?? (remoteCoverFailed ? null : coverPreviewUrl) ?? null
 
   useEffect(() => {
     return () => {
@@ -127,6 +147,7 @@ export function BookForm({
         isbn13: normalizedIsbn?.isbn13,
         isbn10: normalizedIsbn?.isbn10,
         description: note.trim() || undefined,
+        language: language || undefined,
         status,
       },
       coverFile,
@@ -135,23 +156,24 @@ export function BookForm({
 
   return (
     <form onSubmit={handleSubmit} noValidate className="mt-6">
-      <div className="flex items-center gap-4">
-        <div className="w-24 shrink-0">
-          {previewUrl ? (
+      <div className="flex items-start gap-4">
+        <div className="relative aspect-[2/3] w-24 shrink-0 overflow-hidden rounded-[10px]">
+          <BookCover
+            book={{
+              title: title || 'Новая книга',
+              authors: splitList(authors),
+              coverId: initial?.coverId,
+            }}
+            className="absolute inset-0"
+          />
+          {shownCover ? (
             <img
-              src={previewUrl}
+              src={shownCover}
               alt=""
-              className="aspect-[2/3] w-full rounded-[10px] object-cover"
+              onError={() => setRemoteCoverFailed(true)}
+              className="absolute inset-0 h-full w-full object-cover"
             />
-          ) : (
-            <BookCover
-              book={{
-                title: title || 'Новая книга',
-                authors: splitList(authors),
-                coverId: initial?.coverId,
-              }}
-            />
-          )}
+          ) : null}
         </div>
         <div className="min-w-0">
           <label className="inline-flex h-11 cursor-pointer items-center rounded-[var(--radius-pill)] border border-line bg-surface px-4 text-[14px] font-medium active:scale-[0.98]">
