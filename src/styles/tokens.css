@@ -1,18 +1,31 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-paper: #f1f3ee;
-  --color-surface: #fcfdfb;
-  --color-ink: #17211c;
-  --color-muted: #66716a;
-  --color-line: #d8dfd8;
+  --color-paper: #f4f1e9;
+  --color-surface: #fffdf7;
+  --color-ink: #1c241e;
+  --color-muted: #6a7167;
+  --color-line: #ded9cc;
   --color-accent: #1e5c45;
   --color-accent-ink: #f4f8f3;
-  --color-accent-soft: #dceae2;
-  --color-gold: #d9a441;
-  --color-signal: #c24a2c;
-  --color-signal-soft: #f6e2da;
+  --color-accent-soft: #d9e7de;
+  --color-gold: #c9962f;
+  --color-signal: #b8452b;
+  --color-signal-soft: #f6e0d7;
   --color-on-signal: #fdf6f3;
+
+  --color-sage: #dbe7dc;
+  --color-sage-ink: #2f5240;
+  --color-butter: #f6ebc8;
+  --color-butter-ink: #6a5718;
+  --color-sky: #dbe6ef;
+  --color-sky-ink: #2f4f66;
+  --color-peach: #f6e1d0;
+  --color-peach-ink: #7a4526;
+  --color-lilac: #e6e2f1;
+  --color-lilac-ink: #4a416d;
+  --color-rose: #f2dfe0;
+  --color-rose-ink: #6d3a41;
 
   --font-display: 'Literata', ui-serif, Georgia, serif;
   --font-sans: 'Golos Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;

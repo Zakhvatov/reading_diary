@@ -35,11 +35,22 @@ function SkeletonGrid() {
   )
 }
 
+const SHELF_DOTS: Record<BookStatus, string> = {
+  reading: 'bg-accent',
+  want: 'bg-butter-ink',
+  finished: 'bg-sky-ink',
+  dnf: 'bg-rose-ink',
+}
+
 function ShelfSection({ status, books }: { status: BookStatus; books: Book[] }) {
   return (
     <section className="mt-8">
       <div className="flex items-baseline justify-between gap-3">
         <div className="flex min-w-0 items-baseline gap-2">
+          <span
+            className={`size-2 shrink-0 self-center rounded-full ${SHELF_DOTS[status]}`}
+            aria-hidden
+          />
           <h2 className="truncate font-display text-[22px] leading-[28px] font-medium">
             {SHELF_TITLES[status]}
           </h2>

@@ -3,9 +3,9 @@ import { STATUS_LABELS } from '@/lib/bookStatus'
 
 const toneClasses: Record<BookStatus, string> = {
   reading: 'bg-accent text-accent-ink',
-  want: 'bg-accent-soft text-ink',
-  finished: 'border border-accent text-accent',
-  dnf: 'bg-signal-soft text-signal',
+  want: 'bg-butter text-butter-ink',
+  finished: 'bg-sky text-sky-ink',
+  dnf: 'bg-rose text-rose-ink',
 }
 
 type StatusChipProps = {
