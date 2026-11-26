@@ -6,13 +6,13 @@ import type { Book } from '@/db/types'
 type CoverBook = Pick<Book, 'title' | 'authors' | 'coverId'>
 
 const placeholderTones = [
-  'bg-accent-soft',
-  'bg-line/70',
-  'bg-signal-soft',
-  'bg-accent-soft/60',
-  'bg-line/50',
-  'bg-accent-soft/35',
-]
+  ['bg-lilac', 'text-lilac-ink'],
+  ['bg-peach', 'text-peach-ink'],
+  ['bg-butter', 'text-butter-ink'],
+  ['bg-sage', 'text-sage-ink'],
+  ['bg-sky', 'text-sky-ink'],
+  ['bg-rose', 'text-rose-ink'],
+] as const
 
 function hash(value: string): number {
   let result = 0
@@ -52,7 +52,8 @@ export function BookCover({ book, className }: BookCoverProps) {
     }
   }, [url])
 
-  const tone = placeholderTones[hash(book.title) % placeholderTones.length] ?? 'bg-accent-soft'
+  const [tone, toneInk] =
+    placeholderTones[hash(book.title) % placeholderTones.length] ?? placeholderTones[0]
 
   return (
     <div
@@ -67,10 +68,18 @@ export function BookCover({ book, className }: BookCoverProps) {
       {url ? (
         <img src={url} alt="" className="h-full w-full object-cover" />
       ) : (
-        <div className="flex h-full items-center justify-center">
-          <span className="font-display text-[28px] leading-none font-medium text-accent/80">
+        <div
+          className={['relative flex h-full flex-col justify-between p-2 pl-3', toneInk].join(' ')}
+        >
+          <span className="absolute inset-y-0 left-0 w-[5px] bg-current opacity-20" aria-hidden />
+          <span className="font-display text-[26px] leading-none font-semibold">
             {initials(book)}
           </span>
+          {book.authors[0] ? (
+            <span className="line-clamp-2 text-[9px] leading-[11px] opacity-70">
+              {book.authors[0]}
+            </span>
+          ) : null}
         </div>
       )}
     </div>
