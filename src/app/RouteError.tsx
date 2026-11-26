@@ -6,7 +6,9 @@ export function RouteError() {
   const error = useRouteError()
   const detail = isRouteErrorResponse(error)
     ? `${error.status} ${error.statusText}`
-    : 'Экран не загрузился'
+    : error instanceof Error && error.message
+      ? error.message
+      : 'Экран не загрузился'
 
   return (
     <div className="pad-x flex min-h-[100dvh] flex-col justify-center pb-24">

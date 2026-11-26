@@ -4,7 +4,7 @@ import { getBook, listBooks } from './repositories/books'
 import { getGoal } from './repositories/goals'
 import { listJournals } from './repositories/journals'
 import { listSessionsByBook } from './repositories/sessions'
-import { getSettings } from './repositories/settings'
+import { readSettings } from './repositories/settings'
 import type { BookStatus, ID } from './types'
 
 export function useBooks(status?: BookStatus) {
@@ -28,7 +28,7 @@ export function useGoal(year: number) {
 }
 
 export function useSettings() {
-  return useLiveQuery(() => getSettings(), [])
+  return useLiveQuery(() => readSettings(), [])
 }
 
 export function useDaySessions(day: string) {
