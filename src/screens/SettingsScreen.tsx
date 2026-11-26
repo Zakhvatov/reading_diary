@@ -7,6 +7,7 @@ import { useSettings } from '@/db/live'
 import { requestPersistence, updateSettings } from '@/db/repositories/settings'
 import type { RatingScale } from '@/db/types'
 import { RATING_SCALE_LABELS } from '@/lib/bookMeta'
+import { DEFAULT_MODE, DEFAULT_THEME, MODE_LABELS, THEMES, type ThemeMode } from '@/lib/theme'
 import { formatDay, toDay } from '@/lib/dates'
 import { formatBytes } from '@/lib/format'
 
@@ -111,6 +112,71 @@ export function SettingsScreen() {
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
       <ScreenHeader title="Настройки" caption="Приложение" />
+
+      <section className="mt-8">
+        <h2 className="font-display text-[20px] leading-[26px] font-medium">Оформление</h2>
+        <p className="mt-2 text-[13px] leading-[18px] text-muted">
+          Тема меняет главную, шрифты и всё оформление. У каждой есть светлый и тёмный вариант.
+        </p>
+
+        <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface">
+          {THEMES.map((theme) => {
+            const active = (settings?.theme ?? DEFAULT_THEME) === theme.id
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                aria-pressed={active}
+                disabled={!settings}
+                onClick={() => void updateSettings({ theme: theme.id })}
+                className={[
+                  'flex w-full items-center gap-4 border-b border-line px-4 py-3 text-left last:border-b-0 active:bg-accent-soft disabled:opacity-60',
+                  active ? 'bg-accent-soft/40' : '',
+                ].join(' ')}
+              >
+                <span className={`theme-preview theme-preview-${theme.id}`} aria-hidden />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[15px] leading-[20px] font-medium text-ink">
+                    {theme.name}
+                  </span>
+                  <span className="mt-0.5 block text-[12px] leading-[16px] text-muted">
+                    {theme.description}
+                  </span>
+                </span>
+                {active ? (
+                  <CheckCircle size={20} aria-hidden className="shrink-0 text-accent" />
+                ) : null}
+              </button>
+            )
+          })}
+        </div>
+
+        <p className="mt-4 text-[14px] leading-[20px]">Режим</p>
+        <div
+          className="mt-2 grid grid-cols-3 gap-2"
+          role="group"
+          aria-label="Светлый или тёмный режим"
+        >
+          {(['light', 'dark', 'system'] as ThemeMode[]).map((mode) => {
+            const active = (settings?.themeMode ?? DEFAULT_MODE) === mode
+            return (
+              <button
+                key={mode}
+                type="button"
+                aria-pressed={active}
+                disabled={!settings}
+                onClick={() => void updateSettings({ themeMode: mode })}
+                className={[
+                  'h-11 rounded-[var(--radius-control)] px-2 text-[13px] font-medium disabled:opacity-60',
+                  active ? 'bg-accent text-accent-ink' : 'border border-line bg-surface text-ink',
+                ].join(' ')}
+              >
+                {MODE_LABELS[mode]}
+              </button>
+            )
+          })}
+        </div>
+      </section>
 
       <section className="mt-8">
         <h2 className="font-display text-[20px] leading-[26px] font-medium">Данные</h2>

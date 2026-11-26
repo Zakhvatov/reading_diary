@@ -28,9 +28,11 @@ function hash(value: string): number {
 type BookCoverProps = {
   book: CoverBook
   className?: string
+  /** Только цветной корешок: для маленьких обложек, где текст читает подпись. */
+  plain?: boolean
 }
 
-export function BookCover({ book, className }: BookCoverProps) {
+export function BookCover({ book, className, plain = false }: BookCoverProps) {
   const cover = useLiveQuery(
     () => (book.coverId ? getCover(book.coverId) : undefined),
     [book.coverId],
@@ -60,6 +62,20 @@ export function BookCover({ book, className }: BookCoverProps) {
     >
       {url ? (
         <img src={url} alt="" className="h-full w-full object-cover" />
+      ) : plain ? (
+        <>
+          <span className="absolute inset-y-0 left-0 w-[4px] bg-cover-ink/25" aria-hidden />
+          <span
+            className="absolute inset-[5px] rounded-[2px] border border-cover-ink/20"
+            aria-hidden
+          />
+          <span
+            className="absolute inset-0 grid place-items-center font-display text-[20px] text-cover-ink/45"
+            aria-hidden
+          >
+            {label.charAt(0)}
+          </span>
+        </>
       ) : (
         <div className="relative flex h-full flex-col justify-between gap-2 p-2.5 pl-3 text-cover-ink [container-type:inline-size]">
           <span className="absolute inset-y-0 left-0 w-[4px] bg-cover-ink/25" aria-hidden />

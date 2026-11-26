@@ -2,13 +2,29 @@ import { nowISO } from '@/lib/id'
 import { db } from '../db'
 import type { Settings } from '../types'
 
+function withAppearance(settings: Settings): Settings {
+  return {
+    ...settings,
+    theme: settings.theme ?? 'shelf',
+    themeMode: settings.themeMode ?? 'light',
+  }
+}
+
 export async function readSettings(): Promise<Settings | undefined> {
-  return db.settings.get('app')
+  const settings = await db.settings.get('app')
+  return settings ? withAppearance(settings) : undefined
 }
 
 export async function getSettings(): Promise<Settings> {
   const existing = await db.settings.get('app')
-  if (existing) return existing
+  if (existing) {
+    const normalized = withAppearance(existing)
+    if (normalized.theme !== existing.theme || normalized.themeMode !== existing.themeMode) {
+      // Старые записи не мешаем миграцией: дописываем поля один раз.
+      await db.settings.put(normalized)
+    }
+    return normalized
+  }
 
   const now = nowISO()
   const settings: Settings = {
@@ -18,6 +34,8 @@ export async function getSettings(): Promise<Settings> {
     defaultTemplate: 'lite',
     defaultRatingScale: 'stars5',
     dailyGoalMinutes: 0,
+    theme: 'shelf',
+    themeMode: 'light',
     persistGranted: false,
     schemaVersion: 6,
     createdAt: now,

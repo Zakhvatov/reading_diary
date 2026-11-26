@@ -176,6 +176,9 @@ export const goalSchema = z.object({
   updatedAt: isoDateTimeSchema,
 })
 
+export const themeIdSchema = z.enum(['shelf', 'diary', 'leopard'])
+export const themeModeSchema = z.enum(['light', 'dark', 'system'])
+
 export const settingsSchema = z.object({
   id: z.literal('app'),
   onboardingDone: z.boolean(),
@@ -183,6 +186,8 @@ export const settingsSchema = z.object({
   defaultTemplate: diaryTemplateIdSchema,
   defaultRatingScale: ratingScaleSchema,
   dailyGoalMinutes: z.number().int().nonnegative(),
+  theme: themeIdSchema.default('shelf'),
+  themeMode: themeModeSchema.default('light'),
   lastBackupAt: isoDateTimeSchema.optional(),
   lastSnapshotAt: isoDateTimeSchema.optional(),
   persistGranted: z.boolean(),

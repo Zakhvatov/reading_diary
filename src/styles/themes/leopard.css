@@ -1,0 +1,1075 @@
+/* ==========================================================================
+   ЛЕОПАРД — couture leopard theme
+   Light: cappuccino paper, espresso ink, black lacquer, antique gold.
+   Dark:  near-black charcoal, warm cream, muted gold, deep brown.
+   Scoped under [data-theme='leopard'] (+ [data-mode='dark']).
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../../assets/fonts/playfair-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../../assets/fonts/playfair-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../../assets/fonts/playfair-cyrillic-italic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url('../../assets/fonts/playfair-latin-italic.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* --------------------------------------------------------------------------
+   Tokens — light
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] {
+  color-scheme: light;
+
+  --color-paper: #f3ebde;
+  --color-board: #f6eede;
+  --color-surface: #fbf5e9;
+  --color-ink: #241a13;
+  --color-muted: #6b5a4b;
+  --color-line: #ded0bb;
+  --color-accent: #6f4423;
+  --color-accent-ink: #f8efe0;
+  --color-accent-soft: #ecdfc9;
+  --color-gold: #a3823f;
+  --color-signal: #8e3a2b;
+  --color-signal-soft: #f2dfd6;
+  --color-on-signal: #fff8f1;
+
+  --color-sage: #e4e5d3;
+  --color-sage-ink: #454a2e;
+  --color-butter: #f3e6c4;
+  --color-butter-ink: #6a4d16;
+  --color-sky: #e1e5e3;
+  --color-sky-ink: #36443f;
+  --color-peach: #f3e0ce;
+  --color-peach-ink: #7a4a2a;
+  --color-lilac: #e8dfdc;
+  --color-lilac-ink: #554046;
+  --color-rose: #f2dcd8;
+  --color-rose-ink: #7a3a38;
+
+  --color-cover-forest: #3a3b2a;
+  --color-cover-clay: #8a5638;
+  --color-cover-navy: #2f3640;
+  --color-cover-ochre: #7a5a22;
+  --color-cover-plum: #4e3a40;
+  --color-cover-teal: #33494a;
+  --color-cover-slate: #474440;
+  --color-cover-wine: #5c2f35;
+  --color-cover-ink: #f6eedf;
+
+  --mark-red: #9e3b2a;
+  --mark-amber: #a3823f;
+  --mark-green: #46512f;
+  --mark-blue: #39485a;
+
+  --radius-card: 10px;
+  --radius-control: 6px;
+  --radius-pill: 4px;
+
+  --font-display: 'Playfair Display', 'Literata', ui-serif, Georgia, serif;
+  --font-sans: 'Golos Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-hand: 'Playfair Display', 'Literata', Georgia, serif;
+
+  /* legacy aliases read by base.css */
+  --paper: var(--color-paper);
+  --surface: var(--color-surface);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+  --accent: var(--color-accent);
+  --accent-ink: var(--color-accent-ink);
+  --accent-soft: var(--color-accent-soft);
+  --gold: var(--color-gold);
+  --signal: var(--color-signal);
+  --signal-soft: var(--color-signal-soft);
+
+  --leopard-lacquer: #191310;
+  --leopard-lacquer-deep: #0f0b09;
+  --leopard-lacquer-top: #2a201a;
+  --leopard-lacquer-ink: #f4e9d6;
+  --leopard-lacquer-muted: #c9b79e;
+  --leopard-gold: #a3823f;
+  --leopard-gold-bright: #cbaa70;
+  --leopard-gold-type: #80612e;
+  --leopard-gold-line: rgba(168, 135, 74, 0.38);
+  --leopard-gold-hair: rgba(168, 135, 74, 0.22);
+  --leopard-gold-wash: rgba(203, 170, 112, 0.16);
+  --leopard-note: #f8f0e1;
+  --leopard-note-ink: #2a1e15;
+  --leopard-tape: rgba(206, 180, 130, 0.52);
+  --leopard-paper-glow: rgba(255, 252, 245, 0.72);
+  --leopard-shadow: rgba(66, 42, 20, 0.26);
+  --leopard-tab-rest: rgba(244, 233, 214, 0.64);
+  --leopard-tab-active: #d9b77c;
+  --leopard-skeleton: rgba(168, 135, 74, 0.14);
+  --leopard-skeleton-sheen: rgba(255, 250, 240, 0.5);
+  --leopard-rosettes: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NjAiIGhlaWdodD0iNDcwIiB2aWV3Qm94PSIwIDAgNDYwIDQ3MCI+PGcgZmlsbD0iIzNhMmExYiIgZmlsbC1vcGFjaXR5PSIwLjE2Ij48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NCA3Mikgcm90YXRlKDI2Ni4xKSBzY2FsZSgxLjA3IDEuMDYpIj48cGF0aCBkPSJNLTguMSAtNDYuNEE0Ny4xIDQ3LjEgMCAwIDEgMzIuMyAtMzQuM0wyMC4yIC0yMS40QTI5LjQgMjkuNCAwIDAgMCAtNS4wIC0yOS4wWiIvPjxwYXRoIGQ9Ik01MS43IC0yLjRBNTEuNyA1MS43IDAgMCAxIDM4LjcgMzQuNEwyOC40IDI1LjJBMzguMCAzOC4wIDAgMCAwIDM4LjAgLTEuN1oiLz48cGF0aCBkPSJNMTkuNiA0Ny43QTUxLjYgNTEuNiAwIDAgMSAtMTkuNCA0Ny44TC0xMy4zIDMyLjZBMzUuMiAzNS4yIDAgMCAwIDEzLjQgMzIuNloiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjc4IDM2KSByb3RhdGUoMjQ3LjIpIHNjYWxlKDAuOTcgMC45OSkiPjxwYXRoIGQ9Ik0tMzAuNCAtMTAuNkEzMi4yIDMyLjIgMCAwIDEgLTkuMCAtMzAuOUwtNi4xIC0yMC44QTIxLjYgMjEuNiAwIDAgMCAtMjAuNCAtNy4xWiIvPjxwYXRoIGQ9Ik0xMi4xIC0zMi42QTM0LjggMzQuOCAwIDAgMSAzMy43IC04LjZMMjQuNCAtNi4zQTI1LjIgMjUuMiAwIDAgMCA4LjggLTIzLjZaIi8+PHBhdGggZD0iTTMyLjggOC44QTM0LjAgMzQuMCAwIDAgMSAzLjMgMzMuOEwyLjMgMjMuN0EyMy44IDIzLjggMCAwIDAgMjMuMCA2LjJaIi8+PHBhdGggZD0iTS04LjQgMzMuOEEzNC44IDM0LjggMCAwIDEgLTMxLjEgMTUuNUwtMjEuOSAxMC45QTI0LjQgMjQuNCAwIDAgMCAtNS45IDIzLjdaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwNiAxNTApIHJvdGF0ZSgxNTEuMCkgc2NhbGUoMC45MCAxLjA4KSI+PHBhdGggZD0iTTM4LjYgLTMzLjNBNTEuMCA1MS4wIDAgMCAxIDQ0LjkgMjQuM0wyNi44IDE0LjVBMzAuNSAzMC41IDAgMCAwIDIzLjEgLTE5LjlaIi8+PHBhdGggZD0iTTI3LjggMzYuNUE0NS45IDQ1LjkgMCAwIDEgLTIyLjIgNDAuMkwtMTQuOCAyNi44QTMwLjYgMzAuNiAwIDAgMCAxOC41IDI0LjRaIi8+PHBhdGggZD0iTS0zNi42IDMzLjNBNDkuNCA0OS40IDAgMCAxIC00Ni4yIC0xNy43TC0yOS45IC0xMS40QTMyLjEgMzIuMSAwIDAgMCAtMjMuNyAyMS42WiIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzQgMjE2KSByb3RhdGUoMTE2LjEpIHNjYWxlKDAuOTEgMS4xMykiPjxwYXRoIGQ9Ik0tMjguOCAtMzEuNEE0Mi42IDQyLjYgMCAwIDEgMjUuMSAtMzQuNEwxOC4wIC0yNC43QTMwLjUgMzAuNSAwIDAgMCAtMjAuNyAtMjIuNVoiLz48cGF0aCBkPSJNMzUuOCAtMjAuOEE0MS40IDQxLjQgMCAwIDEgMzIuNyAyNS40TDIxLjcgMTYuOEEyNy41IDI3LjUgMCAwIDAgMjMuOCAtMTMuOFoiLz48cGF0aCBkPSJNMTUuMSAzNC42QTM3LjggMzcuOCAwIDAgMSAtOS41IDM2LjZMLTcuMSAyNy40QTI4LjMgMjguMyAwIDAgMCAxMS4zIDI1LjlaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDM0NCAyOTgpIHJvdGF0ZSgxNjEuNSkgc2NhbGUoMC44NSAwLjk5KSI+PHBhdGggZD0iTTI4LjAgNDAuOUE0OS42IDQ5LjYgMCAwIDEgLTMyLjggMzcuMkwtMjIuMCAyNS4wQTMzLjMgMzMuMyAwIDAgMCAxOC44IDI3LjVaIi8+PHBhdGggZD0iTS01MS43IDE4LjRBNTQuOSA1NC45IDAgMCAxIC0zNy41IC00MC4xTC0yNy42IC0yOS41QTQwLjQgNDAuNCAwIDAgMCAtMzguMCAxMy41WiIvPjxwYXRoIGQ9Ik0tMTYuNCAtNDQuOEE0Ny43IDQ3LjcgMCAwIDEgMjYuMiAtMzkuOUwxOS42IC0yOS45QTM1LjggMzUuOCAwIDAgMCAtMTIuMyAtMzMuNloiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjYgMzQwKSByb3RhdGUoMjIuNCkgc2NhbGUoMS4wMyAwLjg5KSI+PHBhdGggZD0iTTM0LjggLTI0LjRBNDIuNSA0Mi41IDAgMCAxIDI5LjggMzAuM0wxOC4xIDE4LjRBMjUuOCAyNS44IDAgMCAwIDIxLjEgLTE0LjhaIi8+PHBhdGggZD0iTTcuOSA0OC45QTQ5LjUgNDkuNSAwIDAgMSAtNDYuMyAxNy40TC0zNC42IDEzLjBBMzcuMCAzNy4wIDAgMCAwIDUuOSAzNi41WiIvPjxwYXRoIGQ9Ik0tNDQuMSAyLjNBNDQuMiA0NC4yIDAgMCAxIC0xNy42IC00MC41TC0xMy4wIC0yOS45QTMyLjYgMzIuNiAwIDAgMCAtMzIuNiAxLjdaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0MCA0MzQpIHJvdGF0ZSgxNzUuMSkgc2NhbGUoMS4xMiAxLjA2KSI+PHBhdGggZD0iTS0zNi43IDIyLjNBNDIuOSA0Mi45IDAgMCAxIC0zOS4wIC0xOC4wTC0yNi4wIC0xMi4wQTI4LjYgMjguNiAwIDAgMCAtMjQuNCAxNC45WiIvPjxwYXRoIGQ9Ik0tNDMuOCAtMjkuOEE1My4wIDUzLjAgMCAwIDEgLTE5LjIgLTQ5LjRMLTE0LjIgLTM2LjNBMzkuMCAzOS4wIDAgMCAwIC0zMi4yIC0yMS45WiIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg0MzIgNDQwKSByb3RhdGUoMjYzLjcpIHNjYWxlKDAuOTcgMC44OCkiPjxwYXRoIGQ9Ik0tMTcuMiAzNi45QTQwLjcgNDAuNyAwIDAgMSAtNDAuNiAyLjRMLTMwLjAgMS44QTMwLjEgMzAuMSAwIDAgMCAtMTIuOCAyNy4zWiIvPjxwYXRoIGQ9Ik0tMjguMiAtMjEuMkEzNS4yIDM1LjIgMCAwIDEgLTEuMCAtMzUuMkwtMC43IC0yMy43QTIzLjcgMjMuNyAwIDAgMCAtMTkuMCAtMTQuM1oiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTE4IDE4Nikgcm90YXRlKDE0Ny4xKSBzY2FsZSgxLjE0IDEuMTQpIj48cGF0aCBkPSJNMzguNCAxNC41QTQxLjEgNDEuMSAwIDAgMSAyLjkgNDEuMEwyLjIgMzEuNkEzMS43IDMxLjcgMCAwIDAgMjkuNiAxMS4yWiIvPjxwYXRoIGQ9Ik0tMTEuOCAzMi44QTM0LjkgMzQuOSAwIDAgMSAtMzQuOSAtMC41TC0yMi40IC0wLjNBMjIuNCAyMi40IDAgMCAwIC03LjYgMjEuMVoiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNDc0IDE4KSByb3RhdGUoMS4zKSBzY2FsZSgwLjkxIDAuOTcpIj48cGF0aCBkPSJNMjMuNyAxOC44QTMwLjIgMzAuMiAwIDAgMSAxMC4xIDI4LjVMNy40IDIxLjBBMjIuMiAyMi4yIDAgMCAwIDE3LjQgMTMuOFoiLz48cGF0aCBkPSJNLTEuMiAzNC40QTM0LjQgMzQuNCAwIDAgMSAtMzQuMSA0LjVMLTI2LjEgMy40QTI2LjMgMjYuMyAwIDAgMCAtMC45IDI2LjNaIi8+PHBhdGggZD0iTS0zMS45IC0xMC4xQTMzLjUgMzMuNSAwIDAgMSAtMjAuMCAtMjYuOEwtMTMuNSAtMTguMUEyMi42IDIyLjYgMCAwIDAgLTIxLjUgLTYuOFoiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUwIDE4KSByb3RhdGUoMTYzLjApIHNjYWxlKDEuMDUgMC45OSkiPjxwYXRoIGQ9Ik0tMTMuMyAtMjAuNUEyNC40IDI0LjQgMCAwIDEgMTkuMCAtMTUuM0wxMy42IC0xMS4wQTE3LjUgMTcuNSAwIDAgMCAtOS41IC0xNC43WiIvPjxwYXRoIGQ9Ik0yMy4xIC02LjZBMjQuMCAyNC4wIDAgMCAxIDguOCAyMi4zTDYuMCAxNS4yQTE2LjMgMTYuMyAwIDAgMCAxNS43IC00LjVaIi8+PHBhdGggZD0iTTMuOSAyNS4yQTI1LjUgMjUuNSAwIDAgMSAtMjMuNiA5LjZMLTE1LjYgNi4zQTE2LjggMTYuOCAwIDAgMCAyLjYgMTYuN1oiLz48L2c+PC9nPjxnIGZpbGw9IiMzYTJhMWIiIGZpbGwtb3BhY2l0eT0iMC4xMSI+PHBhdGggZD0iTTIwMiA5NGM2LjMgLTIuODAwMDAwMDAwMDAwMDAwMyAxMC41IDMuODUwMDAwMDAwMDAwMDAwNSAzLjE1IDguMDQ5OTk5OTk5OTk5OTk5Yy00LjU1IDMuNSAtMTAuNSAtMS43NSAtMy4xNSAtOC4wNDk5OTk5OTk5OTk5OTlaIi8+PHBhdGggZD0iTTM1NCAyMjBjNC41IC0yIDcuNSAyLjc1IDIuMjUgNS43NWMtMy4yNSAyLjUgLTcuNSAtMS4yNSAtMi4yNSAtNS43NVoiLz48cGF0aCBkPSJNMTI4IDI5MGM2LjMgLTIuODAwMDAwMDAwMDAwMDAwMyAxMC41IDMuODUwMDAwMDAwMDAwMDAwNSAzLjE1IDguMDQ5OTk5OTk5OTk5OTk5Yy00LjU1IDMuNSAtMTAuNSAtMS43NSAtMy4xNSAtOC4wNDk5OTk5OTk5OTk5OTlaIi8+PHBhdGggZD0iTTMwMiAzODhjNC41IC0yIDcuNSAyLjc1IDIuMjUgNS43NWMtMy4yNSAyLjUgLTcuNSAtMS4yNSAtMi4yNSAtNS43NVoiLz48cGF0aCBkPSJNMjggMjRjNC41IC0yIDcuNSAyLjc1IDIuMjUgNS43NWMtMy4yNSAyLjUgLTcuNSAtMS4yNSAtMi4yNSAtNS43NVoiLz48cGF0aCBkPSJNNDMyIDI1MmM1LjQgLTIuNDAwMDAwMDAwMDAwMDAwNCA5IDMuMzAwMDAwMDAwMDAwMDAwMyAyLjcgNi44OTk5OTk5OTk5OTk5OTk1Yy0zLjkwMDAwMDAwMDAwMDAwMDQgMyAtOSAtMS41IC0yLjcgLTYuODk5OTk5OTk5OTk5OTk5NVoiLz48cGF0aCBkPSJNMTA2IDQ0NmM1LjQgLTIuNDAwMDAwMDAwMDAwMDAwNCA5IDMuMzAwMDAwMDAwMDAwMDAwMyAyLjcgNi44OTk5OTk5OTk5OTk5OTk1Yy0zLjkwMDAwMDAwMDAwMDAwMDQgMyAtOSAtMS41IC0yLjcgLTYuODk5OTk5OTk5OTk5OTk5NVoiLz48cGF0aCBkPSJNMjE2IDMzNmMzLjYgLTEuNiA2IDIuMiAxLjggNC42Yy0yLjYgMiAtNiAtMSAtMS44IC00LjZaIi8+PHBhdGggZD0iTTM4OCA2NmMzLjYgLTEuNiA2IDIuMiAxLjggNC42Yy0yLjYgMiAtNiAtMSAtMS44IC00LjZaIi8+PHBhdGggZD0iTTI1MiAxNTJjMy42IC0xLjYgNiAyLjIgMS44IDQuNmMtMi42IDIgLTYgLTEgLTEuOCAtNC42WiIvPjwvZz48L3N2Zz4=');
+  --leopard-rosettes-ink: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NjAiIGhlaWdodD0iNDcwIiB2aWV3Qm94PSIwIDAgNDYwIDQ3MCI+PGcgZmlsbD0iI2YzZTZjZCIgZmlsbC1vcGFjaXR5PSIwLjEiPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDc0IDcyKSByb3RhdGUoMzMyLjQpIHNjYWxlKDAuODIgMC45NSkiPjxwYXRoIGQ9Ik0tMjcuMiAtNDIuNkE1MC42IDUwLjYgMCAwIDEgMi42IC01MC41TDEuOSAtMzYuN0EzNi44IDM2LjggMCAwIDAgLTE5LjggLTMxLjBaIi8+PHBhdGggZD0iTTMxLjkgLTQ0LjNBNTQuNiA1NC42IDAgMCAxIDUzLjEgMTIuOUwzOC45IDkuNUE0MC4wIDQwLjAgMCAwIDAgMjMuNCAtMzIuNVoiLz48cGF0aCBkPSJNNDMuMiAxOS45QTQ3LjYgNDcuNiAwIDAgMSAtMTAuNCA0Ni40TC04LjAgMzUuNUEzNi40IDM2LjQgMCAwIDAgMzMuMSAxNS4yWiIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyNzggMzYpIHJvdGF0ZSgyNDUuMCkgc2NhbGUoMS4wNiAwLjk1KSI+PHBhdGggZD0iTTE1LjIgLTM1LjRBMzguNSAzOC41IDAgMCAxIDM3LjMgLTkuNkwyMy4zIC02LjBBMjQuMCAyNC4wIDAgMCAwIDkuNSAtMjIuMFoiLz48cGF0aCBkPSJNMzkuNCA3LjRBNDAuMSA0MC4xIDAgMCAxIDI0LjUgMzEuOEwxNi41IDIxLjRBMjcuMSAyNy4xIDAgMCAwIDI2LjYgNS4wWiIvPjxwYXRoIGQ9Ik0xMy4wIDMxLjRBMzQuMCAzNC4wIDAgMCAxIC0yNi43IDIxLjFMLTE2LjEgMTIuN0EyMC41IDIwLjUgMCAwIDAgNy44IDE5LjBaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQwNiAxNTApIHJvdGF0ZSgxMjMuMSkgc2NhbGUoMC45OCAxLjA3KSI+PHBhdGggZD0iTTI5LjYgMzQuM0E0NS40IDQ1LjQgMCAwIDEgLTkuNCA0NC40TC02LjkgMzIuN0EzMy40IDMzLjQgMCAwIDAgMjEuOCAyNS4zWiIvPjxwYXRoIGQ9Ik0tNDIuNCAzMy4xQTUzLjggNTMuOCAwIDAgMSAtNDQuMiAtMzAuN0wtMzMuNCAtMjMuMkE0MC43IDQwLjcgMCAwIDAgLTMyLjEgMjUuMFoiLz48cGF0aCBkPSJNLTI1LjkgLTM5LjZBNDcuNCA0Ny40IDAgMCAxIDM1LjAgLTMxLjlMMjAuOCAtMTguOUEyOC4xIDI4LjEgMCAwIDAgLTE1LjQgLTIzLjVaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE3NCAyMTYpIHJvdGF0ZSgzMjMuNCkgc2NhbGUoMC44NyAxLjE1KSI+PHBhdGggZD0iTTQwLjUgMjIuMUE0Ni4xIDQ2LjEgMCAwIDEgLTEzLjAgNDQuM0wtMTAuNCAzNS40QTM2LjkgMzYuOSAwIDAgMCAzMi40IDE3LjdaIi8+PHBhdGggZD0iTS0zMi41IDI3LjVBNDIuNiA0Mi42IDAgMCAxIC0zNy41IC0yMC4yTC0yOC4wIC0xNS4wQTMxLjggMzEuOCAwIDAgMCAtMjQuMyAyMC41WiIvPjxwYXRoIGQ9Ik0tMjcuNiAtMzUuMkE0NC44IDQ0LjggMCAwIDEgMjEuNyAtMzkuMkwxMy43IC0yNC44QTI4LjQgMjguNCAwIDAgMCAtMTcuNSAtMjIuM1oiLz48cGF0aCBkPSJNMzkuMiAtMjEuNkE0NC43IDQ0LjcgMCAwIDEgNDMuOCA5LjJMMzEuNyA2LjZBMzIuNCAzMi40IDAgMCAwIDI4LjQgLTE1LjZaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDM0NCAyOTgpIHJvdGF0ZSgyMzUuMykgc2NhbGUoMC45NCAxLjAxKSI+PHBhdGggZD0iTTQ2LjggLTI0LjhBNTMuMCA1My4wIDAgMCAxIDMzLjUgNDEuMUwyNS4yIDMwLjlBMzkuOSAzOS45IDAgMCAwIDM1LjIgLTE4LjdaIi8+PHBhdGggZD0iTTcuMCA1Mi40QTUyLjkgNTIuOSAwIDAgMSAtNDguMSAyMS45TC0zNi40IDE2LjVBMzkuOSAzOS45IDAgMCAwIDUuMyAzOS42WiIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg2NiAzNDApIHJvdGF0ZSgzMzguNikgc2NhbGUoMS4wMCAxLjEzKSI+PHBhdGggZD0iTTcuNSAtNDIuN0E0My4zIDQzLjMgMCAwIDEgMzYuMyAtMjMuNkwyMS40IC0xMy45QTI1LjUgMjUuNSAwIDAgMCA0LjQgLTI1LjFaIi8+PHBhdGggZD0iTTQ1LjIgLTIuNUE0NS4zIDQ1LjMgMCAwIDEgMzEuOCAzMi4yTDE5LjkgMjAuMUEyOC4zIDI4LjMgMCAwIDAgMjguMyAtMS41WiIvPjxwYXRoIGQ9Ik0xMS4yIDQ4LjRBNDkuNyA0OS43IDAgMCAxIC0zNS4wIDM1LjNMLTI1LjMgMjUuNUEzNS45IDM1LjkgMCAwIDAgOC4xIDM1LjBaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDI0MCA0MzQpIHJvdGF0ZSgxMDkuMikgc2NhbGUoMS4wNiAwLjk2KSI+PHBhdGggZD0iTTM1LjcgMzEuOUE0Ny44IDQ3LjggMCAwIDEgLTEzLjEgNDYuMEwtOS4yIDMyLjVBMzMuOCAzMy44IDAgMCAwIDI1LjIgMjIuNVoiLz48cGF0aCBkPSJNLTM2LjEgMzkuOUE1My44IDUzLjggMCAwIDEgLTUyLjQgMTIuMkwtMzMuNiA3LjhBMzQuNSAzNC41IDAgMCAwIC0yMy4xIDI1LjZaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQzMiA0NDApIHJvdGF0ZSgyMzguMykgc2NhbGUoMS4wOSAwLjk1KSI+PHBhdGggZD0iTS0xLjMgLTMyLjdBMzIuNyAzMi43IDAgMCAxIDMxLjMgLTkuNEwyMy4yIC03LjBBMjQuMiAyNC4yIDAgMCAwIC0wLjkgLTI0LjJaIi8+PHBhdGggZD0iTTM4LjYgMTMuMEE0MC44IDQwLjggMCAwIDEgMC45IDQwLjhMMC42IDI2LjRBMjYuNCAyNi40IDAgMCAwIDI1LjAgOC40WiIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTggMTg2KSByb3RhdGUoNTkuOCkgc2NhbGUoMS4xMSAxLjAwKSI+PHBhdGggZD0iTS04LjEgMzguNUEzOS4zIDM5LjMgMCAwIDEgLTMxLjMgMjMuN0wtMTkuOSAxNS4wQTI0LjkgMjQuOSAwIDAgMCAtNS4xIDI0LjRaIi8+PHBhdGggZD0iTS00My4zIDAuMkE0My4zIDQzLjMgMCAwIDEgLTMwLjQgLTMwLjlMLTE5LjQgLTE5LjhBMjcuNyAyNy43IDAgMCAwIC0yNy43IDAuMVoiLz48cGF0aCBkPSJNLTE3LjIgLTMxLjlBMzYuMiAzNi4yIDAgMCAxIDI4LjYgLTIyLjJMMTguNiAtMTQuNEEyMy41IDIzLjUgMCAwIDAgLTExLjIgLTIwLjdaIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDQ3NCAxOCkgcm90YXRlKDM0LjkpIHNjYWxlKDAuOTggMS4xNCkiPjxwYXRoIGQ9Ik0tMTYuMSAyNS4zQTMwLjAgMzAuMCAwIDAgMSAtMjguNiA5LjBMLTIwLjUgNi41QTIxLjUgMjEuNSAwIDAgMCAtMTEuNSAxOC4xWiIvPjxwYXRoIGQ9Ik0tMzIuNyAtMi4yQTMyLjggMzIuOCAwIDAgMSAtMC4zIC0zMi44TC0wLjMgLTI1LjZBMjUuNiAyNS42IDAgMCAwIC0yNS42IC0xLjdaIi8+PHBhdGggZD0iTTEzLjcgLTI0LjlBMjguNSAyOC41IDAgMCAxIDI4LjAgLTUuMEwxOC41IC0zLjNBMTguOCAxOC44IDAgMCAwIDkuMSAtMTYuNVoiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTUwIDE4KSByb3RhdGUoMTAuOSkgc2NhbGUoMS4xNCAwLjkxKSI+PHBhdGggZD0iTTI1LjEgLTUuOUEyNS44IDI1LjggMCAwIDEgOS4xIDI0LjJMNy4yIDE5LjFBMjAuNCAyMC40IDAgMCAwIDE5LjkgLTQuN1oiLz48cGF0aCBkPSJNMC4zIDI4LjhBMjguOCAyOC44IDAgMCAxIC0xOS41IDIxLjJMLTEzLjQgMTQuNkExOS44IDE5LjggMCAwIDAgMC4yIDE5LjhaIi8+PHBhdGggZD0iTS0yNS42IDE0LjJBMjkuMyAyOS4zIDAgMCAxIC0yOS4zIC0xLjZMLTE5LjYgLTEuMUExOS42IDE5LjYgMCAwIDAgLTE3LjEgOS41WiIvPjwvZz48L2c+PGcgZmlsbD0iI2YzZTZjZCIgZmlsbC1vcGFjaXR5PSIwLjA3NSI+PHBhdGggZD0iTTIwMiA5NGM2LjMgLTIuODAwMDAwMDAwMDAwMDAwMyAxMC41IDMuODUwMDAwMDAwMDAwMDAwNSAzLjE1IDguMDQ5OTk5OTk5OTk5OTk5Yy00LjU1IDMuNSAtMTAuNSAtMS43NSAtMy4xNSAtOC4wNDk5OTk5OTk5OTk5OTlaIi8+PHBhdGggZD0iTTM1NCAyMjBjNC41IC0yIDcuNSAyLjc1IDIuMjUgNS43NWMtMy4yNSAyLjUgLTcuNSAtMS4yNSAtMi4yNSAtNS43NVoiLz48cGF0aCBkPSJNMTI4IDI5MGM2LjMgLTIuODAwMDAwMDAwMDAwMDAwMyAxMC41IDMuODUwMDAwMDAwMDAwMDAwNSAzLjE1IDguMDQ5OTk5OTk5OTk5OTk5Yy00LjU1IDMuNSAtMTAuNSAtMS43NSAtMy4xNSAtOC4wNDk5OTk5OTk5OTk5OTlaIi8+PHBhdGggZD0iTTMwMiAzODhjNC41IC0yIDcuNSAyLjc1IDIuMjUgNS43NWMtMy4yNSAyLjUgLTcuNSAtMS4yNSAtMi4yNSAtNS43NVoiLz48cGF0aCBkPSJNMjggMjRjNC41IC0yIDcuNSAyLjc1IDIuMjUgNS43NWMtMy4yNSAyLjUgLTcuNSAtMS4yNSAtMi4yNSAtNS43NVoiLz48cGF0aCBkPSJNNDMyIDI1MmM1LjQgLTIuNDAwMDAwMDAwMDAwMDAwNCA5IDMuMzAwMDAwMDAwMDAwMDAwMyAyLjcgNi44OTk5OTk5OTk5OTk5OTk1Yy0zLjkwMDAwMDAwMDAwMDAwMDQgMyAtOSAtMS41IC0yLjcgLTYuODk5OTk5OTk5OTk5OTk5NVoiLz48cGF0aCBkPSJNMTA2IDQ0NmM1LjQgLTIuNDAwMDAwMDAwMDAwMDAwNCA5IDMuMzAwMDAwMDAwMDAwMDAwMyAyLjcgNi44OTk5OTk5OTk5OTk5OTk1Yy0zLjkwMDAwMDAwMDAwMDAwMDQgMyAtOSAtMS41IC0yLjcgLTYuODk5OTk5OTk5OTk5OTk5NVoiLz48cGF0aCBkPSJNMjE2IDMzNmMzLjYgLTEuNiA2IDIuMiAxLjggNC42Yy0yLjYgMiAtNiAtMSAtMS44IC00LjZaIi8+PHBhdGggZD0iTTM4OCA2NmMzLjYgLTEuNiA2IDIuMiAxLjggNC42Yy0yLjYgMiAtNiAtMSAtMS44IC00LjZaIi8+PHBhdGggZD0iTTI1MiAxNTJjMy42IC0xLjYgNiAyLjIgMS44IDQuNmMtMi42IDIgLTYgLTEgLTEuOCAtNC42WiIvPjwvZz48L3N2Zz4=');
+}
+
+/* --------------------------------------------------------------------------
+   Tokens — dark
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'][data-mode='dark'] {
+  color-scheme: dark;
+
+  --color-paper: #14100e;
+  --color-board: #1a1310;
+  --color-surface: #1d1815;
+  --color-ink: #f2e8d9;
+  --color-muted: #a99c8c;
+  --color-line: #332b24;
+  --color-accent: #d9b77b;
+  --color-accent-ink: #1b1410;
+  --color-accent-soft: #35291a;
+  --color-gold: #c7a46a;
+  --color-signal: #c4694f;
+  --color-signal-soft: #3a211a;
+  --color-on-signal: #1b0f0c;
+
+  --color-sage: #292d24;
+  --color-sage-ink: #d2d3ba;
+  --color-butter: #3b301d;
+  --color-butter-ink: #efd9a6;
+  --color-sky: #242a29;
+  --color-sky-ink: #c6d0ca;
+  --color-peach: #38261e;
+  --color-peach-ink: #edc7ac;
+  --color-lilac: #2e282c;
+  --color-lilac-ink: #dcccd3;
+  --color-rose: #382326;
+  --color-rose-ink: #efc6c1;
+
+  --color-cover-forest: #46503a;
+  --color-cover-clay: #96593f;
+  --color-cover-navy: #3c4756;
+  --color-cover-ochre: #846125;
+  --color-cover-plum: #614650;
+  --color-cover-teal: #3c5859;
+  --color-cover-slate: #565049;
+  --color-cover-wine: #703b44;
+  --color-cover-ink: #f7eedd;
+
+  --mark-red: #c4694f;
+  --mark-amber: #c7a46a;
+  --mark-green: #7d8a5f;
+  --mark-blue: #7f92a6;
+
+  --leopard-lacquer: #221a14;
+  --leopard-lacquer-deep: #17110d;
+  --leopard-lacquer-top: #2c231c;
+  --leopard-lacquer-ink: #f4e9d6;
+  --leopard-lacquer-muted: #cbbaa0;
+  --leopard-gold: #c7a46a;
+  --leopard-gold-bright: #dcc08d;
+  --leopard-gold-type: #c7a46a;
+  --leopard-gold-line: rgba(203, 170, 112, 0.3);
+  --leopard-gold-hair: rgba(203, 170, 112, 0.18);
+  --leopard-gold-wash: rgba(203, 170, 112, 0.12);
+  --leopard-note: #261e17;
+  --leopard-note-ink: #f2e8d9;
+  --leopard-tape: rgba(203, 178, 128, 0.3);
+  --leopard-paper-glow: rgba(199, 164, 106, 0.07);
+  --leopard-shadow: rgba(0, 0, 0, 0.62);
+  --leopard-tab-rest: rgba(242, 232, 217, 0.6);
+  --leopard-tab-active: #dcc08d;
+  --leopard-skeleton: rgba(203, 170, 112, 0.1);
+  --leopard-skeleton-sheen: rgba(255, 248, 235, 0.08);
+  --leopard-rosettes: var(--leopard-rosettes-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Page surface
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] {
+  background: var(--color-paper);
+}
+
+html[data-theme='leopard'] body {
+  background-color: var(--color-paper);
+  background-image: radial-gradient(
+    120% 480px at 50% -40px,
+    var(--leopard-paper-glow),
+    transparent 68%
+  );
+  background-repeat: no-repeat;
+  color: var(--color-ink);
+}
+
+html[data-theme='leopard'] ::selection {
+  background: color-mix(in srgb, var(--leopard-gold) 28%, transparent);
+  color: var(--color-ink);
+}
+
+/* --------------------------------------------------------------------------
+   Editorial type helpers
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .lp-kicker {
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-kicker--lacquer {
+  color: var(--leopard-gold-bright);
+}
+
+html[data-theme='leopard'] .lp-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+html[data-theme='leopard'] .lp-masthead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-masthead::before {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: var(--leopard-gold);
+  opacity: 0.8;
+}
+
+html[data-theme='leopard'] .lp-greeting {
+  margin-top: 9px;
+  font-family: var(--font-display);
+  font-size: clamp(29px, 8.4vw, 37px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+  color: var(--color-ink);
+}
+
+html[data-theme='leopard'] .lp-date {
+  margin-top: 7px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  letter-spacing: 0.015em;
+  color: var(--color-muted);
+}
+
+html[data-theme='leopard'] .lp-gear {
+  display: flex;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--leopard-gold-hair);
+  border-radius: 999px;
+  color: var(--leopard-gold-type);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+html[data-theme='leopard'] .lp-gear:active {
+  background: var(--leopard-gold-wash);
+  border-color: var(--leopard-gold-line);
+}
+
+/* --------------------------------------------------------------------------
+   Hero — the cover story
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .lp-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 22px;
+  padding: 18px 18px 16px;
+  border-radius: var(--radius-card);
+  background:
+    radial-gradient(130% 90% at 92% -8%, rgba(203, 170, 112, 0.16), transparent 58%),
+    linear-gradient(
+      148deg,
+      var(--leopard-lacquer-top) 0%,
+      var(--leopard-lacquer) 52%,
+      var(--leopard-lacquer-deep) 100%
+    );
+  color: var(--leopard-lacquer-ink);
+  box-shadow:
+    0 26px 46px -34px var(--leopard-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html[data-theme='leopard'] .lp-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: var(--leopard-rosettes-ink);
+  background-size: 420px auto;
+  background-position: 78% 8%;
+  background-repeat: no-repeat;
+  opacity: 0.85;
+  -webkit-mask-image: radial-gradient(105% 95% at 96% 2%, #000 0%, transparent 64%);
+  mask-image: radial-gradient(105% 95% at 96% 2%, #000 0%, transparent 64%);
+  pointer-events: none;
+}
+
+html[data-theme='leopard'] .lp-hero::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  z-index: 2;
+  border: 1px solid var(--leopard-gold-line);
+  border-radius: calc(var(--radius-card) - 5px);
+  pointer-events: none;
+}
+
+html[data-theme='leopard'] .lp-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-theme='leopard'] .lp-hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+html[data-theme='leopard'] .lp-hero__no {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--leopard-gold-bright);
+  opacity: 0.82;
+}
+
+html[data-theme='leopard'] .lp-hero__body {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+html[data-theme='leopard'] .lp-cover-frame {
+  display: block;
+  flex: none;
+  width: clamp(78px, 23vw, 96px);
+  padding: 5px;
+  border: 1px solid var(--leopard-gold-line);
+  background: linear-gradient(150deg, #0c0907, #1a1310);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 18px 26px -18px rgba(0, 0, 0, 0.92);
+  transform: rotate(-1.6deg);
+  transition: transform 420ms cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+
+html[data-theme='leopard'] .lp-cover-frame > div {
+  border-radius: 1px;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='leopard'] .lp-cover-frame:hover {
+  transform: rotate(0deg) translateY(-2px);
+}
+
+html[data-theme='leopard'] .lp-hero__meta {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  padding-left: 15px;
+  border-left: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-hero__author {
+  font-size: 9.5px;
+  line-height: 1.65;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--leopard-lacquer-muted);
+}
+
+html[data-theme='leopard'] .lp-hero__since {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(244, 233, 214, 0.62);
+}
+
+html[data-theme='leopard'] .lp-hero__percent {
+  margin-top: auto;
+  padding-top: 10px;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
+  color: var(--leopard-gold-bright);
+}
+
+html[data-theme='leopard'] .lp-hero__percent span {
+  margin-left: 1px;
+  font-size: 15px;
+  font-style: italic;
+}
+
+html[data-theme='leopard'] .lp-hero__title {
+  margin-top: 18px;
+  font-family: var(--font-display);
+  font-size: clamp(27px, 8.2vw, 36px);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  color: var(--leopard-lacquer-ink);
+}
+
+html[data-theme='leopard'] .lp-hero__subtitle {
+  margin-top: 7px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--leopard-lacquer-muted);
+}
+
+html[data-theme='leopard'] .lp-hero__text {
+  margin-top: 10px;
+  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.65;
+  color: rgba(244, 233, 214, 0.7);
+}
+
+html[data-theme='leopard'] .lp-hero__progress {
+  margin-top: 18px;
+}
+
+html[data-theme='leopard'] .lp-hero__bar {
+  height: 2px;
+  overflow: hidden;
+  background: rgba(244, 233, 214, 0.16);
+}
+
+html[data-theme='leopard'] .lp-hero__bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--leopard-gold), var(--leopard-gold-bright));
+}
+
+html[data-theme='leopard'] .lp-hero__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+html[data-theme='leopard'] .lp-hero__pages {
+  font-size: 10.5px;
+  line-height: 1.5;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 233, 214, 0.66);
+}
+
+html[data-theme='leopard'] .lp-hero__cta {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid var(--leopard-gold-line);
+  border-radius: 3px;
+  font-size: 9.5px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--leopard-lacquer-ink);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+html[data-theme='leopard'] .lp-hero__cta svg {
+  color: var(--leopard-gold-bright);
+}
+
+html[data-theme='leopard'] .lp-hero__cta:active {
+  background: var(--leopard-gold-wash);
+  border-color: var(--leopard-gold);
+}
+
+/* ghost cover used by empty states */
+html[data-theme='leopard'] .lp-ghost-cover {
+  position: relative;
+  flex: none;
+  width: clamp(78px, 23vw, 96px);
+  aspect-ratio: 2 / 3;
+  border: 1px solid var(--leopard-gold-line);
+  transform: rotate(-1.6deg);
+}
+
+html[data-theme='leopard'] .lp-ghost-cover::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-ghost-cover::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--leopard-gold);
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* --------------------------------------------------------------------------
+   Stats index + streak
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .lp-section {
+  margin-top: 34px;
+}
+
+html[data-theme='leopard'] .lp-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-section__link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+html[data-theme='leopard'] .lp-section__link svg {
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-index {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  border-bottom: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-index__lead {
+  padding: 16px 12px 16px 0;
+}
+
+html[data-theme='leopard'] .lp-index__value {
+  font-family: var(--font-display);
+  font-size: clamp(58px, 17vw, 74px);
+  font-weight: 400;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  color: var(--color-ink);
+}
+
+html[data-theme='leopard'] .lp-index__unit {
+  margin-top: 10px;
+  font-size: 9px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+html[data-theme='leopard'] .lp-index__note {
+  margin-top: 7px;
+  font-size: 9px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-index__rows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 16px;
+  border-left: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-index__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+html[data-theme='leopard'] .lp-index__row + .lp-index__row {
+  border-top: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-index__row dt {
+  font-size: 9px;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+html[data-theme='leopard'] .lp-index__row dd {
+  font-family: var(--font-display);
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+html[data-theme='leopard'] .lp-streak {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 12px;
+}
+
+html[data-theme='leopard'] .lp-streak__label {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+html[data-theme='leopard'] .lp-streak__num {
+  font-family: var(--font-display);
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--color-ink);
+}
+
+html[data-theme='leopard'] .lp-streak__days {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+html[data-theme='leopard'] .lp-streak__days li {
+  width: 3px;
+  height: 15px;
+  background: transparent;
+  border: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-streak__days li.is-on {
+  border-color: var(--leopard-gold);
+  background: var(--leopard-gold);
+}
+
+/* --------------------------------------------------------------------------
+   Lookbook strip
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .lp-lookbook {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 16px 0 4px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+html[data-theme='leopard'] .lp-bleed {
+  margin-left: calc(-1 * max(20px, var(--safe-left)));
+  margin-right: calc(-1 * max(20px, var(--safe-right)));
+  padding-left: max(20px, var(--safe-left));
+  padding-right: max(20px, var(--safe-right));
+}
+
+html[data-theme='leopard'] .lp-lookbook::-webkit-scrollbar {
+  display: none;
+}
+
+html[data-theme='leopard'] .lp-look {
+  flex: none;
+  width: 94px;
+  scroll-snap-align: start;
+}
+
+html[data-theme='leopard'] .lp-look__no {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-look__frame {
+  margin-top: 7px;
+  padding: 3px;
+  border: 1px solid var(--leopard-gold-hair);
+  background: var(--color-surface);
+  box-shadow: 0 16px 24px -20px var(--leopard-shadow);
+  transition: transform 320ms cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+
+html[data-theme='leopard'] .lp-look__frame > div {
+  border-radius: 1px;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme='leopard'] .lp-look:hover .lp-look__frame {
+  transform: translateY(-3px);
+}
+
+html[data-theme='leopard'] .lp-look__title {
+  margin-top: 9px;
+  height: 2.5em;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.005em;
+  color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html[data-theme='leopard'] .lp-look__date {
+  margin-top: 4px;
+  font-size: 9px;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Taped journal note
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .lp-note {
+  position: relative;
+  display: block;
+  margin: 18px 2px 4px;
+  padding: 22px 20px 18px;
+  border: 1px solid var(--leopard-gold-hair);
+  border-radius: 2px;
+  background: var(--leopard-note);
+  color: var(--leopard-note-ink);
+  box-shadow: 0 20px 34px -30px var(--leopard-shadow);
+  transform: rotate(-0.7deg);
+}
+
+html[data-theme='leopard'] .lp-note::before,
+html[data-theme='leopard'] .lp-note::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  width: 54px;
+  height: 17px;
+  background: var(--leopard-tape);
+  opacity: 0.9;
+  pointer-events: none;
+  clip-path: polygon(1% 6%, 99% 0, 100% 92%, 2% 100%);
+}
+
+html[data-theme='leopard'] .lp-note::before {
+  left: 22px;
+  transform: rotate(-7deg);
+}
+
+html[data-theme='leopard'] .lp-note::after {
+  right: 24px;
+  transform: rotate(6deg);
+}
+
+html[data-theme='leopard'] .lp-note__kicker {
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-quote {
+  margin-top: 12px;
+  font-family: var(--font-hand);
+  font-style: italic;
+  font-size: clamp(18px, 4.8vw, 21px);
+  font-weight: 400;
+  line-height: 1.46;
+  letter-spacing: 0.002em;
+  color: var(--leopard-note-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+html[data-theme='leopard'] .lp-note__footer {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 11px;
+  border-top: 1px solid var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-note__title {
+  font-size: 9.5px;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+html[data-theme='leopard'] .lp-note__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 9.5px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--leopard-gold-type);
+}
+
+html[data-theme='leopard'] .lp-note--empty {
+  border-style: dashed;
+  transform: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+html[data-theme='leopard'] .lp-note--empty::before,
+html[data-theme='leopard'] .lp-note--empty::after {
+  display: none;
+}
+
+html[data-theme='leopard'] .lp-note--empty .lp-quote {
+  color: var(--color-muted);
+  -webkit-line-clamp: 2;
+}
+
+/* --------------------------------------------------------------------------
+   Loading / footer
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .lp-loading-text {
+  margin-top: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 21px;
+  line-height: 1.3;
+  color: var(--leopard-lacquer-muted);
+}
+
+html[data-theme='leopard'] .lp-loading-line {
+  position: relative;
+  height: 1px;
+  margin-top: 22px;
+  overflow: hidden;
+  background: var(--leopard-gold-hair);
+}
+
+html[data-theme='leopard'] .lp-loading-line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--leopard-gold-bright), transparent);
+  animation: lp-sweep 1.8s ease-in-out infinite;
+}
+
+html[data-theme='leopard'] .lp-skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--leopard-skeleton);
+}
+
+html[data-theme='leopard'] .lp-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--leopard-skeleton-sheen), transparent);
+  transform: translateX(-100%);
+  animation: lp-shimmer 1.9s ease-in-out infinite;
+}
+
+html[data-theme='leopard'] .lp-foot {
+  margin-top: 34px;
+  padding-top: 12px;
+  border-top: 1px solid var(--leopard-gold-hair);
+  font-size: 9px;
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Bottom navigation
+   -------------------------------------------------------------------------- */
+
+html[data-theme='leopard'] .tab-bar {
+  border-top: 1px solid var(--leopard-gold-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 40%), var(--leopard-lacquer);
+  color: var(--leopard-tab-rest);
+  box-shadow: 0 -18px 36px -32px var(--leopard-shadow);
+}
+
+html[data-theme='leopard'] .tab-bar ul {
+  max-width: 36rem;
+}
+
+html[data-theme='leopard'] .tab-bar a span:first-child {
+  background: transparent;
+  color: var(--leopard-tab-rest);
+}
+
+html[data-theme='leopard'] .tab-bar a span:last-child {
+  color: var(--leopard-tab-rest);
+}
+
+html[data-theme='leopard'] .tab-bar a[aria-current='page'] span:first-child {
+  background: var(--leopard-gold-wash);
+  color: var(--leopard-tab-active);
+}
+
+html[data-theme='leopard'] .tab-bar a[aria-current='page'] span:last-child {
+  color: var(--leopard-tab-active);
+  letter-spacing: 0.035em;
+}
+
+/* --------------------------------------------------------------------------
+   Motion
+   -------------------------------------------------------------------------- */
+
+@keyframes lp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lp-sweep {
+  0% {
+    transform: translateX(-110%);
+  }
+  60%,
+  100% {
+    transform: translateX(260%);
+  }
+}
+
+@keyframes lp-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+html[data-theme='leopard'] .lp-rise {
+  animation: lp-rise 620ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme='leopard'] .lp-rise,
+  html[data-theme='leopard'] .lp-loading-line::after,
+  html[data-theme='leopard'] .lp-skeleton::after {
+    animation: none;
+  }
+
+  html[data-theme='leopard'] .lp-cover-frame,
+  html[data-theme='leopard'] .lp-look__frame,
+  html[data-theme='leopard'] .lp-gear,
+  html[data-theme='leopard'] .lp-hero__cta {
+    transition: none;
+  }
+
+  html[data-theme='leopard'] .lp-cover-frame:hover,
+  html[data-theme='leopard'] .lp-look:hover .lp-look__frame {
+    transform: none;
+  }
+}

@@ -372,6 +372,8 @@ async function touchSettings(): Promise<void> {
     defaultTemplate: 'lite',
     defaultRatingScale: 'stars5',
     dailyGoalMinutes: 0,
+    theme: 'shelf',
+    themeMode: 'light',
     lastBackupAt: now,
     persistGranted: false,
     schemaVersion: BACKUP_SCHEMA_VERSION,

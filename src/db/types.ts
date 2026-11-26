@@ -8,6 +8,8 @@ export type ID = string
 export type ISODateTime = string // UTC ISO
 export type ISODate = string // YYYY-MM-DD, local calendar day
 
+import type { ThemeId, ThemeMode } from '@/lib/theme'
+
 export type BookStatus = 'want' | 'reading' | 'finished' | 'dnf' | 'rereading'
 export type ProgressMode = 'pages' | 'percent'
 export type RatingScale = 'stars5' | 'score10' | 'emotion'
@@ -174,6 +176,8 @@ export interface Settings {
   defaultTemplate: DiaryTemplateId
   defaultRatingScale: RatingScale
   dailyGoalMinutes: number
+  theme: ThemeId
+  themeMode: ThemeMode
   lastBackupAt?: ISODateTime
   lastSnapshotAt?: ISODateTime
   persistGranted: boolean
