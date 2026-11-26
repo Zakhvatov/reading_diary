@@ -3,14 +3,32 @@ import { z } from 'zod'
 const idSchema = z.string().min(1)
 const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
 const isoDateTimeSchema = z.string().min(1)
-const ratingSchema = z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)])
+const ratingSchema = z.number().min(0).max(10)
 
-export const bookStatusSchema = z.enum(['want', 'reading', 'finished', 'dnf'])
+export const bookStatusSchema = z.enum(['want', 'reading', 'finished', 'dnf', 'rereading'])
 export const progressModeSchema = z.enum(['pages', 'percent'])
+export const ratingScaleSchema = z.enum(['stars5', 'score10', 'emotion'])
+export const emotionRatingSchema = z.enum(['love', 'neutral', 'mindblown'])
+export const bookFormatSchema = z.enum(['paper', 'ebook', 'audio'])
+export const acquisitionSchema = z.enum(['bought', 'library', 'gift', 'other'])
+export const colorLabelSchema = z.enum(['red', 'amber', 'green', 'blue', 'none'])
+export const diaryTemplateIdSchema = z.enum(['lite', 'analyst', 'bookclub'])
 export const journalColorSchema = z.enum(['pine', 'amber', 'clay', 'sky', 'plum', 'moss'])
 export const sessionKindSchema = z.enum(['timer', 'manual'])
 export const readingStatusSchema = z.enum(['reading', 'finished', 'dnf'])
-export const entityKindSchema = z.enum(['book', 'reading', 'session', 'quote', 'journal', 'goal'])
+export const bookNoteKindSchema = z.enum(['plot', 'insight'])
+export const bookLinkKindSchema = z.enum(['similar', 'sequel', 'prequel', 'same-world', 'other'])
+export const entityKindSchema = z.enum([
+  'book',
+  'reading',
+  'session',
+  'quote',
+  'journal',
+  'goal',
+  'character',
+  'bookNote',
+  'bookLink',
+])
 
 export const bookSchema = z.object({
   id: idSchema,
@@ -30,6 +48,15 @@ export const bookSchema = z.object({
   currentPage: z.number().int().nonnegative(),
   percent: z.number().min(0).max(100),
   rating: ratingSchema.optional(),
+  ratingScale: ratingScaleSchema,
+  emotion: emotionRatingSchema.optional(),
+  tags: z.array(z.string()),
+  moods: z.array(z.string()),
+  format: bookFormatSchema.optional(),
+  acquisition: acquisitionSchema.optional(),
+  colorLabel: colorLabelSchema,
+  diaryTemplate: diaryTemplateIdSchema,
+  shareable: z.boolean(),
   startedAt: isoDateSchema.optional(),
   finishedAt: isoDateSchema.optional(),
   coverId: idSchema.optional(),
@@ -72,7 +99,10 @@ export const quoteSchema = z.object({
   bookId: idSchema,
   text: z.string().min(1),
   page: z.number().int().nonnegative().optional(),
+  chapter: z.string().optional(),
   note: z.string().optional(),
+  favorite: z.boolean(),
+  shareable: z.boolean(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
 })
@@ -85,6 +115,44 @@ export const journalEntrySchema = z.object({
   color: journalColorSchema,
   photoId: idSchema.optional(),
   entryDate: isoDateSchema,
+  tags: z.array(z.string()),
+  mood: z.string().optional(),
+  shareable: z.boolean(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
+})
+
+export const characterSchema = z.object({
+  id: idSchema,
+  bookId: idSchema,
+  name: z.string().min(1),
+  role: z.string().optional(),
+  note: z.string(),
+  spoiler: z.boolean().optional(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
+})
+
+export const bookNoteSchema = z.object({
+  id: idSchema,
+  bookId: idSchema,
+  kind: bookNoteKindSchema,
+  title: z.string().optional(),
+  chapter: z.string().optional(),
+  body: z.string(),
+  tags: z.array(z.string()),
+  order: z.number().int(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
+})
+
+export const bookLinkSchema = z.object({
+  id: idSchema,
+  bookId: idSchema,
+  targetBookId: idSchema.optional(),
+  targetTitle: z.string().min(1),
+  kind: bookLinkKindSchema,
+  note: z.string().optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
 })
@@ -101,6 +169,8 @@ export const settingsSchema = z.object({
   id: z.literal('app'),
   onboardingDone: z.boolean(),
   defaultStatus: bookStatusSchema,
+  defaultTemplate: diaryTemplateIdSchema,
+  defaultRatingScale: ratingScaleSchema,
   dailyGoalMinutes: z.number().int().nonnegative(),
   lastBackupAt: isoDateTimeSchema.optional(),
   lastSnapshotAt: isoDateTimeSchema.optional(),
@@ -134,6 +204,9 @@ export const backupDataSchema = z.object({
   sessions: z.array(sessionSchema),
   quotes: z.array(quoteSchema),
   journals: z.array(journalEntrySchema),
+  characters: z.array(characterSchema).default([]),
+  bookNotes: z.array(bookNoteSchema).default([]),
+  bookLinks: z.array(bookLinkSchema).default([]),
   goals: z.array(goalSchema),
   settings: z.array(settingsSchema),
   tombstones: z.array(tombstoneSchema),

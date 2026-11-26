@@ -16,6 +16,9 @@ const EMPTY: BackupData = {
   sessions: [],
   quotes: [],
   journals: [],
+  characters: [],
+  bookNotes: [],
+  bookLinks: [],
   goals: [],
   settings: [],
   tombstones: [],
@@ -33,6 +36,12 @@ function makeBook(overrides: Partial<Book> = {}): Book {
     progressMode: 'pages',
     currentPage: 0,
     percent: 0,
+    ratingScale: 'stars5',
+    tags: [],
+    moods: [],
+    colorLabel: 'none',
+    diaryTemplate: 'lite',
+    shareable: false,
     totalReadingMs: 0,
     sessionCount: 0,
     pagesReadTotal: 0,
@@ -176,10 +185,49 @@ describe('backup import', () => {
   })
 
   it('rejects a backup from a newer schema version', async () => {
-    const file = backupFile({ ...EMPTY }, 3)
+    const file = backupFile({ ...EMPTY }, 4)
 
     await expect(importBackup(file, 'replace')).rejects.toThrow('более новой версии')
     expect(await db.books.count()).toBe(0)
+  })
+
+  it('converts ratings and fills deep diary defaults from a v2 backup', async () => {
+    const oldBook = {
+      id: 'old-book',
+      title: 'Старая книга',
+      authors: [],
+      genres: [],
+      status: 'finished',
+      progressMode: 'pages',
+      currentPage: 100,
+      percent: 100,
+      rating: 4,
+      totalReadingMs: 0,
+      sessionCount: 0,
+      pagesReadTotal: 0,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+    } as unknown as Book
+
+    await importBackup(backupFile({ ...EMPTY, books: [oldBook] }, 2), 'replace')
+
+    expect(await db.books.get('old-book')).toMatchObject({
+      rating: 8,
+      ratingScale: 'stars5',
+      tags: [],
+      moods: [],
+      colorLabel: 'none',
+      diaryTemplate: 'lite',
+      shareable: false,
+    })
+  })
+
+  it('keeps a canonical rating from a v3 backup as is', async () => {
+    const book = makeBook({ id: 'new-book', rating: 8 })
+
+    await importBackup(backupFile({ ...EMPTY, books: [book] }, 3), 'replace')
+
+    expect(await db.books.get('new-book')).toMatchObject({ rating: 8, ratingScale: 'stars5' })
   })
 
   it('recalculates derived book stats from sessions after import', async () => {

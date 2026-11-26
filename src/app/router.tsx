@@ -1,26 +1,25 @@
-import {
-  CalendarDots,
-  ChartBar,
-  Info,
-  Notebook,
-  PencilSimple,
-  Sparkle,
-  Target,
-  Timer,
-} from '@phosphor-icons/react'
+import { Info, Sparkle } from '@phosphor-icons/react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import { AddBookScreen } from '@/screens/add/AddBookScreen'
 import { BackupScreen } from '@/screens/BackupScreen'
 import { BookDetailScreen } from '@/screens/book/BookDetailScreen'
 import { BookEditScreen } from '@/screens/book/BookEditScreen'
+import { CalendarScreen } from '@/screens/calendar/CalendarScreen'
+import { DiaryScreen } from '@/screens/diary/DiaryScreen'
+import { GoalScreen } from '@/screens/goal/GoalScreen'
 import { HomeScreen } from '@/screens/HomeScreen'
+import { JournalDetailScreen } from '@/screens/journals/JournalDetailScreen'
+import { JournalEditorScreen } from '@/screens/journals/JournalEditorScreen'
+import { JournalListScreen } from '@/screens/journals/JournalListScreen'
 import { NotFoundScreen } from '@/screens/NotFoundScreen'
 import { PlaceholderScreen } from '@/screens/PlaceholderScreen'
 import { ScanScreen } from '@/screens/scan/ScanScreen'
 import { SettingsScreen } from '@/screens/SettingsScreen'
 import { ShelfDetailScreen } from '@/screens/shelves/ShelfDetailScreen'
 import { ShelvesScreen } from '@/screens/shelves/ShelvesScreen'
+import { StatsScreen } from '@/screens/stats/StatsScreen'
+import { TimerScreen } from '@/screens/timer/TimerScreen'
 import { RouteError } from './RouteError'
 import { routerBasename } from './basePath'
 
@@ -58,84 +57,44 @@ export const router = createBrowserRouter(
           element: <BookEditScreen />,
         },
         {
+          path: 'books/:bookId/diary',
+          element: <DiaryScreen />,
+        },
+        {
           path: 'timer',
-          element: (
-            <PlaceholderScreen
-              title="Таймер"
-              caption="Чтение"
-              icon={<Timer size={28} />}
-              description="Запуск сессии, пауза и сохранение времени чтения."
-            />
-          ),
+          element: <TimerScreen />,
+        },
+        {
+          path: 'timer/:bookId',
+          element: <TimerScreen />,
         },
         {
           path: 'journals',
-          element: (
-            <PlaceholderScreen
-              title="Дневник"
-              caption="Записи"
-              icon={<Notebook size={28} />}
-              description="Записи и цитаты по книгам — с датой, цветной полосой и привязкой к книге."
-            />
-          ),
+          element: <JournalListScreen />,
         },
         {
           path: 'journals/new',
-          element: (
-            <PlaceholderScreen
-              title="Новая запись"
-              caption="Дневник"
-              back
-              icon={<PencilSimple size={28} />}
-              description="Редактор записи появится вместе с дневником."
-            />
-          ),
+          element: <JournalEditorScreen />,
         },
         {
           path: 'journals/:journalId',
-          element: (
-            <PlaceholderScreen
-              title="Запись"
-              caption="Дневник"
-              back
-              icon={<Notebook size={28} />}
-              description="Текст записи, цитаты и связанные книги."
-            />
-          ),
+          element: <JournalDetailScreen />,
+        },
+        {
+          path: 'journals/:journalId/edit',
+          element: <JournalEditorScreen />,
         },
         {
           path: 'calendar',
-          element: (
-            <PlaceholderScreen
-              title="Календарь"
-              caption="Статистика"
-              icon={<CalendarDots size={28} />}
-              description="Дни чтения, страницы и книги — в календарной сетке."
-            />
-          ),
+          element: <CalendarScreen />,
         },
         {
           path: 'stats',
-          element: (
-            <PlaceholderScreen
-              title="Статистика"
-              caption="Итоги"
-              icon={<ChartBar size={28} />}
-              description="Время, страницы и серия дней по неделям, месяцам и годам."
-            />
-          ),
+          element: <StatsScreen />,
         },
         {
           path: 'goal',
-          element: (
-            <PlaceholderScreen
-              title="Цель"
-              caption="Статистика"
-              back
-              icon={<Target size={28} />}
-              description="Годовая цель по книгам и страницам."
-            />
-          ),
+          element: <GoalScreen />,
         },
         {
           path: 'settings',

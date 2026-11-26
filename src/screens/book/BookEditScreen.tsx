@@ -42,6 +42,13 @@ export function BookEditScreen() {
         description: values.description,
         language: values.language,
         status: values.status,
+        tags: values.tags,
+        moods: values.moods,
+        format: values.format,
+        acquisition: values.acquisition,
+        colorLabel: values.colorLabel,
+        diaryTemplate: values.diaryTemplate,
+        shareable: values.shareable,
       })
 
       if (coverFile) {

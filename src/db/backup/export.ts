@@ -6,7 +6,12 @@ import type { BackupData, BackupManifest, CoverMeta } from '../schema'
 import type { Cover } from '../types'
 import { BACKUP_SCHEMA_VERSION } from './normalize'
 
-export type ExportOptions = { includeCovers?: boolean; appVersion?: string }
+export type ExportOptions = {
+  includeCovers?: boolean
+  appVersion?: string
+  /** Default true. Local snapshots pass false so they never look like a user backup. */
+  markBackup?: boolean
+}
 
 function toCoverMeta(cover: Cover): CoverMeta {
   const meta: CoverMeta = {
@@ -24,18 +29,33 @@ function toCoverMeta(cover: Cover): CoverMeta {
 }
 
 async function collectData(): Promise<BackupData> {
-  const [books, readings, sessions, quotes, journals, goals, settings, tombstones, covers] =
-    await Promise.all([
-      db.books.toArray(),
-      db.readings.toArray(),
-      db.sessions.toArray(),
-      db.quotes.toArray(),
-      db.journals.toArray(),
-      db.goals.toArray(),
-      db.settings.toArray(),
-      db.tombstones.toArray(),
-      db.covers.toArray(),
-    ])
+  const [
+    books,
+    readings,
+    sessions,
+    quotes,
+    journals,
+    characters,
+    bookNotes,
+    bookLinks,
+    goals,
+    settings,
+    tombstones,
+    covers,
+  ] = await Promise.all([
+    db.books.toArray(),
+    db.readings.toArray(),
+    db.sessions.toArray(),
+    db.quotes.toArray(),
+    db.journals.toArray(),
+    db.characters.toArray(),
+    db.bookNotes.toArray(),
+    db.bookLinks.toArray(),
+    db.goals.toArray(),
+    db.settings.toArray(),
+    db.tombstones.toArray(),
+    db.covers.toArray(),
+  ])
 
   return {
     books,
@@ -43,6 +63,9 @@ async function collectData(): Promise<BackupData> {
     sessions,
     quotes,
     journals,
+    characters,
+    bookNotes,
+    bookLinks,
     goals,
     settings,
     tombstones,
@@ -62,6 +85,9 @@ function buildManifest(data: BackupData, appVersion?: string): BackupManifest {
       sessions: data.sessions.length,
       quotes: data.quotes.length,
       journals: data.journals.length,
+      characters: data.characters.length,
+      bookNotes: data.bookNotes.length,
+      bookLinks: data.bookLinks.length,
       goals: data.goals.length,
       settings: data.settings.length,
       tombstones: data.tombstones.length,
@@ -86,17 +112,17 @@ export async function exportBackupZip(options: ExportOptions = {}): Promise<Blob
   }
 
   const zip = zipSync(entries)
-  await updateSettings({ lastBackupAt: nowISO() })
+  if (options.markBackup ?? true) await updateSettings({ lastBackupAt: nowISO() })
   return new Blob([zip], { type: 'application/zip' })
 }
 
-export async function exportBackupJson(): Promise<Blob> {
+export async function exportBackupJson(options: ExportOptions = {}): Promise<Blob> {
   const data = await collectData()
   const payload = {
     manifest: buildManifest(data),
     data: { ...data, covers: [] },
   }
 
-  await updateSettings({ lastBackupAt: nowISO() })
+  if (options.markBackup ?? true) await updateSettings({ lastBackupAt: nowISO() })
   return new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
 }

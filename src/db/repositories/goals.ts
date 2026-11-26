@@ -2,6 +2,11 @@ import { nowISO } from '@/lib/id'
 import { db } from '../db'
 import type { Goal } from '../types'
 
+function normalizeTarget(value: number): number {
+  if (!Number.isFinite(value)) return 1
+  return Math.min(Math.max(Math.round(value), 1), 9999)
+}
+
 export async function getGoal(year: number): Promise<Goal | undefined> {
   return db.goals.where('year').equals(year).first()
 }
@@ -25,6 +30,16 @@ export async function setGoal(year: number, targetBooks: number): Promise<Goal> 
 
   await db.goals.add(goal)
   return goal
+}
+
+/** Одна цель на год: при существующей записи обновляет её. */
+export async function createGoal(year: number, targetBooks: number): Promise<Goal> {
+  return setGoal(year, normalizeTarget(targetBooks))
+}
+
+/** Обновляет цель года; если записи ещё нет — создаёт её. */
+export async function updateGoal(year: number, targetBooks: number): Promise<Goal> {
+  return setGoal(year, normalizeTarget(targetBooks))
 }
 
 export async function deleteGoal(year: number): Promise<void> {

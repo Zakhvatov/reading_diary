@@ -27,20 +27,26 @@ export function TabBar() {
           <li key={to} className="flex-1">
             <NavLink
               to={to}
-              className={({ isActive }) =>
-                [
-                  'relative flex h-full min-h-11 flex-col items-center justify-center gap-1 text-[11px] leading-none',
-                  isActive ? 'text-accent' : 'text-muted',
-                ].join(' ')
-              }
+              className="relative flex h-full min-h-11 flex-col items-center justify-center gap-1"
             >
               {({ isActive }) => (
                 <>
-                  {isActive ? (
-                    <span className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-accent" />
-                  ) : null}
-                  <TabIcon size={22} weight={isActive ? 'fill' : 'regular'} aria-hidden />
-                  <span>{label}</span>
+                  <span
+                    className={[
+                      'flex size-8 items-center justify-center rounded-full transition-colors duration-[160ms]',
+                      isActive ? 'bg-accent-soft text-accent' : 'text-muted',
+                    ].join(' ')}
+                  >
+                    <TabIcon size={22} weight={isActive ? 'fill' : 'regular'} aria-hidden />
+                  </span>
+                  <span
+                    className={[
+                      'text-[11px] leading-none transition-colors duration-[160ms]',
+                      isActive ? 'font-medium text-accent' : 'text-muted',
+                    ].join(' ')}
+                  >
+                    {label}
+                  </span>
                 </>
               )}
             </NavLink>

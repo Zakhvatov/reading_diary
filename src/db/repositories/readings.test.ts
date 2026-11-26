@@ -72,6 +72,20 @@ describe('readings repository', () => {
     expect(readings[1]?.finishedAt).toBeUndefined()
   })
 
+  it('opens a new reading when the book moves to rereading', async () => {
+    const book = await createBook({ title: 'Книга' })
+    await updateBook(book.id, { status: 'reading' })
+    await updateBook(book.id, { status: 'finished' })
+
+    await updateBook(book.id, { status: 'rereading' })
+
+    const readings = await listReadings(book.id)
+    expect(readings).toHaveLength(2)
+    expect(readings[0]).toMatchObject({ status: 'finished' })
+    expect(readings[1]).toMatchObject({ status: 'reading', startedAt: today() })
+    expect(readings[1]?.finishedAt).toBeUndefined()
+  })
+
   it('starts a reading when the first session moves a planned book to reading', async () => {
     const book = await createBook({ title: 'Книга', pageCount: 200 })
 

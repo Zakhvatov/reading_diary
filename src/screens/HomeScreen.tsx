@@ -1,36 +1,30 @@
-import { BookOpen, GearSix } from '@phosphor-icons/react'
+import { BookOpen } from '@phosphor-icons/react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookCover } from '@/components/book/BookCover'
+import { BackupBanner } from '@/components/home/BackupBanner'
+import {
+  dismissBackupBanner,
+  isBackupBannerDismissed,
+  isBackupStale,
+} from '@/components/home/backup'
+import { HomeHeader } from '@/components/home/HomeHeader'
+import { JournalPreview } from '@/components/home/JournalPreview'
+import { Skeleton } from '@/components/home/Skeleton'
+import { StreakBlock } from '@/components/home/StreakBlock'
+import { TodayBlock } from '@/components/home/TodayBlock'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { SpineProgress } from '@/components/ui/SpineProgress'
-import { useBooks, useDaySessions } from '@/db/live'
+import { useBooks, useDaySessions, useJournals, useSettings } from '@/db/live'
+import { getStreak } from '@/db/queries/streak'
 import type { Book } from '@/db/types'
 import { formatAuthors } from '@/lib/authors'
+import { shelfOf } from '@/lib/bookStatus'
 import { today } from '@/lib/dates'
+import { formatDuration, pluralRu } from '@/lib/format'
 import { bookProgress } from '@/lib/progress'
-
-function formatToday(): string {
-  const formatted = new Intl.DateTimeFormat('ru-RU', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }).format(new Date())
-
-  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
-}
-
-function StatTile({ tone, label, value }: { tone: string; label: string; value: string }) {
-  return (
-    <div className={`rounded-[var(--radius-card)] px-3 py-3 ${tone}`}>
-      <p className="text-[11px] leading-[14px] opacity-70">{label}</p>
-      <p className="mt-1 font-display text-[21px] leading-[26px] font-medium tabular-nums">
-        {value}
-      </p>
-    </div>
-  )
-}
 
 function RecentBooks({ books }: { books: Book[] }) {
   if (books.length === 0) return null
@@ -55,11 +49,61 @@ function RecentBooks({ books }: { books: Book[] }) {
   )
 }
 
+function CurrentBook({ book }: { book: Book }) {
+  const progress = bookProgress(book)
+  const hasReadingTime = book.totalReadingMs > 0
+  const hasSessions = book.sessionCount > 0
+
+  return (
+    <Link
+      to={`/books/${book.id}`}
+      className="mt-4 flex gap-4 rounded-[var(--radius-card)] bg-peach p-4 text-peach-ink active:brightness-[0.98]"
+    >
+      <BookCover book={book} className="w-24 shrink-0" />
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-medium tracking-[0.08em] uppercase opacity-70">
+          Сейчас читаю
+        </p>
+        <h2 className="mt-1 line-clamp-2 font-display text-[23px] leading-[29px] font-medium">
+          {book.title}
+        </h2>
+        <p className="mt-0.5 line-clamp-1 text-[13px] leading-[18px] opacity-80">
+          {formatAuthors(book.authors, true)}
+        </p>
+        <SpineProgress value={progress} className="mt-3" />
+        <p className="mt-2 text-[13px] leading-[18px] opacity-80">
+          {book.pageCount
+            ? `${book.currentPage} из ${book.pageCount} стр.`
+            : `${book.currentPage} стр.`}{' '}
+          · {Math.round(progress * 100)}%
+        </p>
+        {hasReadingTime || hasSessions ? (
+          <p className="mt-1 text-[12px] leading-[16px] opacity-60">
+            {hasReadingTime ? `Всего ${formatDuration(book.totalReadingMs)}` : null}
+            {hasReadingTime && hasSessions ? ' · ' : null}
+            {hasSessions
+              ? `${book.sessionCount} ${pluralRu(book.sessionCount, [
+                  'сессия',
+                  'сессии',
+                  'сессий',
+                ])}`
+              : null}
+          </p>
+        ) : null}
+      </div>
+    </Link>
+  )
+}
+
 export function HomeScreen() {
+  const anchor = today()
   const books = useBooks()
-  const reading = useBooks('reading')
-  const current = reading?.[0]
-  const sessions = useDaySessions(today())
+  const current = (books ?? []).find((book) => shelfOf(book.status) === 'reading')
+  const sessions = useDaySessions(anchor)
+  const settings = useSettings()
+  const journals = useJournals()
+  const streak = useLiveQuery(() => getStreak(anchor), [anchor])
+  const [bannerHidden, setBannerHidden] = useState(isBackupBannerDismissed)
 
   const minutes = Math.round(
     (sessions ?? []).reduce((total, session) => total + session.durationMs, 0) / 60_000,
@@ -74,74 +118,47 @@ export function HomeScreen() {
     .sort((a, b) => (b.finishedAt ?? '').localeCompare(a.finishedAt ?? ''))
     .slice(0, 6)
 
+  const showBackupBanner =
+    settings !== undefined && !bannerHidden && isBackupStale(settings.lastBackupAt)
+
+  function hideBackupBanner() {
+    dismissBackupBanner()
+    setBannerHidden(true)
+  }
+
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader
-        title="Сегодня"
-        caption={formatToday()}
-        action={
-          <Link
-            to="/settings"
-            aria-label="Настройки"
-            className="flex size-11 items-center justify-center rounded-full text-muted active:bg-accent-soft"
-          >
-            <GearSix size={22} aria-hidden />
-          </Link>
-        }
-      />
+      <HomeHeader />
+
+      {showBackupBanner ? <BackupBanner onDismiss={hideBackupBanner} /> : null}
 
       {books === undefined ? (
-        <div className="mt-8 space-y-3" aria-hidden>
-          <div className="h-20 animate-pulse rounded-[var(--radius-card)] bg-line/50" />
-          <div className="h-36 animate-pulse rounded-[var(--radius-card)] bg-line/50" />
-          <div className="h-4 w-2/3 animate-pulse rounded bg-line/50" />
-        </div>
-      ) : books.length === 0 ? (
-        <div className="mt-8">
-          <EmptyState
-            icon={<BookOpen size={28} />}
-            title="Полка пока пуста"
-            description="Добавьте первую книгу — прогресс, сессии и заметки появятся здесь."
-            action={<Button to="/add">Добавить книгу</Button>}
-          />
+        <div className="mt-6 space-y-3">
+          <Skeleton className="h-20" />
+          <Skeleton className="h-40" />
+          <Skeleton className="h-28" />
         </div>
       ) : (
         <>
-          <div className="mt-6 grid grid-cols-3 gap-2">
-            <StatTile tone="bg-sage text-sage-ink" label="Сегодня" value={`${minutes} мин`} />
-            <StatTile tone="bg-butter text-butter-ink" label="Страниц" value={String(pages)} />
-            <StatTile
-              tone="bg-lilac text-lilac-ink"
-              label="Книг за год"
-              value={String(finishedThisYear)}
-            />
-          </div>
+          <TodayBlock
+            minutes={minutes}
+            pages={pages}
+            finishedThisYear={finishedThisYear}
+            goalMinutes={settings?.dailyGoalMinutes ?? 0}
+            loading={settings === undefined || sessions === undefined}
+          />
 
-          {current ? (
-            <Link
-              to={`/books/${current.id}`}
-              className="mt-4 flex gap-4 rounded-[var(--radius-card)] bg-peach p-4 text-peach-ink active:brightness-[0.98]"
-            >
-              <BookCover book={current} className="w-24 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-medium tracking-[0.08em] uppercase opacity-70">
-                  Сейчас читаю
-                </p>
-                <h2 className="mt-1 line-clamp-2 font-display text-[23px] leading-[29px] font-medium">
-                  {current.title}
-                </h2>
-                <p className="mt-0.5 line-clamp-1 text-[13px] leading-[18px] opacity-80">
-                  {formatAuthors(current.authors, true)}
-                </p>
-                <SpineProgress value={bookProgress(current)} className="mt-3" />
-                <p className="mt-2 text-[13px] leading-[18px] opacity-80">
-                  {current.pageCount
-                    ? `${current.currentPage} из ${current.pageCount} стр.`
-                    : `${current.currentPage} стр.`}{' '}
-                  · {Math.round(bookProgress(current) * 100)}%
-                </p>
-              </div>
-            </Link>
+          {books.length === 0 ? (
+            <div className="mt-6">
+              <EmptyState
+                icon={<BookOpen size={28} />}
+                title="Полка пока пуста"
+                description="Добавьте первую книгу — прогресс, сессии и заметки появятся здесь."
+                action={<Button to="/add">Добавить книгу</Button>}
+              />
+            </div>
+          ) : current ? (
+            <CurrentBook book={current} />
           ) : (
             <section className="mt-4 rounded-[var(--radius-card)] bg-sky p-5 text-sky-ink">
               <h2 className="font-display text-[22px] leading-[28px] font-medium">
@@ -158,11 +175,15 @@ export function HomeScreen() {
 
           <RecentBooks books={recent} />
 
-          <p className="mt-8 text-[13px] leading-[18px] text-muted">
-            Данные хранятся только в этом браузере.
-          </p>
+          <StreakBlock streak={streak} />
+
+          <JournalPreview entry={journals?.[0]} loading={journals === undefined} />
         </>
       )}
+
+      <p className="mt-8 text-[13px] leading-[18px] text-muted">
+        Данные хранятся только в этом браузере.
+      </p>
     </div>
   )
 }

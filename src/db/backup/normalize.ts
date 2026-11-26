@@ -1,6 +1,6 @@
 import { toDay } from '@/lib/dates'
 
-export const BACKUP_SCHEMA_VERSION = 2
+export const BACKUP_SCHEMA_VERSION = 3
 
 type JsonRecord = Record<string, unknown>
 
@@ -36,22 +36,41 @@ function normalizeList(
   return result
 }
 
-function normalizeBook(record: JsonRecord): JsonRecord | null {
+function stringList(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : []
+}
+
+function normalizeBook(record: JsonRecord, sourceVersion: number): JsonRecord | null {
   const id = str(record.id)
   const title = str(record.title)
   if (!id || !title) return null
 
   const createdAt = str(record.createdAt, new Date().toISOString())
+  const converted =
+    sourceVersion < 3 && typeof record.rating === 'number' && record.rating <= 5
+      ? record.rating * 2
+      : record.rating
+  const rating = typeof converted === 'number' && Number.isFinite(converted) ? converted : undefined
+
   return {
     ...record,
     id,
     title,
-    authors: Array.isArray(record.authors) ? record.authors : [],
-    genres: Array.isArray(record.genres) ? record.genres : [],
+    authors: stringList(record.authors),
+    genres: stringList(record.genres),
     status: str(record.status, 'want'),
     progressMode: str(record.progressMode, 'pages'),
     currentPage: num(record.currentPage, 0),
     percent: num(record.percent, 0),
+    rating,
+    ratingScale: str(record.ratingScale, 'stars5'),
+    tags: stringList(record.tags),
+    moods: stringList(record.moods),
+    colorLabel: str(record.colorLabel, 'none'),
+    diaryTemplate: str(record.diaryTemplate, 'lite'),
+    shareable: typeof record.shareable === 'boolean' ? record.shareable : false,
     totalReadingMs: num(record.totalReadingMs, 0),
     sessionCount: num(record.sessionCount, 0),
     pagesReadTotal: num(record.pagesReadTotal, 0),
@@ -116,6 +135,8 @@ function normalizeQuote(record: JsonRecord): JsonRecord | null {
     id,
     bookId,
     text,
+    favorite: typeof record.favorite === 'boolean' ? record.favorite : false,
+    shareable: typeof record.shareable === 'boolean' ? record.shareable : false,
     createdAt,
     updatedAt: str(record.updatedAt, createdAt),
   }
@@ -133,6 +154,63 @@ function normalizeJournal(record: JsonRecord): JsonRecord | null {
     body: str(record.body),
     color: str(record.color, 'pine'),
     entryDate: str(record.entryDate) || dayOf(createdAt, toDay(new Date())),
+    tags: stringList(record.tags),
+    shareable: typeof record.shareable === 'boolean' ? record.shareable : false,
+    createdAt,
+    updatedAt: str(record.updatedAt, createdAt),
+  }
+}
+
+function normalizeCharacter(record: JsonRecord): JsonRecord | null {
+  const id = str(record.id)
+  const bookId = str(record.bookId)
+  const name = str(record.name)
+  if (!id || !bookId || !name) return null
+
+  const createdAt = str(record.createdAt, new Date().toISOString())
+  return {
+    ...record,
+    id,
+    bookId,
+    name,
+    note: str(record.note),
+    createdAt,
+    updatedAt: str(record.updatedAt, createdAt),
+  }
+}
+
+function normalizeBookNote(record: JsonRecord): JsonRecord | null {
+  const id = str(record.id)
+  const bookId = str(record.bookId)
+  if (!id || !bookId) return null
+
+  const createdAt = str(record.createdAt, new Date().toISOString())
+  return {
+    ...record,
+    id,
+    bookId,
+    kind: str(record.kind, 'plot'),
+    body: str(record.body),
+    tags: stringList(record.tags),
+    order: num(record.order, 0),
+    createdAt,
+    updatedAt: str(record.updatedAt, createdAt),
+  }
+}
+
+function normalizeBookLink(record: JsonRecord): JsonRecord | null {
+  const id = str(record.id)
+  const bookId = str(record.bookId)
+  const targetTitle = str(record.targetTitle)
+  if (!id || !bookId || !targetTitle) return null
+
+  const createdAt = str(record.createdAt, new Date().toISOString())
+  return {
+    ...record,
+    id,
+    bookId,
+    targetTitle,
+    kind: str(record.kind, 'other'),
     createdAt,
     updatedAt: str(record.updatedAt, createdAt),
   }
@@ -164,6 +242,8 @@ function normalizeSettings(record: JsonRecord): JsonRecord | null {
     id: 'app',
     onboardingDone: typeof record.onboardingDone === 'boolean' ? record.onboardingDone : true,
     defaultStatus: str(record.defaultStatus, 'want'),
+    defaultTemplate: str(record.defaultTemplate, 'lite'),
+    defaultRatingScale: str(record.defaultRatingScale, 'stars5'),
     dailyGoalMinutes: num(record.dailyGoalMinutes, 0),
     persistGranted: typeof record.persistGranted === 'boolean' ? record.persistGranted : false,
     schemaVersion: num(record.schemaVersion, 2),
@@ -211,15 +291,18 @@ function normalizeCover(record: JsonRecord): JsonRecord | null {
  * (and books without a title) are dropped instead of being guessed. The result
  * is still untrusted and must be validated with `backupDataSchema`.
  */
-export function normalizeBackup(raw: unknown): Record<string, unknown> {
+export function normalizeBackup(raw: unknown, sourceVersion = 1): Record<string, unknown> {
   const source = isRecord(raw) ? raw : {}
 
   return {
-    books: normalizeList(source.books, normalizeBook),
+    books: normalizeList(source.books, (book) => normalizeBook(book, sourceVersion)),
     readings: normalizeList(source.readings, normalizeReading),
     sessions: normalizeList(source.sessions, normalizeSession),
     quotes: normalizeList(source.quotes, normalizeQuote),
     journals: normalizeList(source.journals, normalizeJournal),
+    characters: normalizeList(source.characters, normalizeCharacter),
+    bookNotes: normalizeList(source.bookNotes, normalizeBookNote),
+    bookLinks: normalizeList(source.bookLinks, normalizeBookLink),
     goals: normalizeList(source.goals, normalizeGoal),
     settings: normalizeList(source.settings, normalizeSettings),
     tombstones: normalizeList(source.tombstones, normalizeTombstone),

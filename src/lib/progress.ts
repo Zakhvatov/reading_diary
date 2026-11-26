@@ -58,6 +58,16 @@ export function setBookStatus(book: Book, status: Book['status'], day: ISODate):
     return finishBook(book, day)
   }
 
+  if (status === 'rereading') {
+    return {
+      status,
+      currentPage: 0,
+      percent: 0,
+      startedAt: day,
+      finishedAt: undefined,
+    }
+  }
+
   if (status === 'reading') {
     return {
       status,

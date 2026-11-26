@@ -1,13 +1,15 @@
 import { Books } from '@phosphor-icons/react'
 import { useState } from 'react'
-import { Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { BookGrid } from '@/components/book/BookGrid'
+import { STATUS_TONE } from '@/components/book/statusTone'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { useBooks } from '@/db/live'
 import type { Book, BookStatus } from '@/db/types'
-import { isBookStatus, SHELF_TITLES } from '@/lib/bookStatus'
+import { BOOK_STATUSES, isBookStatus, shelfOf, SHELF_TITLES, STATUS_SHORT } from '@/lib/bookStatus'
+import { pluralRu } from '@/lib/format'
 
 type SortKey = 'recent' | 'title' | 'author'
 
@@ -18,6 +20,10 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 ]
 
 const SKELETON_KEYS = ['a', 'b', 'c']
+
+function bookCount(count: number): string {
+  return `${count} ${pluralRu(count, ['книга', 'книги', 'книг'])}`
+}
 
 function sortBooks(books: Book[], sort: SortKey): Book[] {
   if (sort === 'recent') {
@@ -32,7 +38,8 @@ function sortBooks(books: Book[], sort: SortKey): Book[] {
 export function ShelfDetailScreen() {
   const { shelf } = useParams()
   const status: BookStatus | undefined = isBookStatus(shelf) ? shelf : undefined
-  const books = useBooks(status)
+  const allBooks = useBooks()
+  const books = allBooks?.filter((book) => shelfOf(book.status) === status)
   const [sort, setSort] = useState<SortKey>('recent')
 
   if (!status) {
@@ -41,23 +48,54 @@ export function ShelfDetailScreen() {
 
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title={SHELF_TITLES[status]} caption="Библиотека" back />
+      <ScreenHeader
+        title={SHELF_TITLES[status]}
+        caption="Библиотека"
+        back
+        captionClassName={STATUS_TONE[status].caption}
+      />
 
-      <select
-        value={sort}
-        onChange={(event) => setSort(event.target.value as SortKey)}
-        aria-label="Сортировка"
-        className="mt-6 h-11 rounded-[var(--radius-control)] border border-line bg-surface px-3 text-[15px] text-ink focus-visible:border-accent focus-visible:outline-none"
-      >
-        {SORT_OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      <div className="-mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1">
+        {BOOK_STATUSES.map((option) => {
+          const active = option === status
+          return (
+            <Link
+              key={option}
+              to={`/shelves/${option}`}
+              aria-current={active ? 'page' : undefined}
+              className={[
+                'inline-flex h-11 shrink-0 items-center rounded-[var(--radius-pill)] px-4 text-[13px] font-medium',
+                active ? STATUS_TONE[option].chip : 'border border-line bg-surface text-muted',
+              ].join(' ')}
+            >
+              {STATUS_SHORT[option]}
+            </Link>
+          )
+        })}
+      </div>
+
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <span
+          className={`inline-flex h-7 shrink-0 items-center rounded-[var(--radius-pill)] px-3 text-[12px] leading-none font-medium ${STATUS_TONE[status].chip}`}
+        >
+          {books === undefined ? '…' : bookCount(books.length)}
+        </span>
+        <select
+          value={sort}
+          onChange={(event) => setSort(event.target.value as SortKey)}
+          aria-label="Сортировка"
+          className="h-11 rounded-[var(--radius-control)] border border-line bg-surface px-3 text-[16px] text-ink focus-visible:border-accent focus-visible:outline-none"
+        >
+          {SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {books === undefined ? (
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-6" aria-hidden>
+        <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-7" aria-hidden>
           {SKELETON_KEYS.map((key) => (
             <div key={key} className="animate-pulse">
               <div className="aspect-[2/3] rounded-[10px] bg-line/60" />
@@ -74,6 +112,7 @@ export function ShelfDetailScreen() {
             icon={<Books size={28} />}
             title="На полке пусто"
             description="Книги этого статуса появятся здесь."
+            tone={STATUS_TONE[status].tone}
             action={<Button to="/add">Добавить книгу</Button>}
           />
         </div>

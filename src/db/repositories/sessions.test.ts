@@ -75,14 +75,28 @@ describe('sessions repository', () => {
     })
   })
 
-  it('rejects a zero-length session', async () => {
+  it('accepts a page-only session with zero duration', async () => {
+    const book = await createBook({ title: 'Книга', pageCount: 50 })
+
+    const session = await addSession({
+      bookId: book.id,
+      startedAt: '2026-02-04T10:00:00.000Z',
+      durationMs: 0,
+      endPage: 10,
+    })
+
+    expect(session.durationMs).toBe(0)
+    expect((await getBook(book.id))?.currentPage).toBe(10)
+  })
+
+  it('rejects a negative session duration', async () => {
     const book = await createBook({ title: 'Книга' })
 
     await expect(
       addSession({
         bookId: book.id,
         startedAt: '2026-02-04T10:00:00.000Z',
-        durationMs: 0,
+        durationMs: -1,
       }),
     ).rejects.toThrow('Длительность')
   })

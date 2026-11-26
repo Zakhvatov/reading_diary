@@ -1,9 +1,21 @@
+import { CaretDown } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react'
 import { BookCover } from '@/components/book/BookCover'
+import { ColorLabelPicker } from '@/components/diary/ColorLabelPicker'
+import { TagInput } from '@/components/diary/TagInput'
 import { Button } from '@/components/ui/Button'
-import type { Book, BookStatus } from '@/db/types'
-import { BOOK_STATUSES, STATUS_LABELS } from '@/lib/bookStatus'
+import type {
+  Acquisition,
+  Book,
+  BookFormat,
+  BookStatus,
+  ColorLabel,
+  DiaryTemplateId,
+} from '@/db/types'
+import { ACQUISITION_LABELS, BOOK_FORMAT_LABELS } from '@/lib/bookMeta'
+import { STATUS_LABELS, STATUS_OPTIONS } from '@/lib/bookStatus'
 import { normalizeIsbn } from '@/lib/isbn'
+import { DIARY_TEMPLATES } from '@/lib/templates'
 
 export type BookFormValues = {
   title: string
@@ -17,6 +29,13 @@ export type BookFormValues = {
   description?: string
   language?: string
   status: BookStatus
+  tags: string[]
+  moods: string[]
+  format?: BookFormat
+  acquisition?: Acquisition
+  colorLabel: ColorLabel
+  diaryTemplate: DiaryTemplateId
+  shareable: boolean
 }
 
 type BookFormProps = {
@@ -24,6 +43,7 @@ type BookFormProps = {
   initialValues?: Partial<BookFormValues>
   coverPreviewUrl?: string
   defaultStatus?: BookStatus
+  defaultTemplate?: DiaryTemplateId
   submitLabel: string
   busy?: boolean
   error?: string | null
@@ -67,6 +87,7 @@ export function BookForm({
   initialValues,
   coverPreviewUrl,
   defaultStatus,
+  defaultTemplate,
   submitLabel,
   busy = false,
   error,
@@ -95,6 +116,24 @@ export function BookForm({
     initial?.status ?? initialValues?.status ?? defaultStatus ?? 'want',
   )
   const [language] = useState(initial?.language ?? initialValues?.language ?? '')
+  const [tags, setTags] = useState(initial?.tags ?? initialValues?.tags ?? [])
+  const [moods, setMoods] = useState(initial?.moods ?? initialValues?.moods ?? [])
+  const [format, setFormat] = useState<BookFormat | ''>(
+    initial?.format ?? initialValues?.format ?? '',
+  )
+  const [acquisition, setAcquisition] = useState<Acquisition | ''>(
+    initial?.acquisition ?? initialValues?.acquisition ?? '',
+  )
+  const [colorLabel, setColorLabel] = useState<ColorLabel>(
+    initial?.colorLabel ?? initialValues?.colorLabel ?? 'none',
+  )
+  const [template, setTemplate] = useState<DiaryTemplateId>(
+    initial?.diaryTemplate ?? initialValues?.diaryTemplate ?? defaultTemplate ?? 'lite',
+  )
+  const [shareable, setShareable] = useState(
+    initial?.shareable ?? initialValues?.shareable ?? false,
+  )
+  const [expanded, setExpanded] = useState(false)
   const [coverFile, setCoverFile] = useState<File | null>(null)
   const [remoteCoverFailed, setRemoteCoverFailed] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -112,6 +151,7 @@ export function BookForm({
     const next: Record<string, string> = {}
 
     if (!title.trim()) next.title = 'Введите название'
+    if (!authors.trim()) next.authors = 'Введите автора'
     if (pages && (!/^\d+$/.test(pages) || Number(pages) <= 0)) {
       next.pages = 'Только целое число'
     }
@@ -149,6 +189,13 @@ export function BookForm({
         description: note.trim() || undefined,
         language: language || undefined,
         status,
+        tags,
+        moods,
+        format: format || undefined,
+        acquisition: acquisition || undefined,
+        colorLabel,
+        diaryTemplate: template,
+        shareable,
       },
       coverFile,
     )
@@ -211,7 +258,7 @@ export function BookForm({
         />
       </Field>
 
-      <Field label="Авторы" hint="Через запятую">
+      <Field label="Авторы" hint="Через запятую" error={errors.authors}>
         <input
           name="authors"
           value={authors}
@@ -285,7 +332,7 @@ export function BookForm({
           onChange={(event) => setStatus(event.target.value as BookStatus)}
           className={inputClass}
         >
-          {BOOK_STATUSES.map((value) => (
+          {STATUS_OPTIONS.map((value) => (
             <option key={value} value={value}>
               {STATUS_LABELS[value]}
             </option>
@@ -302,6 +349,127 @@ export function BookForm({
           placeholder="Почему хочется прочитать"
         />
       </Field>
+
+      <button
+        type="button"
+        onClick={() => setExpanded((value) => !value)}
+        aria-expanded={expanded}
+        className="mt-8 flex min-h-11 w-full items-center justify-between gap-3 border-t border-line pt-4 text-left"
+      >
+        <span>
+          <span className="block text-[16px] leading-[22px] font-medium">Подробнее</span>
+          <span className="block text-[13px] leading-[18px] text-muted">
+            Теги, формат, ярлык и шаблон
+          </span>
+        </span>
+        <CaretDown
+          size={18}
+          className={['shrink-0 text-muted', expanded ? 'rotate-180' : ''].join(' ')}
+          aria-hidden
+        />
+      </button>
+
+      {expanded ? (
+        <div>
+          <div className="mt-4">
+            <span className="text-[13px] leading-[18px] font-medium text-muted">Теги</span>
+            <TagInput
+              value={tags}
+              onChange={setTags}
+              disabled={busy}
+              placeholder="медленное чтение"
+            />
+          </div>
+
+          <div className="mt-4">
+            <span className="text-[13px] leading-[18px] font-medium text-muted">Настроения</span>
+            <TagInput
+              value={moods}
+              onChange={setMoods}
+              disabled={busy}
+              placeholder="тихое"
+              ariaLabel="Добавить настроение"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="mt-4 block">
+              <span className="text-[13px] leading-[18px] font-medium text-muted">Формат</span>
+              <select
+                value={format}
+                onChange={(event) => setFormat(event.target.value as BookFormat | '')}
+                className={inputClass}
+              >
+                <option value="">Не указан</option>
+                {(Object.keys(BOOK_FORMAT_LABELS) as BookFormat[]).map((value) => (
+                  <option key={value} value={value}>
+                    {BOOK_FORMAT_LABELS[value]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="mt-4 block">
+              <span className="text-[13px] leading-[18px] font-medium text-muted">Откуда</span>
+              <select
+                value={acquisition}
+                onChange={(event) => setAcquisition(event.target.value as Acquisition | '')}
+                className={inputClass}
+              >
+                <option value="">Не указано</option>
+                {(Object.keys(ACQUISITION_LABELS) as Acquisition[]).map((value) => (
+                  <option key={value} value={value}>
+                    {ACQUISITION_LABELS[value]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="mt-4">
+            <span className="text-[13px] leading-[18px] font-medium text-muted">Цветной ярлык</span>
+            <div className="mt-1">
+              <ColorLabelPicker value={colorLabel} onChange={setColorLabel} disabled={busy} />
+            </div>
+          </div>
+
+          <label className="mt-4 block">
+            <span className="text-[13px] leading-[18px] font-medium text-muted">
+              Шаблон дневника
+            </span>
+            <select
+              value={template}
+              onChange={(event) => setTemplate(event.target.value as DiaryTemplateId)}
+              className={inputClass}
+            >
+              {DIARY_TEMPLATES.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.title}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-[13px] leading-[18px] text-muted">
+              {DIARY_TEMPLATES.find((option) => option.id === template)?.description}
+            </span>
+          </label>
+
+          <label className="mt-4 flex min-h-11 items-center justify-between gap-4">
+            <span>
+              <span className="block text-[15px] leading-[20px]">
+                Разрешить в экспорте «Для других»
+              </span>
+              <span className="block text-[13px] leading-[18px] text-muted">
+                Ничего не публикуется, это только фильтр.
+              </span>
+            </span>
+            <input
+              type="checkbox"
+              checked={shareable}
+              onChange={(event) => setShareable(event.target.checked)}
+              className="size-5 shrink-0 accent-accent"
+            />
+          </label>
+        </div>
+      ) : null}
 
       {error ? (
         <p role="alert" className="mt-4 text-[14px] leading-[20px] text-signal">

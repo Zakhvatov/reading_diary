@@ -19,6 +19,15 @@ export function formatDay(day: ISODate): string {
   return format(parseDay(day), 'd MMM yyyy', { locale: ru })
 }
 
+export function formatMoment(iso: string): string {
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? '' : format(date, 'd MMM yyyy, HH:mm', { locale: ru })
+}
+
+export function formatDayShort(day: ISODate): string {
+  return format(parseDay(day), 'd MMM', { locale: ru })
+}
+
 export function today(): ISODate {
   return toDay(new Date())
 }

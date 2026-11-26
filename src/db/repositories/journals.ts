@@ -9,6 +9,9 @@ export type JournalInput = {
   entryDate: string
   bookId?: ID
   photoId?: ID
+  tags?: string[]
+  mood?: string
+  shareable?: boolean
 }
 
 export async function createJournal(input: JournalInput): Promise<JournalEntry> {
@@ -19,12 +22,15 @@ export async function createJournal(input: JournalInput): Promise<JournalEntry> 
     body: input.body,
     color: input.color,
     entryDate: input.entryDate,
+    tags: input.tags ?? [],
+    shareable: input.shareable ?? false,
     createdAt: now,
     updatedAt: now,
   }
 
   if (input.bookId) entry.bookId = input.bookId
   if (input.photoId) entry.photoId = input.photoId
+  if (input.mood) entry.mood = input.mood
 
   await db.journals.add(entry)
   return entry

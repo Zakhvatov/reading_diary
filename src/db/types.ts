@@ -1,9 +1,18 @@
+import type { DiaryTemplateId } from '@/lib/templates'
+
+export type { DiaryTemplateId } from '@/lib/templates'
+
 export type ID = string
 export type ISODateTime = string // UTC ISO
 export type ISODate = string // YYYY-MM-DD, local calendar day
 
-export type BookStatus = 'want' | 'reading' | 'finished' | 'dnf'
+export type BookStatus = 'want' | 'reading' | 'finished' | 'dnf' | 'rereading'
 export type ProgressMode = 'pages' | 'percent'
+export type RatingScale = 'stars5' | 'score10' | 'emotion'
+export type EmotionRating = 'love' | 'neutral' | 'mindblown'
+export type BookFormat = 'paper' | 'ebook' | 'audio'
+export type Acquisition = 'bought' | 'library' | 'gift' | 'other'
+export type ColorLabel = 'red' | 'amber' | 'green' | 'blue' | 'none'
 
 export interface Book {
   id: ID
@@ -22,7 +31,17 @@ export interface Book {
   progressMode: ProgressMode
   currentPage: number
   percent: number
-  rating?: 1 | 2 | 3 | 4 | 5
+  /** Каноническая оценка 0…10, независимо от шкалы ввода. */
+  rating?: number
+  ratingScale: RatingScale
+  emotion?: EmotionRating
+  tags: string[]
+  moods: string[]
+  format?: BookFormat
+  acquisition?: Acquisition
+  colorLabel: ColorLabel
+  diaryTemplate: DiaryTemplateId
+  shareable: boolean
   startedAt?: ISODate
   finishedAt?: ISODate
   coverId?: ID
@@ -71,7 +90,10 @@ export interface Quote {
   bookId: ID
   text: string
   page?: number
+  chapter?: string
   note?: string
+  favorite: boolean
+  shareable: boolean
   createdAt: ISODateTime
   updatedAt: ISODateTime
 }
@@ -86,6 +108,48 @@ export interface JournalEntry {
   color: JournalColor
   photoId?: ID
   entryDate: ISODate
+  tags: string[]
+  mood?: string
+  shareable: boolean
+  createdAt: ISODateTime
+  updatedAt: ISODateTime
+}
+
+export interface Character {
+  id: ID
+  bookId: ID
+  name: string
+  role?: string
+  note: string
+  spoiler?: boolean
+  createdAt: ISODateTime
+  updatedAt: ISODateTime
+}
+
+export type BookNoteKind = 'plot' | 'insight'
+
+export interface BookNote {
+  id: ID
+  bookId: ID
+  kind: BookNoteKind
+  title?: string
+  chapter?: string
+  body: string
+  tags: string[]
+  order: number
+  createdAt: ISODateTime
+  updatedAt: ISODateTime
+}
+
+export type BookLinkKind = 'similar' | 'sequel' | 'prequel' | 'same-world' | 'other'
+
+export interface BookLink {
+  id: ID
+  bookId: ID
+  targetBookId?: ID
+  targetTitle: string
+  kind: BookLinkKind
+  note?: string
   createdAt: ISODateTime
   updatedAt: ISODateTime
 }
@@ -102,6 +166,8 @@ export interface Settings {
   id: 'app'
   onboardingDone: boolean
   defaultStatus: BookStatus
+  defaultTemplate: DiaryTemplateId
+  defaultRatingScale: RatingScale
   dailyGoalMinutes: number
   lastBackupAt?: ISODateTime
   lastSnapshotAt?: ISODateTime
@@ -111,7 +177,16 @@ export interface Settings {
   updatedAt: ISODateTime
 }
 
-export type EntityKind = 'book' | 'reading' | 'session' | 'quote' | 'journal' | 'goal'
+export type EntityKind =
+  | 'book'
+  | 'reading'
+  | 'session'
+  | 'quote'
+  | 'journal'
+  | 'goal'
+  | 'character'
+  | 'bookNote'
+  | 'bookLink'
 
 export interface Tombstone {
   id: ID
