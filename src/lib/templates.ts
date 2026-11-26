@@ -39,3 +39,22 @@ export const DIARY_TEMPLATES: { id: DiaryTemplateId; title: string; description:
 export function sectionsFor(template: DiaryTemplateId): DiarySection[] {
   return [...TEMPLATE_SECTIONS[template]]
 }
+
+/** Подсказка над разделом: шаблон задаёт не только состав, но и тон записей. */
+export const TEMPLATE_SECTION_HINTS: Record<
+  DiaryTemplateId,
+  Partial<Record<DiarySection, string>>
+> = {
+  lite: {},
+  analyst: {
+    quotes: 'Цитаты, которые хочется перечитать.',
+    characters: 'Кто двигает сюжет и зачем.',
+    plot: 'Что происходит по главам — коротко.',
+    insights: 'Наблюдения, догадки и то, что зацепило.',
+  },
+  bookclub: {
+    quotes: 'Цитаты, на которых строится обсуждение.',
+    insights: 'Вопросы, которые стоит задать группе.',
+    links: 'С чем сравнить и что напоминает.',
+  },
+}

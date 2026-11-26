@@ -15,7 +15,6 @@ import { TemplatePicker } from '@/components/diary/TemplatePicker'
 import { DiaryExport } from '@/components/export/DiaryExport'
 import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
-import { Sheet } from '@/components/ui/Sheet'
 import {
   useBook,
   useBookLinks,
@@ -33,9 +32,12 @@ import { formatDayShort } from '@/lib/dates'
 import { daysRead } from '@/lib/days'
 import { pluralRu } from '@/lib/format'
 import { formatRating } from '@/lib/rating'
-import { DIARY_SECTION_LABELS, sectionsFor, type DiarySection } from '@/lib/templates'
-
-const ALL_SECTIONS = Object.keys(DIARY_SECTION_LABELS) as DiarySection[]
+import {
+  DIARY_SECTION_LABELS,
+  sectionsFor,
+  TEMPLATE_SECTION_HINTS,
+  type DiarySection,
+} from '@/lib/templates'
 
 const NOT_FOUND_DELAY_MS = 1000
 
@@ -68,7 +70,6 @@ export function DiaryScreen() {
   const books = useBooks()
   const readings = useReadings(bookId)
   const [active, setActive] = useState<DiarySection>('overview')
-  const [allOpen, setAllOpen] = useState(false)
   const [waitedId, setWaitedId] = useState<string | undefined>(undefined)
 
   useEffect(() => {
@@ -104,8 +105,8 @@ export function DiaryScreen() {
   }
 
   const visible = sectionsFor(book.diaryTemplate)
-  const hidden = ALL_SECTIONS.filter((section) => !visible.includes(section))
   const current = active
+  const hint = TEMPLATE_SECTION_HINTS[book.diaryTemplate][current]
   const counts: Record<DiarySection, number> = {
     overview: 0,
     quotes: quotes?.length ?? 0,
@@ -194,18 +195,10 @@ export function DiaryScreen() {
             </button>
           )
         })}
-        {hidden.length > 0 ? (
-          <button
-            type="button"
-            onClick={() => setAllOpen(true)}
-            className="inline-flex h-11 shrink-0 items-center rounded-[var(--radius-pill)] border border-line bg-surface px-4 text-[13px] leading-[18px] font-medium text-accent"
-          >
-            Все разделы
-          </button>
-        ) : null}
       </div>
 
       <div className="mt-5 border-t border-line pt-5">
+        {hint ? <p className="mb-4 text-[13px] leading-[18px] text-muted">{hint}</p> : null}
         {current === 'overview' ? (
           <Overview
             book={book}
@@ -214,6 +207,7 @@ export function DiaryScreen() {
             characters={characters ?? []}
             notes={allNotes}
             links={links ?? []}
+            onOpenSection={setActive}
           />
         ) : null}
         {current === 'quotes' ? <QuoteList book={book} /> : null}
@@ -246,41 +240,6 @@ export function DiaryScreen() {
           )
         ) : null}
       </div>
-
-      <Sheet open={allOpen} onClose={() => setAllOpen(false)} title="Все разделы">
-        <div className="flex flex-col">
-          {ALL_SECTIONS.map((section) => {
-            const selected = section === current
-            const count = counts[section]
-
-            return (
-              <button
-                key={section}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => {
-                  setActive(section)
-                  setAllOpen(false)
-                }}
-                className={[
-                  'flex min-h-12 items-center justify-between gap-3 rounded-[var(--radius-control)] px-2 text-left text-[16px] leading-[22px]',
-                  selected ? 'bg-accent-soft' : 'active:bg-accent-soft',
-                ].join(' ')}
-              >
-                <span className={visible.includes(section) ? 'text-ink' : 'text-muted'}>
-                  {DIARY_SECTION_LABELS[section]}
-                </span>
-                <span className="shrink-0 text-[13px] leading-[18px] text-muted tabular-nums">
-                  {count > 0 ? count : ''}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-        <p className="mt-3 text-[13px] leading-[18px] text-muted">
-          Разделы вне шаблона не удалены — записи остаются на месте.
-        </p>
-      </Sheet>
     </div>
   )
 }
@@ -301,19 +260,18 @@ type OverviewProps = {
   characters: Character[]
   notes: BookNote[]
   links: BookLink[]
+  onOpenSection: (section: DiarySection) => void
 }
 
-function Overview({ book, readings, quotes, characters, notes, links }: OverviewProps) {
-  const days = daysRead(book.startedAt, book.finishedAt)
-  const finished = readings?.filter((reading) => reading.status === 'finished').length ?? 0
-  const last = readings && readings.length > 0 ? readings[readings.length - 1] : undefined
-  const hasMeta =
-    book.tags.length > 0 ||
-    book.moods.length > 0 ||
-    Boolean(book.format) ||
-    Boolean(book.acquisition) ||
-    book.colorLabel !== 'none'
-
+function Overview({
+  book,
+  readings,
+  quotes,
+  characters,
+  notes,
+  links,
+  onOpenSection,
+}: OverviewProps) {
   return (
     <div className="flex flex-col gap-5">
       <RatingInput
@@ -323,54 +281,32 @@ function Overview({ book, readings, quotes, characters, notes, links }: Overview
         onChange={(patch) => void updateBook(book.id, patch)}
       />
 
-      <section className="border-t border-line pt-4">
-        <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
-          Метаданные
-        </h3>
+      {book.diaryTemplate === 'analyst' ? (
+        <>
+          <MetadataSection book={book} />
+          <ReadingSection book={book} readings={readings} />
+        </>
+      ) : null}
 
-        {book.tags.length > 0 ? <ChipRow label="Теги" values={book.tags} /> : null}
-        {book.moods.length > 0 ? <ChipRow label="Настроения" values={book.moods} /> : null}
-        {hasMeta && (book.format || book.acquisition || book.colorLabel !== 'none') ? (
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] leading-[18px] text-muted">
-            {book.format ? <span>{BOOK_FORMAT_LABELS[book.format]}</span> : null}
-            {book.acquisition ? <span>{ACQUISITION_LABELS[book.acquisition]}</span> : null}
-            {book.colorLabel !== 'none' ? (
-              <span className="inline-flex items-center gap-1.5">
-                <ColorLabelDot label={book.colorLabel} />
-                {COLOR_LABEL_NAMES[book.colorLabel]}
-              </span>
-            ) : null}
-          </div>
-        ) : null}
-        {!hasMeta ? (
-          <p className="mt-2 text-[13px] leading-[18px] text-muted">
-            Теги, настроение и формат можно добавить в карточке книги.{' '}
-            <Link to={`/books/${book.id}/edit`} className="text-accent">
-              Заполнить
-            </Link>
+      {book.diaryTemplate === 'bookclub' ? (
+        <DiscussionSection notes={notes} links={links} onOpenSection={onOpenSection} />
+      ) : null}
+
+      {book.diaryTemplate === 'lite' ? (
+        <section className="border-t border-line pt-4">
+          <p className="text-[15px] leading-[22px]">Короткий дневник: оценка и цитаты.</p>
+          <p className="mt-1 text-[13px] leading-[18px] text-muted">
+            Персонажи, сюжет и мысли спрятаны. Включите «Аналитик», когда захочется копнуть глубже.
           </p>
-        ) : null}
-      </section>
-
-      <section className="border-t border-line pt-4">
-        <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Чтение</h3>
-        <p className="mt-2 text-[15px] leading-[22px]">
-          {days ? `${dayCount(days)} с книгой` : 'Ещё не начата'}
-        </p>
-        <p className="mt-1 text-[13px] leading-[18px] text-muted">
-          {readings === undefined
-            ? 'Загрузка…'
-            : readings.length === 0
-              ? 'Попыток чтения пока нет.'
-              : [
-                  `Попыток: ${readings.length}`,
-                  finished > 0 ? `дочитано ${finished}` : undefined,
-                  last?.finishedAt ? `последняя ${formatDayShort(last.finishedAt)}` : undefined,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-        </p>
-      </section>
+          <button
+            type="button"
+            onClick={() => onOpenSection('quotes')}
+            className="mt-3 inline-flex min-h-11 items-center rounded-[var(--radius-pill)] border border-line px-4 text-[14px] font-medium active:bg-accent-soft"
+          >
+            К цитатам
+          </button>
+        </section>
+      ) : null}
 
       <div className="border-t border-line pt-1">
         <DiaryExport
@@ -382,6 +318,134 @@ function Overview({ book, readings, quotes, characters, notes, links }: Overview
         />
       </div>
     </div>
+  )
+}
+
+function MetadataSection({ book }: { book: Book }) {
+  const hasMeta =
+    book.tags.length > 0 ||
+    book.moods.length > 0 ||
+    Boolean(book.format) ||
+    Boolean(book.acquisition) ||
+    book.colorLabel !== 'none'
+
+  return (
+    <section className="border-t border-line pt-4">
+      <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Метаданные</h3>
+
+      {book.tags.length > 0 ? <ChipRow label="Теги" values={book.tags} /> : null}
+      {book.moods.length > 0 ? <ChipRow label="Настроения" values={book.moods} /> : null}
+      {hasMeta && (book.format || book.acquisition || book.colorLabel !== 'none') ? (
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] leading-[18px] text-muted">
+          {book.format ? <span>{BOOK_FORMAT_LABELS[book.format]}</span> : null}
+          {book.acquisition ? <span>{ACQUISITION_LABELS[book.acquisition]}</span> : null}
+          {book.colorLabel !== 'none' ? (
+            <span className="inline-flex items-center gap-1.5">
+              <ColorLabelDot label={book.colorLabel} />
+              {COLOR_LABEL_NAMES[book.colorLabel]}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+      {!hasMeta ? (
+        <p className="mt-2 text-[13px] leading-[18px] text-muted">
+          Теги, настроение и формат можно добавить в карточке книги.{' '}
+          <Link to={`/books/${book.id}/edit`} className="text-accent">
+            Заполнить
+          </Link>
+        </p>
+      ) : null}
+    </section>
+  )
+}
+
+function ReadingSection({ book, readings }: { book: Book; readings?: Reading[] }) {
+  const days = daysRead(book.startedAt, book.finishedAt)
+  const finished = readings?.filter((reading) => reading.status === 'finished').length ?? 0
+  const last = readings && readings.length > 0 ? readings[readings.length - 1] : undefined
+
+  return (
+    <section className="border-t border-line pt-4">
+      <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Чтение</h3>
+      <p className="mt-2 text-[15px] leading-[22px]">
+        {days ? `${dayCount(days)} с книгой` : 'Ещё не начата'}
+      </p>
+      <p className="mt-1 text-[13px] leading-[18px] text-muted">
+        {readings === undefined
+          ? 'Загрузка…'
+          : readings.length === 0
+            ? 'Попыток чтения пока нет.'
+            : [
+                `Попыток: ${readings.length}`,
+                finished > 0 ? `дочитано ${finished}` : undefined,
+                last?.finishedAt ? `последняя ${formatDayShort(last.finishedAt)}` : undefined,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+      </p>
+    </section>
+  )
+}
+
+function DiscussionSection({
+  notes,
+  links,
+  onOpenSection,
+}: {
+  notes: BookNote[]
+  links: BookLink[]
+  onOpenSection: (section: DiarySection) => void
+}) {
+  const questions = notes.filter((note) => note.kind === 'insight').slice(0, 3)
+  const related = links.slice(0, 3)
+
+  return (
+    <section className="border-t border-line pt-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
+          К обсуждению
+        </h3>
+        <button
+          type="button"
+          onClick={() => onOpenSection('insights')}
+          className="text-[13px] leading-[18px] font-medium text-accent"
+        >
+          Все вопросы
+        </button>
+      </div>
+
+      {questions.length > 0 ? (
+        <ul className="mt-2 flex flex-col gap-3">
+          {questions.map((note) => (
+            <li key={note.id}>
+              <p className="text-[15px] leading-[21px] font-medium">{note.title}</p>
+              {note.body ? (
+                <p className="mt-0.5 line-clamp-2 text-[13px] leading-[18px] text-muted">
+                  {note.body}
+                </p>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 text-[13px] leading-[18px] text-muted">
+          Запишите вопросы, которые хочется задать группе.
+        </p>
+      )}
+
+      {related.length > 0 ? (
+        <div className="mt-4">
+          <h3 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">Связи</h3>
+          <ul className="mt-2 flex flex-col gap-1.5">
+            {related.map((link) => (
+              <li key={link.id} className="text-[14px] leading-[20px]">
+                {link.targetTitle}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
   )
 }
 
