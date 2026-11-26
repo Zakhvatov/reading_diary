@@ -3,6 +3,7 @@ import { nowISO } from '@/lib/id'
 import { applySessionProgress } from '@/lib/progress'
 import { db } from '../db'
 import type { ID, Session, SessionKind } from '../types'
+import { finishReading, startReading } from './readings'
 
 export type SessionInput = {
   bookId: ID
@@ -22,7 +23,7 @@ export async function addSession(input: SessionInput): Promise<Session> {
     throw new Error('Длительность сессии должна быть больше нуля')
   }
 
-  return db.transaction('rw', [db.books, db.sessions, db.tombstones], async () => {
+  return db.transaction('rw', [db.books, db.readings, db.sessions, db.tombstones], async () => {
     const book = await db.books.get(input.bookId)
 
     if (!book) {
@@ -53,6 +54,12 @@ export async function addSession(input: SessionInput): Promise<Session> {
     const progressPatch = applySessionProgress(book, session)
     if (Object.keys(progressPatch).length > 0) {
       await db.books.update(book.id, { ...progressPatch, updatedAt: now })
+    }
+
+    if (progressPatch.status === 'finished') {
+      await finishReading(book.id, session.day)
+    } else if (progressPatch.status === 'reading') {
+      await startReading(book.id, session.day)
     }
 
     await recalcBookStatsInTransaction(book.id)

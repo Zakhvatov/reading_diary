@@ -8,10 +8,15 @@ import {
   startOfWeek,
   startOfYear,
 } from 'date-fns'
+import { ru } from 'date-fns/locale'
 import type { ISODate } from '@/db/types'
 
 export function toDay(date: Date): ISODate {
   return format(date, 'yyyy-MM-dd')
+}
+
+export function formatDay(day: ISODate): string {
+  return format(parseDay(day), 'd MMM yyyy', { locale: ru })
 }
 
 export function today(): ISODate {

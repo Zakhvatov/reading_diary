@@ -28,6 +28,7 @@ type Stats = { readingMs: number; count: number; pages: number }
 
 const TABLES = [
   db.books,
+  db.readings,
   db.sessions,
   db.quotes,
   db.journals,
@@ -108,7 +109,15 @@ export async function readBackup(file: Blob): Promise<ReadResult> {
 }
 
 function emptyCounts(): Record<string, number> {
-  return { books: 0, sessions: 0, quotes: 0, journals: 0, goals: 0, tombstones: 0 }
+  return {
+    books: 0,
+    readings: 0,
+    sessions: 0,
+    quotes: 0,
+    journals: 0,
+    goals: 0,
+    tombstones: 0,
+  }
 }
 
 function tally(target: Record<string, number>, key: string, count: number): void {
@@ -364,6 +373,7 @@ async function touchSettings(): Promise<void> {
 
 async function replaceAll(data: BackupData, covers: Map<string, Blob>): Promise<ImportSummary> {
   await db.books.clear()
+  await db.readings.clear()
   await db.sessions.clear()
   await db.quotes.clear()
   await db.journals.clear()
@@ -372,6 +382,7 @@ async function replaceAll(data: BackupData, covers: Map<string, Blob>): Promise<
   await db.tombstones.clear()
 
   await db.books.bulkPut(data.books)
+  await db.readings.bulkPut(data.readings)
   await db.sessions.bulkPut(data.sessions)
   await db.quotes.bulkPut(data.quotes)
   await db.journals.bulkPut(data.journals)
@@ -387,6 +398,7 @@ async function replaceAll(data: BackupData, covers: Map<string, Blob>): Promise<
   return {
     added: {
       books: data.books.length,
+      readings: data.readings.length,
       sessions: data.sessions.length,
       quotes: data.quotes.length,
       journals: data.journals.length,
@@ -406,6 +418,7 @@ async function mergeAll(data: BackupData, covers: Map<string, Blob>): Promise<Im
 
   const affected = new Set<string>()
   const books = await mergeBooks(data.books, affected)
+  const readings = await mergeNewer(data.readings, db.readings)
   const sessions = await mergeSessions(data.sessions, affected)
   const quotes = await mergeNewer(data.quotes, db.quotes)
   const journals = await mergeNewer(data.journals, db.journals)
@@ -414,6 +427,7 @@ async function mergeAll(data: BackupData, covers: Map<string, Blob>): Promise<Im
 
   const results: [string, MergeCount][] = [
     ['books', books],
+    ['readings', readings],
     ['sessions', sessions],
     ['quotes', quotes],
     ['journals', journals],

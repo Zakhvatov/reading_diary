@@ -12,6 +12,7 @@ import { importBackup, readBackup } from './import'
 
 const EMPTY: BackupData = {
   books: [],
+  readings: [],
   sessions: [],
   quotes: [],
   journals: [],
@@ -175,7 +176,7 @@ describe('backup import', () => {
   })
 
   it('rejects a backup from a newer schema version', async () => {
-    const file = backupFile({ ...EMPTY }, 2)
+    const file = backupFile({ ...EMPTY }, 3)
 
     await expect(importBackup(file, 'replace')).rejects.toThrow('более новой версии')
     expect(await db.books.count()).toBe(0)

@@ -17,7 +17,7 @@ export async function getSettings(): Promise<Settings> {
     defaultStatus: 'want',
     dailyGoalMinutes: 0,
     persistGranted: false,
-    schemaVersion: 1,
+    schemaVersion: 2,
     createdAt: now,
     updatedAt: now,
   }
