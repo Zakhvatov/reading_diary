@@ -2,6 +2,7 @@ import { Check, PencilSimple } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { BookCover } from '@/components/book/BookCover'
+import { ProgressEditor } from '@/components/book/ProgressEditor'
 import { StatusChip } from '@/components/book/StatusChip'
 import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
@@ -15,7 +16,7 @@ import { formatDay, today } from '@/lib/dates'
 import { formatDuration, formatPercent } from '@/lib/format'
 import { bookProgress, finishBook, setBookStatus } from '@/lib/progress'
 
-type SheetKind = 'status' | 'delete' | null
+type SheetKind = 'status' | 'progress' | 'delete' | null
 
 const READING_STATUS_LABELS: Record<Reading['status'], string> = {
   reading: 'Читаю',
@@ -117,10 +118,17 @@ export function BookDetailScreen() {
           <p className="mt-2 text-[14px] leading-[20px] text-muted">
             {book.authors.join(', ') || 'Автор не указан'}
           </p>
-          <SpineProgress value={progress} className="mt-4" />
-          <p className="mt-2 text-[13px] leading-[18px] text-muted">
-            {progressLabel(book)} · {formatPercent(progress)}
-          </p>
+          <button
+            type="button"
+            onClick={() => setSheet('progress')}
+            aria-label="Изменить прогресс"
+            className="mt-4 block w-full text-left"
+          >
+            <SpineProgress value={progress} />
+            <span className="mt-2 block text-[13px] leading-[18px] text-muted">
+              {progressLabel(book)} · {formatPercent(progress)}
+            </span>
+          </button>
           {book.sessionCount > 0 ? (
             <p className="mt-1 text-[13px] leading-[18px] text-muted">
               {formatDuration(book.totalReadingMs)} · {book.sessionCount} сессий
@@ -200,6 +208,8 @@ export function BookDetailScreen() {
       >
         Удалить книгу
       </button>
+
+      {sheet === 'progress' ? <ProgressEditor book={book} onClose={() => setSheet(null)} /> : null}
 
       <Sheet open={sheet === 'status'} onClose={() => setSheet(null)} title="Статус книги">
         <div className="flex flex-col">
