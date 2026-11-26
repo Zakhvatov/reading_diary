@@ -1,4 +1,5 @@
-import { BookOpen } from '@phosphor-icons/react'
+import { BookOpen, GearSix } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
@@ -16,7 +17,19 @@ function formatToday(): string {
 export function HomeScreen() {
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title="Сегодня" caption={formatToday()} />
+      <ScreenHeader
+        title="Сегодня"
+        caption={formatToday()}
+        action={
+          <Link
+            to="/settings"
+            aria-label="Настройки"
+            className="flex size-11 items-center justify-center rounded-full text-muted active:bg-accent-soft"
+          >
+            <GearSix size={22} aria-hidden />
+          </Link>
+        }
+      />
 
       <div className="mt-8">
         <EmptyState
