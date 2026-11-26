@@ -139,6 +139,26 @@ export class ReadingDiaryDB extends Dexie {
           })
         }
       })
+
+    this.version(4)
+      .stores({
+        journals: 'id, bookId, entryDate, createdAt, *tags',
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table('journals')
+          .toCollection()
+          .modify((entry: Partial<JournalEntry> & { photoId?: string }) => {
+            entry.photoIds ??= entry.photoId ? [entry.photoId] : []
+            entry.stickers ??= []
+            delete entry.photoId
+          })
+
+        const settingsTable = transaction.table('settings')
+        if (await settingsTable.get('app')) {
+          await settingsTable.update('app', { schemaVersion: 4 })
+        }
+      })
   }
 }
 

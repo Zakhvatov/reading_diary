@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import { MAX_JOURNAL_PHOTOS, MAX_JOURNAL_STICKERS } from '@/lib/journal'
+import { STICKER_IDS } from '@/lib/stickers'
 
 const idSchema = z.string().min(1)
 const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -14,6 +16,7 @@ export const acquisitionSchema = z.enum(['bought', 'library', 'gift', 'other'])
 export const colorLabelSchema = z.enum(['red', 'amber', 'green', 'blue', 'none'])
 export const diaryTemplateIdSchema = z.enum(['lite', 'analyst', 'bookclub'])
 export const journalColorSchema = z.enum(['pine', 'amber', 'clay', 'sky', 'plum', 'moss'])
+export const stickerIdSchema = z.enum(STICKER_IDS)
 export const sessionKindSchema = z.enum(['timer', 'manual'])
 export const readingStatusSchema = z.enum(['reading', 'finished', 'dnf'])
 export const bookNoteKindSchema = z.enum(['plot', 'insight'])
@@ -113,7 +116,8 @@ export const journalEntrySchema = z.object({
   title: z.string(),
   body: z.string(),
   color: journalColorSchema,
-  photoId: idSchema.optional(),
+  photoIds: z.array(idSchema).max(MAX_JOURNAL_PHOTOS),
+  stickers: z.array(stickerIdSchema).max(MAX_JOURNAL_STICKERS),
   entryDate: isoDateSchema,
   tags: z.array(z.string()),
   mood: z.string().optional(),

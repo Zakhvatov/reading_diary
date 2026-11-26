@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { JOURNAL_COLOR_STYLES } from '@/components/journal/colors'
 import { JournalPhoto } from '@/components/journal/JournalPhoto'
+import { StickerCluster } from '@/components/journal/Sticker'
 import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { Sheet } from '@/components/ui/Sheet'
@@ -66,37 +67,50 @@ export function JournalDetailScreen() {
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
       <ScreenHeader title="Запись" caption="Дневник" back />
 
-      {entry.photoId ? (
-        <JournalPhoto
-          photoId={entry.photoId}
-          alt={`Фото к записи «${entry.title || 'Без названия'}»`}
-          className="mt-5 h-48 w-full rounded-[var(--radius-card)] object-cover"
-        />
+      {entry.photoIds.length > 0 ? (
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          {entry.photoIds.map((photoId, index) => (
+            <JournalPhoto
+              key={photoId}
+              photoId={photoId}
+              alt={`Фото ${index + 1} к записи «${entry.title || 'Без названия'}»`}
+              className={
+                index === 0
+                  ? 'col-span-2 h-48 w-full rounded-[var(--radius-card)] border border-line object-cover'
+                  : 'aspect-square w-full rounded-[var(--radius-card)] border border-line object-cover'
+              }
+            />
+          ))}
+        </div>
       ) : null}
 
-      <article
-        className={`relative mt-5 overflow-hidden rounded-[var(--radius-card)] p-5 pl-6 ${tone.surface} ${tone.ink}`}
-      >
-        <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${tone.stripe}`} />
-        <time
-          dateTime={entry.entryDate}
-          className="block text-[11px] leading-[14px] font-medium tracking-[0.08em] uppercase opacity-70"
+      <div className="relative mt-5">
+        <article
+          className={`relative overflow-hidden rounded-[var(--radius-card)] p-5 pl-6 ${tone.surface} ${tone.ink}`}
         >
-          {formatDay(entry.entryDate)}
-        </time>
-        <h2 className="mt-1 font-display text-[26px] leading-[32px] font-medium">
-          {entry.title || 'Без названия'}
-        </h2>
-        {book ? (
-          <Link
-            to={`/books/${book.id}`}
-            className="mt-2 inline-flex max-w-full items-center gap-1.5 text-[13px] leading-[18px] underline underline-offset-2 opacity-80"
+          <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${tone.stripe}`} />
+          <time
+            dateTime={entry.entryDate}
+            className="block text-[11px] leading-[14px] font-medium tracking-[0.08em] uppercase opacity-70"
           >
-            <BookOpen size={15} aria-hidden className="shrink-0" />
-            <span className="truncate">{book.title}</span>
-          </Link>
-        ) : null}
-      </article>
+            {formatDay(entry.entryDate)}
+          </time>
+          <h2 className="mt-1 font-display text-[26px] leading-[32px] font-medium">
+            {entry.title || 'Без названия'}
+          </h2>
+          {book ? (
+            <Link
+              to={`/books/${book.id}`}
+              className="mt-2 inline-flex max-w-full items-center gap-1.5 text-[13px] leading-[18px] underline underline-offset-2 opacity-80"
+            >
+              <BookOpen size={15} aria-hidden className="shrink-0" />
+              <span className="truncate">{book.title}</span>
+            </Link>
+          ) : null}
+        </article>
+
+        <StickerCluster stickers={entry.stickers} className="absolute right-3 -bottom-5" />
+      </div>
 
       {entry.body.trim() ? <div className="mt-6">{renderMarkdown(entry.body)}</div> : null}
 
