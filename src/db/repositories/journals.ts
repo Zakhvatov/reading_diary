@@ -1,4 +1,5 @@
 import { nowISO } from '@/lib/id'
+import type { StickerId } from '@/lib/stickers'
 import { db } from '../db'
 import type { ID, JournalEntry } from '../types'
 
@@ -8,7 +9,8 @@ export type JournalInput = {
   color: JournalEntry['color']
   entryDate: string
   bookId?: ID
-  photoId?: ID
+  photoIds?: ID[]
+  stickers?: StickerId[]
   tags?: string[]
   mood?: string
   shareable?: boolean
@@ -21,6 +23,8 @@ export async function createJournal(input: JournalInput): Promise<JournalEntry> 
     title: input.title.trim(),
     body: input.body,
     color: input.color,
+    photoIds: input.photoIds ?? [],
+    stickers: input.stickers ?? [],
     entryDate: input.entryDate,
     tags: input.tags ?? [],
     shareable: input.shareable ?? false,
@@ -29,7 +33,6 @@ export async function createJournal(input: JournalInput): Promise<JournalEntry> 
   }
 
   if (input.bookId) entry.bookId = input.bookId
-  if (input.photoId) entry.photoId = input.photoId
   if (input.mood) entry.mood = input.mood
 
   await db.journals.add(entry)

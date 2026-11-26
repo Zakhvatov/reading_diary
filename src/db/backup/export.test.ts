@@ -74,6 +74,8 @@ describe('backup export', () => {
       body: '',
       color: 'pine',
       entryDate: '2026-02-01',
+      photoIds: ['photo-1', 'photo-2'],
+      stickers: ['heart', 'star'],
     })
 
     const file = await exportBackupJson()
@@ -99,7 +101,12 @@ describe('backup export', () => {
       kind: 'similar',
     })
     expect(await db.quotes.get(quote.id)).toMatchObject({ favorite: false, shareable: false })
-    expect(await db.journals.get(journal.id)).toMatchObject({ tags: [], shareable: false })
+    expect(await db.journals.get(journal.id)).toMatchObject({
+      tags: [],
+      shareable: false,
+      photoIds: ['photo-1', 'photo-2'],
+      stickers: ['heart', 'star'],
+    })
   })
 
   it('exports and restores reading history', async () => {

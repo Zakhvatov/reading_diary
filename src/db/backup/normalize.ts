@@ -1,6 +1,8 @@
 import { toDay } from '@/lib/dates'
+import { MAX_JOURNAL_PHOTOS, MAX_JOURNAL_STICKERS } from '@/lib/journal'
+import { isStickerId } from '@/lib/stickers'
 
-export const BACKUP_SCHEMA_VERSION = 3
+export const BACKUP_SCHEMA_VERSION = 4
 
 type JsonRecord = Record<string, unknown>
 
@@ -147,18 +149,29 @@ function normalizeJournal(record: JsonRecord): JsonRecord | null {
   if (!id) return null
 
   const createdAt = str(record.createdAt, new Date().toISOString())
-  return {
+  const legacyPhotoId = str(record.photoId)
+  const photoIds = Array.isArray(record.photoIds)
+    ? stringList(record.photoIds)
+    : legacyPhotoId
+      ? [legacyPhotoId]
+      : []
+  const next: JsonRecord = {
     ...record,
     id,
     title: str(record.title),
     body: str(record.body),
     color: str(record.color, 'pine'),
+    photoIds: photoIds.slice(0, MAX_JOURNAL_PHOTOS),
+    stickers: stringList(record.stickers).filter(isStickerId).slice(0, MAX_JOURNAL_STICKERS),
     entryDate: str(record.entryDate) || dayOf(createdAt, toDay(new Date())),
     tags: stringList(record.tags),
     shareable: typeof record.shareable === 'boolean' ? record.shareable : false,
     createdAt,
     updatedAt: str(record.updatedAt, createdAt),
   }
+
+  delete next.photoId
+  return next
 }
 
 function normalizeCharacter(record: JsonRecord): JsonRecord | null {
@@ -246,7 +259,7 @@ function normalizeSettings(record: JsonRecord): JsonRecord | null {
     defaultRatingScale: str(record.defaultRatingScale, 'stars5'),
     dailyGoalMinutes: num(record.dailyGoalMinutes, 0),
     persistGranted: typeof record.persistGranted === 'boolean' ? record.persistGranted : false,
-    schemaVersion: num(record.schemaVersion, 2),
+    schemaVersion: num(record.schemaVersion, BACKUP_SCHEMA_VERSION),
     createdAt,
     updatedAt: str(record.updatedAt, createdAt),
   }

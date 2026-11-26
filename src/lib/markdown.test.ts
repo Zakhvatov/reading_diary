@@ -61,4 +61,33 @@ describe('markdown', () => {
   it('strips markers for the card preview', () => {
     expect(markdownToPlainText('## Глава\n- **важно** и *мягко*')).toBe('Глава важно и мягко')
   })
+
+  it('renders a coloured highlight', () => {
+    const html = render('Это =={rose}важная мысль== на память.')
+
+    expect(html).toContain('<mark')
+    expect(html).toContain('bg-rose')
+    expect(html).toContain('важная мысль')
+    expect(html).not.toContain('==')
+    expect(html).not.toContain('{rose}')
+  })
+
+  it('falls back to amber for a bare highlight', () => {
+    const html = render('Просто ==выделено==.')
+
+    expect(html).toContain('bg-butter')
+    expect(html).toContain('выделено')
+  })
+
+  it('keeps bold inside a highlight and a highlight inside bold', () => {
+    const html = render('=={sky}**важно**== и **=={sage}тоже==**')
+
+    expect(html.match(/<mark/g)).toHaveLength(2)
+    expect(html).toContain('<strong>важно</strong>')
+    expect(html).toContain('<strong><mark')
+  })
+
+  it('strips highlight markers for the card preview', () => {
+    expect(markdownToPlainText('=={amber}тепло== и ==свет==')).toBe('тепло и свет')
+  })
 })

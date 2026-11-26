@@ -67,6 +67,7 @@ describe('dexie v2 to v3 migration', () => {
       title: 'Запись',
       body: '',
       color: 'pine',
+      photoId: 'cover-legacy',
       entryDate: '2026-01-01',
       createdAt: now,
       updatedAt: now,
@@ -110,9 +111,12 @@ describe('dexie v2 to v3 migration', () => {
       expect(await upgraded.journals.get('journal-1')).toMatchObject({
         tags: [],
         shareable: false,
+        photoIds: ['cover-legacy'],
+        stickers: [],
       })
+      expect(await upgraded.journals.get('journal-1')).not.toHaveProperty('photoId')
       expect(await upgraded.settings.get('app')).toMatchObject({
-        schemaVersion: 3,
+        schemaVersion: 4,
         defaultTemplate: 'analyst',
         defaultRatingScale: 'stars5',
       })

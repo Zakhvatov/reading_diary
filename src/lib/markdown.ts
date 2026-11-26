@@ -1,38 +1,68 @@
 import { createElement, type ReactNode } from 'react'
+import { HIGHLIGHT_COLORS, HIGHLIGHT_MARK_CLASS, type HighlightColor } from './highlights'
 
 /**
- * Мини-Markdown для дневника: ## заголовок, **жирный**, *курсив*, - список.
+ * Мини-Markdown для дневника: ## заголовок, **жирный**, *курсив*, - список
+ * и выделение =={amber}текст== (без цвета — янтарное).
  * Возвращает React-узлы, поэтому сырой HTML остаётся текстом и не исполняется.
+ *
+ * Регулярка создаётся на каждый вызов: рендер вложенный, общий lastIndex сломал бы цикл.
  */
-const INLINE_PATTERN = /\*\*([^*]+?)\*\*|\*([^*\n]+?)\*/g
+const INLINE_SOURCE =
+  '\\*\\*([^*]+?)\\*\\*' +
+  '|\\*([^*\\n]+?)\\*' +
+  `|==\\{(${HIGHLIGHT_COLORS.join('|')})\\}(.+?)==` +
+  '|==(.+?)=='
 
 function renderInline(text: string, key: string): ReactNode[] {
+  const pattern = new RegExp(INLINE_SOURCE, 'g')
   const nodes: ReactNode[] = []
   let lastIndex = 0
-
-  INLINE_PATTERN.lastIndex = 0
   let index = 0
   let match: RegExpExecArray | null
 
-  while ((match = INLINE_PATTERN.exec(text)) !== null) {
+  while ((match = pattern.exec(text)) !== null) {
     if (match.index > lastIndex) {
       nodes.push(text.slice(lastIndex, match.index))
     }
 
     const strong = match[1]
     const italic = match[2]
+    const color = match[3]
+    const colored = match[4]
+    const plain = match[5]
 
     if (strong !== undefined) {
-      nodes.push(createElement('strong', { key: `${key}-s${index}` }, strong))
+      nodes.push(
+        createElement(
+          'strong',
+          { key: `${key}-s${index}` },
+          renderInline(strong, `${key}-s${index}`),
+        ),
+      )
     } else if (italic !== undefined) {
-      nodes.push(createElement('em', { key: `${key}-i${index}` }, italic))
+      nodes.push(
+        createElement('em', { key: `${key}-i${index}` }, renderInline(italic, `${key}-i${index}`)),
+      )
+    } else {
+      const highlight = (color ?? 'amber') as HighlightColor
+      const content = colored ?? plain ?? ''
+
+      nodes.push(
+        createElement(
+          'mark',
+          {
+            key: `${key}-h${index}`,
+            className: `${HIGHLIGHT_MARK_CLASS[highlight]} rounded-[3px] px-0.5 [box-decoration-break:clone]`,
+          },
+          renderInline(content, `${key}-h${index}`),
+        ),
+      )
     }
 
-    lastIndex = match.index + match[0].length
+    lastIndex = match.index + (match[0]?.length ?? 0)
     index += 1
   }
-
-  INLINE_PATTERN.lastIndex = 0
 
   if (lastIndex < text.length) {
     nodes.push(text.slice(lastIndex))
@@ -137,6 +167,8 @@ export function markdownToPlainText(source: string): string {
     .replace(/^-\s+/gm, '')
     .replace(/\*\*([^*]+?)\*\*/g, '$1')
     .replace(/\*([^*\n]+?)\*/g, '$1')
+    .replace(/==\{[a-z]+\}/g, '')
+    .replace(/==/g, '')
     .replace(/\s+/g, ' ')
     .trim()
 }

@@ -9,6 +9,7 @@ import type { BackupData, BackupManifest } from '../schema'
 import type { Book, Session } from '../types'
 import { exportBackupJson, exportBackupZip } from './export'
 import { importBackup, readBackup } from './import'
+import { BACKUP_SCHEMA_VERSION } from './normalize'
 
 const EMPTY: BackupData = {
   books: [],
@@ -185,7 +186,7 @@ describe('backup import', () => {
   })
 
   it('rejects a backup from a newer schema version', async () => {
-    const file = backupFile({ ...EMPTY }, 4)
+    const file = backupFile({ ...EMPTY }, BACKUP_SCHEMA_VERSION + 1)
 
     await expect(importBackup(file, 'replace')).rejects.toThrow('более новой версии')
     expect(await db.books.count()).toBe(0)
@@ -220,6 +221,32 @@ describe('backup import', () => {
       diaryTemplate: 'lite',
       shareable: false,
     })
+  })
+
+  it('moves a legacy journal photo into photoIds from a v3 backup', async () => {
+    const journal = {
+      id: 'old-journal',
+      title: 'Запись',
+      body: '',
+      color: 'pine',
+      photoId: 'cover-1',
+      entryDate: '2026-01-01',
+      tags: [],
+      shareable: false,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+    }
+
+    await importBackup(
+      backupFile({ ...EMPTY, journals: [journal] } as unknown as BackupData, 3),
+      'replace',
+    )
+
+    expect(await db.journals.get('old-journal')).toMatchObject({
+      photoIds: ['cover-1'],
+      stickers: [],
+    })
+    expect(await db.journals.get('old-journal')).not.toHaveProperty('photoId')
   })
 
   it('keeps a canonical rating from a v3 backup as is', async () => {

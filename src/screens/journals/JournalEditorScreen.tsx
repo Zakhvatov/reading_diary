@@ -2,18 +2,22 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import {
   CaretDown,
   Check,
+  Highlighter,
   Image as ImageIcon,
   ListBullets,
   MagnifyingGlass,
   TextB,
   TextHTwo,
   TextItalic,
+  X,
 } from '@phosphor-icons/react'
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { useBlocker, useNavigate, useParams } from 'react-router-dom'
 import { JOURNAL_COLORS, JOURNAL_COLOR_STYLES } from '@/components/journal/colors'
 import { JournalPhoto } from '@/components/journal/JournalPhoto'
+import { Sticker, StickerCluster } from '@/components/journal/Sticker'
+import { StickerPicker } from '@/components/journal/StickerPicker'
 import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { Sheet } from '@/components/ui/Sheet'
@@ -23,8 +27,16 @@ import { deleteCover, saveCover } from '@/db/repositories/covers'
 import type { Book, JournalColor, JournalEntry } from '@/db/types'
 import { formatAuthors } from '@/lib/authors'
 import { today } from '@/lib/dates'
+import {
+  HIGHLIGHT_COLORS,
+  HIGHLIGHT_LABELS,
+  HIGHLIGHT_SWATCH_CLASS,
+  type HighlightColor,
+} from '@/lib/highlights'
 import { fileToCover } from '@/lib/image'
+import { MAX_JOURNAL_PHOTOS, MAX_JOURNAL_STICKERS } from '@/lib/journal'
 import { renderMarkdown } from '@/lib/markdown'
+import { STICKER_LABELS, type StickerId } from '@/lib/stickers'
 import { normalizeText } from '@/lib/text'
 
 const fieldBase =
@@ -161,8 +173,11 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
   const [bookId, setBookId] = useState<string | undefined>(entry ? entry.bookId : lastReading?.id)
   const [bookPickerOpen, setBookPickerOpen] = useState(false)
   const [mode, setMode] = useState<'write' | 'preview'>('write')
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [photoRemoved, setPhotoRemoved] = useState(false)
+  const [photoIds, setPhotoIds] = useState<string[]>(entry?.photoIds ?? [])
+  const [newPhotos, setNewPhotos] = useState<File[]>([])
+  const [removedPhotoIds, setRemovedPhotoIds] = useState<string[]>([])
+  const [stickers, setStickers] = useState<StickerId[]>(entry?.stickers ?? [])
+  const [stickerPickerOpen, setStickerPickerOpen] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -171,8 +186,11 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const book = books.find((item) => item.id === bookId)
-  const hasPhoto = Boolean(photoFile) || Boolean(entry?.photoId && !photoRemoved)
-  const previewUrl = useMemo(() => (photoFile ? URL.createObjectURL(photoFile) : null), [photoFile])
+  const photoCount = photoIds.length + newPhotos.length
+  const newPhotoUrls = useMemo(
+    () => newPhotos.map((file) => URL.createObjectURL(file)),
+    [newPhotos],
+  )
 
   const currentSnapshot = JSON.stringify({
     title,
@@ -180,11 +198,10 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
     entryDate,
     color,
     bookId: bookId ?? '',
-    photo: photoFile
-      ? `${photoFile.name}:${photoFile.size}`
-      : photoRemoved
-        ? 'removed'
-        : (entry?.photoId ?? ''),
+    photoIds,
+    newPhotos: newPhotos.map((file) => `${file.name}:${file.size}`),
+    removedPhotoIds,
+    stickers,
   })
   const [baseline, setBaseline] = useState(() => currentSnapshot)
   const isDirty = currentSnapshot !== baseline
@@ -192,9 +209,9 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
 
   useEffect(() => {
     return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl)
+      for (const url of newPhotoUrls) URL.revokeObjectURL(url)
     }
-  }, [previewUrl])
+  }, [newPhotoUrls])
 
   useEffect(() => {
     if (!isDirty) return
@@ -255,32 +272,65 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
     )
   }
 
-  function pickPhoto(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
+  function pickPhotos(event: ChangeEvent<HTMLInputElement>) {
+    const files = [...(event.target.files ?? [])]
     event.target.value = ''
-    if (!file) return
-    if (!file.type.startsWith('image/')) {
-      setPhotoError('Выберите изображение')
+    if (files.length === 0) return
+
+    const images = files.filter((file) => file.type.startsWith('image/'))
+    if (images.length === 0) {
+      setPhotoError('Выберите изображения')
       return
     }
 
-    setPhotoError(null)
-    setPhotoFile(file)
-    setPhotoRemoved(false)
+    const room = Math.max(0, MAX_JOURNAL_PHOTOS - photoIds.length - newPhotos.length)
+    if (room === 0) {
+      setPhotoError(`Можно добавить не больше ${MAX_JOURNAL_PHOTOS} фото`)
+      return
+    }
+
+    setPhotoError(images.length > room ? `Добавлены первые ${room} из ${images.length}` : null)
+    setNewPhotos((current) => [...current, ...images.slice(0, room)])
   }
 
-  function removePhoto() {
-    if (photoFile) {
-      setPhotoFile(null)
+  function removePhoto(photoId: string) {
+    setPhotoIds((current) => current.filter((id) => id !== photoId))
+    setRemovedPhotoIds((current) => [...current, photoId])
+  }
+
+  function removeNewPhoto(index: number) {
+    setNewPhotos((current) => current.filter((_, itemIndex) => itemIndex !== index))
+  }
+
+  function highlight(color: HighlightColor) {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selected = textarea.value.slice(start, end)
+    const opening = `=={${color}}`
+    const closing = '=='
+    const paragraphs = selected.split(/\n{2,}/)
+    const wrapped =
+      paragraphs.length > 1
+        ? paragraphs.map((part) => `${opening}${part}${closing}`).join('\n\n')
+        : `${opening}${selected}${closing}`
+    const next = `${textarea.value.slice(0, start)}${wrapped}${textarea.value.slice(end)}`
+
+    if (paragraphs.length > 1) {
+      writeBody(next, start + wrapped.length)
       return
     }
-    setPhotoRemoved(true)
+
+    writeBody(next, start + opening.length, start + opening.length + selected.length)
   }
 
   async function handleSave() {
     const trimmedTitle = title.trim()
-    if (!trimmedTitle && !body.trim()) {
-      setError('Добавьте заголовок или текст')
+    const hasPhotos = photoIds.length > 0 || newPhotos.length > 0
+    if (!trimmedTitle && !body.trim() && !hasPhotos) {
+      setError('Добавьте заголовок, текст или фото')
       return
     }
 
@@ -288,7 +338,7 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
     setError(null)
 
     const date = entryDate || today()
-    const input = { title: trimmedTitle, body, color, entryDate: date, bookId }
+    const input = { title: trimmedTitle, body, color, entryDate: date, bookId, stickers }
 
     try {
       let id = entryId
@@ -298,9 +348,9 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
         setEntryId(created.id)
       }
 
-      let nextPhotoId = photoRemoved ? undefined : entry?.photoId
-      if (photoFile) {
-        const image = await fileToCover(photoFile, 1600, 900)
+      const nextPhotoIds = [...photoIds]
+      for (const file of newPhotos) {
+        const image = await fileToCover(file, 1600, 900)
         const cover = await saveCover({
           ownerType: 'journal',
           ownerId: id,
@@ -308,13 +358,13 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
           width: image.width,
           height: image.height,
         })
-        nextPhotoId = cover.id
+        nextPhotoIds.push(cover.id)
       }
 
-      await updateJournal(id, { ...input, photoId: nextPhotoId })
+      await updateJournal(id, { ...input, photoIds: nextPhotoIds })
 
-      if (entry?.photoId && (photoFile || photoRemoved)) {
-        await deleteCover(entry.photoId)
+      for (const photoId of removedPhotoIds) {
+        await deleteCover(photoId)
       }
 
       setBaseline(currentSnapshot)
@@ -411,46 +461,113 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
       </div>
 
       <div className="mt-5">
-        <p className="text-[13px] leading-[18px] font-medium text-muted">Фото</p>
-        {hasPhoto ? (
-          <div className="mt-2 overflow-hidden rounded-[var(--radius-card)]">
-            {previewUrl ? (
-              <img src={previewUrl} alt="" className="h-40 w-full object-cover" />
-            ) : entry?.photoId && !photoRemoved ? (
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-[13px] leading-[18px] font-medium text-muted">Фото</p>
+          <span className="text-[12px] leading-[16px] text-muted tabular-nums">
+            {photoCount} из {MAX_JOURNAL_PHOTOS}
+          </span>
+        </div>
+
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {photoIds.map((photoId) => (
+            <div key={photoId} className="relative">
               <JournalPhoto
-                photoId={entry.photoId}
+                photoId={photoId}
                 alt="Фото к записи"
-                className="h-40 w-full object-cover"
+                className="aspect-square w-full rounded-[10px] border border-line object-cover"
               />
-            ) : null}
-          </div>
-        ) : null}
-        <div className="mt-2 flex flex-wrap items-center gap-4">
-          <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-[var(--radius-pill)] border border-line bg-surface px-4 text-[14px] font-medium">
-            <ImageIcon size={18} aria-hidden />
-            {hasPhoto ? 'Заменить фото' : 'Добавить фото'}
-            <input
-              type="file"
-              accept="image/*"
-              className="sr-only"
-              disabled={busy}
-              onChange={pickPhoto}
-            />
-          </label>
-          {hasPhoto ? (
-            <button
-              type="button"
-              onClick={removePhoto}
-              disabled={busy}
-              className="min-h-11 text-[13px] leading-[18px] text-signal"
-            >
-              Убрать фото
-            </button>
+              <button
+                type="button"
+                aria-label="Убрать фото"
+                onClick={() => removePhoto(photoId)}
+                disabled={busy}
+                className="absolute top-1 right-1 flex size-8 items-center justify-center rounded-full bg-surface text-ink after:absolute after:-inset-2 after:content-[''] active:bg-accent-soft"
+              >
+                <X size={15} aria-hidden />
+              </button>
+            </div>
+          ))}
+
+          {newPhotos.map((file, index) => (
+            <div key={`${file.name}-${index}`} className="relative">
+              <img
+                src={newPhotoUrls[index]}
+                alt=""
+                className="aspect-square w-full rounded-[10px] border border-line object-cover"
+              />
+              <button
+                type="button"
+                aria-label="Убрать фото"
+                onClick={() => removeNewPhoto(index)}
+                disabled={busy}
+                className="absolute top-1 right-1 flex size-8 items-center justify-center rounded-full bg-surface text-ink after:absolute after:-inset-2 after:content-[''] active:bg-accent-soft"
+              >
+                <X size={15} aria-hidden />
+              </button>
+            </div>
+          ))}
+
+          {photoCount < MAX_JOURNAL_PHOTOS ? (
+            <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-[10px] border border-dashed border-line text-muted active:bg-accent-soft/40">
+              <ImageIcon size={20} aria-hidden />
+              <span className="text-[11px] leading-[14px]">Добавить</span>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="sr-only"
+                disabled={busy}
+                onChange={pickPhotos}
+              />
+            </label>
           ) : null}
         </div>
+
         {photoError ? (
-          <p className="mt-1 text-[13px] leading-[18px] text-signal">{photoError}</p>
+          <p className="mt-1 text-[12px] leading-[16px] text-signal">{photoError}</p>
         ) : null}
+      </div>
+
+      <div className="mt-5">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-[13px] leading-[18px] font-medium text-muted">Стикеры</p>
+          <button
+            type="button"
+            onClick={() => setStickerPickerOpen(true)}
+            disabled={busy}
+            className="min-h-11 text-[13px] leading-[18px] font-medium text-accent"
+          >
+            {stickers.length > 0 ? 'Изменить' : 'Выбрать'}
+          </button>
+        </div>
+
+        {stickers.length > 0 ? (
+          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+            {stickers.map((sticker, index) => (
+              <span
+                key={`${sticker}-${index}`}
+                className="relative flex size-12 items-center justify-center rounded-[10px] border border-line bg-surface"
+              >
+                <Sticker name={sticker} className="size-9" />
+                <button
+                  type="button"
+                  aria-label={`Убрать стикер «${STICKER_LABELS[sticker]}»`}
+                  onClick={() =>
+                    setStickers((current) => current.filter((_, itemIndex) => itemIndex !== index))
+                  }
+                  disabled={busy}
+                  className="absolute -top-1 -right-1 flex size-6 items-center justify-center rounded-full bg-ink text-paper after:absolute after:-inset-2.5 after:content-['']"
+                >
+                  <X size={12} aria-hidden />
+                </button>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-1 text-[13px] leading-[18px] text-muted">
+            Наклейка на запись — как в бумажном дневнике.
+          </p>
+        )}
       </div>
 
       <section className="mt-6">
@@ -497,6 +614,27 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
               <ToolbarButton label="Список" onClick={() => prefixLines('- ')} disabled={busy}>
                 <ListBullets size={19} aria-hidden />
               </ToolbarButton>
+
+              <div className="mt-1 flex w-full items-center gap-1 border-t border-line/70 px-1 pt-1">
+                <span className="px-1 text-muted" aria-hidden>
+                  <Highlighter size={18} />
+                </span>
+                {HIGHLIGHT_COLORS.map((highlightColor) => (
+                  <button
+                    key={highlightColor}
+                    type="button"
+                    aria-label={`Выделить ${HIGHLIGHT_LABELS[highlightColor]}`}
+                    onClick={() => highlight(highlightColor)}
+                    disabled={busy}
+                    className="flex size-11 items-center justify-center rounded-[10px] active:bg-accent-soft disabled:opacity-50"
+                  >
+                    <span
+                      aria-hidden
+                      className={`size-4 rounded-full ${HIGHLIGHT_SWATCH_CLASS[highlightColor]} ring-1 ring-black/10`}
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
             <textarea
               ref={textareaRef}
@@ -507,10 +645,14 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
               placeholder="Что запомнилось, что зацепило"
               className="min-h-[240px] w-full resize-y rounded-b-[var(--radius-control)] border border-line bg-surface px-4 py-3 text-[16px] leading-[26px] text-ink placeholder:text-muted/70"
             />
+            <p className="mt-1 text-[12px] leading-[16px] text-muted">
+              Выделение и стикеры видно в «Просмотре» и в готовой записи.
+            </p>
           </>
         ) : (
-          <div className="mt-2 min-h-[140px] rounded-[var(--radius-control)] border border-line bg-surface px-4 py-3">
+          <div className="relative mt-2 min-h-[140px] rounded-[var(--radius-control)] border border-line bg-surface px-4 py-3">
             {renderMarkdown(body) ?? <p className="text-[15px] text-muted">Пока пусто</p>}
+            <StickerCluster stickers={stickers} className="absolute right-3 -bottom-4" />
           </div>
         )}
       </section>
@@ -535,6 +677,19 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
           Удалить запись
         </button>
       ) : null}
+
+      <StickerPicker
+        open={stickerPickerOpen}
+        selected={stickers}
+        onToggle={(id) =>
+          setStickers((current) => {
+            if (current.includes(id)) return current.filter((sticker) => sticker !== id)
+            if (current.length >= MAX_JOURNAL_STICKERS) return current
+            return [...current, id]
+          })
+        }
+        onClose={() => setStickerPickerOpen(false)}
+      />
 
       {bookPickerOpen ? (
         <BookPickerSheet
@@ -565,7 +720,7 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
 
       <Sheet open={deleteOpen} onClose={() => setDeleteOpen(false)} title="Удалить запись?">
         <p className="text-[15px] leading-[23px] text-muted">
-          Запись и её фото удалятся без возможности отменить.
+          Запись, фото и стикеры удалятся без возможности отменить.
         </p>
         <div className="mt-5 flex flex-col gap-3">
           <Button variant="danger" onClick={handleDelete} disabled={busy}>

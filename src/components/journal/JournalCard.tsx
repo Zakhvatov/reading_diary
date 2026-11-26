@@ -49,9 +49,9 @@ export function JournalCard({ entry }: JournalCardProps) {
           ) : null}
         </div>
 
-        {entry.photoId ? (
+        {entry.photoIds[0] ? (
           <JournalPhoto
-            photoId={entry.photoId}
+            photoId={entry.photoIds[0]}
             alt={`Фото к записи «${entry.title || 'Без названия'}»`}
             className="size-16 shrink-0 rounded-[10px] object-cover"
           />
