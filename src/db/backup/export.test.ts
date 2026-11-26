@@ -75,9 +75,9 @@ describe('backup export', () => {
       color: 'pine',
       entryDate: '2026-02-01',
       photoIds: ['photo-1', 'photo-2'],
-      stickers: [
-        { id: 'sticker-1', sticker: 'heart', x: 0.4, y: 0.2, rotate: -10 },
-        { id: 'sticker-2', sticker: 'star', x: 0.6, y: 0.3, rotate: 8 },
+      board: [
+        { id: 'note-1', color: 'sage', text: 'Мысль', x: 0.4, y: 0.2 },
+        { id: 'note-2', color: 'lilac', text: '', x: 0.6, y: 0.3 },
       ],
     })
 
@@ -108,9 +108,9 @@ describe('backup export', () => {
       tags: [],
       shareable: false,
       photoIds: ['photo-1', 'photo-2'],
-      stickers: [
-        { id: 'sticker-1', sticker: 'heart', x: 0.4, y: 0.2, rotate: -10 },
-        { id: 'sticker-2', sticker: 'star', x: 0.6, y: 0.3, rotate: 8 },
+      board: [
+        { id: 'note-1', color: 'sage', text: 'Мысль', x: 0.4, y: 0.2 },
+        { id: 'note-2', color: 'lilac', text: '', x: 0.6, y: 0.3 },
       ],
     })
   })

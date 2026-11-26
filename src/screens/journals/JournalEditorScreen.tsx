@@ -598,7 +598,7 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
               className="min-h-[240px] w-full resize-y rounded-b-[var(--radius-control)] border border-line bg-surface px-4 py-3 text-[16px] leading-[26px] text-ink placeholder:text-muted/70"
             />
             <p className="mt-1 text-[12px] leading-[16px] text-muted">
-              Выделение и стикеры видно в «Просмотре» и в готовой записи.
+              Выделение видно в «Просмотре» и в готовой записи.
             </p>
           </>
         ) : (
@@ -658,7 +658,7 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
 
       <Sheet open={deleteOpen} onClose={() => setDeleteOpen(false)} title="Удалить запись?">
         <p className="text-[15px] leading-[23px] text-muted">
-          Запись, фото и стикеры удалятся без возможности отменить.
+          Запись, фото и заметки на доске удалятся без возможности отменить.
         </p>
         <div className="mt-5 flex flex-col gap-3">
           <Button variant="danger" onClick={handleDelete} disabled={busy}>

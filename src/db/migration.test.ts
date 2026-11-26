@@ -113,14 +113,15 @@ describe('dexie v2 to v3 migration', () => {
         tags: [],
         shareable: false,
         photoIds: ['cover-legacy'],
-        stickers: [
-          { id: 'legacy-0-heart', sticker: 'heart', x: 0.62, y: 0.06, rotate: -14 },
-          { id: 'legacy-1-star', sticker: 'star', x: 0.74, y: 0.06, rotate: 10 },
+        board: [
+          { id: 'note-0', color: 'sage', text: '', x: 0.62, y: 0.06 },
+          { id: 'note-1', color: 'sky', text: '', x: 0.74, y: 0.06 },
         ],
       })
       expect(await upgraded.journals.get('journal-1')).not.toHaveProperty('photoId')
+      expect(await upgraded.journals.get('journal-1')).not.toHaveProperty('stickers')
       expect(await upgraded.settings.get('app')).toMatchObject({
-        schemaVersion: 5,
+        schemaVersion: 6,
         defaultTemplate: 'analyst',
         defaultRatingScale: 'stars5',
       })
