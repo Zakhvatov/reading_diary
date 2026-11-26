@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.github
+docs
+.beads
+.plan
+.agents
+.claude
+.codex
+.cursor
+*.log
+.DS_Store

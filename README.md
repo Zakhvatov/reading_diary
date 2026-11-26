@@ -46,3 +46,32 @@ npm run build
 ```bash
 BASE_PATH=/reading_diary/ npm run build
 ```
+
+## Запуск в Docker
+
+Собрать production-версию и открыть её как обычное веб-приложение на компьютере:
+
+```bash
+docker compose up --build
+```
+
+Затем открыть **http://localhost:8080**. Внутри — nginx со статикой и
+SPA-fallback, поэтому глубокие ссылки вроде `/books/:id` работают и при
+обновлении страницы.
+
+Остановить:
+
+```bash
+docker compose down
+```
+
+Порт можно поменять в `docker-compose.yml` (`"8080:80"`), а собрать образ
+вручную — так:
+
+```bash
+docker build -t reading-diary .
+docker run --rm -p 8080:80 reading-diary
+```
+
+Данные по-прежнему хранятся в браузере на этом компьютере: контейнер отдаёт
+только файлы приложения и ничего не сохраняет между запусками.
