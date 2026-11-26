@@ -1,5 +1,5 @@
 import Dexie, { type Table } from 'dexie'
-import { toStickerPlacements } from '@/lib/stickerLayout'
+import { toBoardNotes } from '@/lib/board'
 import type { DiaryTemplateId } from '@/lib/templates'
 import type {
   Book,
@@ -149,7 +149,7 @@ export class ReadingDiaryDB extends Dexie {
         await transaction
           .table('journals')
           .toCollection()
-          .modify((entry: Partial<JournalEntry> & { photoId?: string }) => {
+          .modify((entry: Partial<JournalEntry> & { photoId?: string; stickers?: unknown }) => {
             entry.photoIds ??= entry.photoId ? [entry.photoId] : []
             entry.stickers ??= []
             delete entry.photoId
@@ -169,13 +169,39 @@ export class ReadingDiaryDB extends Dexie {
         await transaction
           .table('journals')
           .toCollection()
-          .modify((entry: Partial<JournalEntry>) => {
-            entry.stickers = toStickerPlacements(entry.stickers)
+          .modify((entry: Partial<JournalEntry> & { stickers?: unknown }) => {
+            entry.stickers ??= []
           })
 
         const settingsTable = transaction.table('settings')
         if (await settingsTable.get('app')) {
           await settingsTable.update('app', { schemaVersion: 5 })
+        }
+      })
+
+    this.version(6)
+      .stores({
+        journals: 'id, bookId, entryDate, createdAt, *tags',
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table('journals')
+          .toCollection()
+          .modify(
+            (
+              entry: Partial<JournalEntry> & {
+                stickers?: unknown
+                board?: unknown
+              },
+            ) => {
+              entry.board = toBoardNotes(entry.board ?? entry.stickers)
+              delete entry.stickers
+            },
+          )
+
+        const settingsTable = transaction.table('settings')
+        if (await settingsTable.get('app')) {
+          await settingsTable.update('app', { schemaVersion: 6 })
         }
       })
   }

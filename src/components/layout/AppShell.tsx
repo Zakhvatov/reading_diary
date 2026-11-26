@@ -7,10 +7,11 @@ import { TabBar } from './TabBar'
 import { UpdatePrompt } from './UpdatePrompt'
 
 const fullscreenRoutes = new Set(['/scan'])
+const boardRoute = /^\/journals\/[^/]+\/board\/?$/
 
 export function AppShell() {
   const { pathname } = useLocation()
-  const fullscreen = fullscreenRoutes.has(pathname)
+  const fullscreen = fullscreenRoutes.has(pathname) || boardRoute.test(pathname)
 
   useEffect(() => {
     void maybeCreateSnapshot()

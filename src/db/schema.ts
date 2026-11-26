@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import { MAX_JOURNAL_PHOTOS, MAX_JOURNAL_STICKERS } from '@/lib/journal'
-import { STICKER_IDS } from '@/lib/stickers'
+import { BOARD_NOTE_COLORS, BOARD_NOTE_MAX_LENGTH, MAX_BOARD_NOTES } from '@/lib/board'
+import { MAX_JOURNAL_PHOTOS } from '@/lib/journal'
 
 const idSchema = z.string().min(1)
 const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -16,13 +16,13 @@ export const acquisitionSchema = z.enum(['bought', 'library', 'gift', 'other'])
 export const colorLabelSchema = z.enum(['red', 'amber', 'green', 'blue', 'none'])
 export const diaryTemplateIdSchema = z.enum(['lite', 'analyst', 'bookclub'])
 export const journalColorSchema = z.enum(['pine', 'amber', 'clay', 'sky', 'plum', 'moss'])
-export const stickerIdSchema = z.enum(STICKER_IDS)
-export const stickerPlacementSchema = z.object({
+export const boardNoteColorSchema = z.enum(BOARD_NOTE_COLORS)
+export const boardNoteSchema = z.object({
   id: idSchema,
-  sticker: stickerIdSchema,
+  color: boardNoteColorSchema,
+  text: z.string().max(BOARD_NOTE_MAX_LENGTH),
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
-  rotate: z.number().min(-180).max(180),
 })
 export const sessionKindSchema = z.enum(['timer', 'manual'])
 export const readingStatusSchema = z.enum(['reading', 'finished', 'dnf'])
@@ -124,7 +124,7 @@ export const journalEntrySchema = z.object({
   body: z.string(),
   color: journalColorSchema,
   photoIds: z.array(idSchema).max(MAX_JOURNAL_PHOTOS),
-  stickers: z.array(stickerPlacementSchema).max(MAX_JOURNAL_STICKERS),
+  board: z.array(boardNoteSchema).max(MAX_BOARD_NOTES),
   entryDate: isoDateSchema,
   tags: z.array(z.string()),
   mood: z.string().optional(),

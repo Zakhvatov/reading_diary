@@ -245,7 +245,7 @@ describe('backup import', () => {
 
     expect(await db.journals.get('old-journal')).toMatchObject({
       photoIds: ['cover-1'],
-      stickers: [{ id: 'legacy-0-heart', sticker: 'heart', x: 0.62, y: 0.06, rotate: -14 }],
+      board: [{ id: 'note-0', color: 'sage', text: '', x: 0.62, y: 0.06 }],
     })
     expect(await db.journals.get('old-journal')).not.toHaveProperty('photoId')
   })

@@ -9,6 +9,7 @@ import { CalendarScreen } from '@/screens/calendar/CalendarScreen'
 import { DiaryScreen } from '@/screens/diary/DiaryScreen'
 import { GoalScreen } from '@/screens/goal/GoalScreen'
 import { HomeScreen } from '@/screens/HomeScreen'
+import { JournalBoardScreen } from '@/screens/journals/JournalBoardScreen'
 import { JournalDetailScreen } from '@/screens/journals/JournalDetailScreen'
 import { JournalEditorScreen } from '@/screens/journals/JournalEditorScreen'
 import { JournalListScreen } from '@/screens/journals/JournalListScreen'
@@ -74,6 +75,10 @@ export const router = createBrowserRouter(
         {
           path: 'journals/:journalId/edit',
           element: <JournalEditorScreen />,
+        },
+        {
+          path: 'journals/:journalId/board',
+          element: <JournalBoardScreen />,
         },
         {
           path: 'calendar',

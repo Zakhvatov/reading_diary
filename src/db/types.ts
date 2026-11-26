@@ -1,7 +1,7 @@
-import type { StickerPlacement } from '@/lib/stickers'
+import type { BoardNote } from '@/lib/board'
 import type { DiaryTemplateId } from '@/lib/templates'
 
-export type { StickerId, StickerPlacement } from '@/lib/stickers'
+export type { BoardNote, BoardNoteColor } from '@/lib/board'
 export type { DiaryTemplateId } from '@/lib/templates'
 
 export type ID = string
@@ -110,8 +110,8 @@ export interface JournalEntry {
   color: JournalColor
   /** Фотографии записи: до шести, порядок задаёт галерею. */
   photoIds: ID[]
-  /** Наклейки с координатами на странице. */
-  stickers: StickerPlacement[]
+  /** Заметки на доске записи: порядок массива — порядок наложения. */
+  board: BoardNote[]
   entryDate: ISODate
   tags: string[]
   mood?: string
