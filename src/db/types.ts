@@ -34,6 +34,20 @@ export interface Book {
   updatedAt: ISODateTime
 }
 
+export type ReadingStatus = 'reading' | 'finished' | 'dnf'
+
+/** Одна попытка прочтения книги. Перечитывание — новая запись. */
+export interface Reading {
+  id: ID
+  bookId: ID
+  status: ReadingStatus
+  startedAt?: ISODate
+  /** Дата завершения попытки: прочитано или брошено. */
+  finishedAt?: ISODate
+  createdAt: ISODateTime
+  updatedAt: ISODateTime
+}
+
 export type SessionKind = 'timer' | 'manual'
 
 export interface Session {
@@ -97,7 +111,7 @@ export interface Settings {
   updatedAt: ISODateTime
 }
 
-export type EntityKind = 'book' | 'session' | 'quote' | 'journal' | 'goal'
+export type EntityKind = 'book' | 'reading' | 'session' | 'quote' | 'journal' | 'goal'
 
 export interface Tombstone {
   id: ID

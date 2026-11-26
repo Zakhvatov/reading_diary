@@ -24,9 +24,10 @@ function toCoverMeta(cover: Cover): CoverMeta {
 }
 
 async function collectData(): Promise<BackupData> {
-  const [books, sessions, quotes, journals, goals, settings, tombstones, covers] =
+  const [books, readings, sessions, quotes, journals, goals, settings, tombstones, covers] =
     await Promise.all([
       db.books.toArray(),
+      db.readings.toArray(),
       db.sessions.toArray(),
       db.quotes.toArray(),
       db.journals.toArray(),
@@ -38,6 +39,7 @@ async function collectData(): Promise<BackupData> {
 
   return {
     books,
+    readings,
     sessions,
     quotes,
     journals,
@@ -56,6 +58,7 @@ function buildManifest(data: BackupData, appVersion?: string): BackupManifest {
     appVersion: appVersion ?? __APP_VERSION__,
     counts: {
       books: data.books.length,
+      readings: data.readings.length,
       sessions: data.sessions.length,
       quotes: data.quotes.length,
       journals: data.journals.length,

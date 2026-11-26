@@ -1,6 +1,6 @@
 import { toDay } from '@/lib/dates'
 
-export const BACKUP_SCHEMA_VERSION = 1
+export const BACKUP_SCHEMA_VERSION = 2
 
 type JsonRecord = Record<string, unknown>
 
@@ -55,6 +55,22 @@ function normalizeBook(record: JsonRecord): JsonRecord | null {
     totalReadingMs: num(record.totalReadingMs, 0),
     sessionCount: num(record.sessionCount, 0),
     pagesReadTotal: num(record.pagesReadTotal, 0),
+    createdAt,
+    updatedAt: str(record.updatedAt, createdAt),
+  }
+}
+
+function normalizeReading(record: JsonRecord): JsonRecord | null {
+  const id = str(record.id)
+  const bookId = str(record.bookId)
+  if (!id || !bookId) return null
+
+  const createdAt = str(record.createdAt, new Date().toISOString())
+  return {
+    ...record,
+    id,
+    bookId,
+    status: str(record.status, str(record.finishedAt) ? 'finished' : 'reading'),
     createdAt,
     updatedAt: str(record.updatedAt, createdAt),
   }
@@ -150,7 +166,7 @@ function normalizeSettings(record: JsonRecord): JsonRecord | null {
     defaultStatus: str(record.defaultStatus, 'want'),
     dailyGoalMinutes: num(record.dailyGoalMinutes, 0),
     persistGranted: typeof record.persistGranted === 'boolean' ? record.persistGranted : false,
-    schemaVersion: num(record.schemaVersion, 1),
+    schemaVersion: num(record.schemaVersion, 2),
     createdAt,
     updatedAt: str(record.updatedAt, createdAt),
   }
@@ -200,6 +216,7 @@ export function normalizeBackup(raw: unknown): Record<string, unknown> {
 
   return {
     books: normalizeList(source.books, normalizeBook),
+    readings: normalizeList(source.readings, normalizeReading),
     sessions: normalizeList(source.sessions, normalizeSession),
     quotes: normalizeList(source.quotes, normalizeQuote),
     journals: normalizeList(source.journals, normalizeJournal),

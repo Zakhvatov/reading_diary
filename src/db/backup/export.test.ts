@@ -4,7 +4,7 @@ import { createBook } from '../repositories/books'
 import { saveCover } from '../repositories/covers'
 import { getSettings } from '../repositories/settings'
 import { exportBackupJson, exportBackupZip } from './export'
-import { readBackup } from './import'
+import { importBackup, readBackup } from './import'
 
 beforeEach(async () => {
   await db.delete()
@@ -52,5 +52,19 @@ describe('backup export', () => {
 
     expect(backup.data.covers).toHaveLength(1)
     expect(backup.covers.size).toBe(0)
+  })
+
+  it('exports and restores reading history', async () => {
+    await createBook({ title: 'Книга', status: 'reading' })
+
+    const file = await exportBackupJson()
+    const backup = await readBackup(file)
+    expect(backup.manifest.counts.readings).toBe(1)
+    expect(backup.data.readings).toHaveLength(1)
+
+    await db.readings.clear()
+    await importBackup(file, 'replace')
+
+    expect(await db.readings.count()).toBe(1)
   })
 })

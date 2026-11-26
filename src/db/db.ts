@@ -6,6 +6,7 @@ import type {
   JournalEntry,
   MetaRecord,
   Quote,
+  Reading,
   Session,
   Settings,
   Tombstone,
@@ -13,6 +14,7 @@ import type {
 
 export class ReadingDiaryDB extends Dexie {
   books!: Table<Book, string>
+  readings!: Table<Reading, string>
   sessions!: Table<Session, string>
   quotes!: Table<Quote, string>
   journals!: Table<JournalEntry, string>
@@ -35,6 +37,41 @@ export class ReadingDiaryDB extends Dexie {
       tombstones: 'id, entity, deletedAt, [entity+entityId]',
       meta: 'key, kind, fetchedAt',
     })
+
+    this.version(2)
+      .stores({
+        readings: 'id, bookId, status, startedAt, finishedAt, [bookId+status]',
+      })
+      .upgrade(async (transaction) => {
+        const books = (await transaction.table('books').toArray()) as Book[]
+        const rows: Reading[] = []
+
+        for (const book of books) {
+          if (book.status === 'want') continue
+
+          const reading: Reading = {
+            id: crypto.randomUUID(),
+            bookId: book.id,
+            status:
+              book.status === 'finished' ? 'finished' : book.status === 'dnf' ? 'dnf' : 'reading',
+            createdAt: book.createdAt,
+            updatedAt: book.createdAt,
+          }
+
+          if (book.startedAt) reading.startedAt = book.startedAt
+          if (book.finishedAt) reading.finishedAt = book.finishedAt
+          rows.push(reading)
+        }
+
+        if (rows.length > 0) {
+          await transaction.table('readings').bulkAdd(rows)
+        }
+
+        const settingsTable = transaction.table('settings')
+        if (await settingsTable.get('app')) {
+          await settingsTable.update('app', { schemaVersion: 2 })
+        }
+      })
   }
 }
 

@@ -1,7 +1,9 @@
 import { nowISO } from '@/lib/id'
+import { today } from '@/lib/dates'
 import { normalizeText } from '@/lib/text'
 import { db } from '../db'
 import type { Book, BookStatus, EntityKind, ID } from '../types'
+import { applyBookStatusChange, finishReading, startReading } from './readings'
 
 export type BookInput = {
   title: string
@@ -58,7 +60,16 @@ export async function createBook(input: BookInput): Promise<Book> {
   if (input.coverId) book.coverId = input.coverId
   if (input.metadataSource) book.metadataSource = input.metadataSource
 
-  await db.books.add(book)
+  await db.transaction('rw', [db.books, db.readings], async () => {
+    await db.books.add(book)
+
+    if (book.status === 'reading') {
+      await startReading(book.id, book.startedAt ?? today())
+    } else if (book.status === 'finished') {
+      await finishReading(book.id, book.finishedAt ?? today(), book.startedAt)
+    }
+  })
+
   return book
 }
 
@@ -78,7 +89,20 @@ export async function updateBook(id: ID, patch: Partial<Book>): Promise<void> {
   const next: Partial<Book> = { ...patch, updatedAt: nowISO() }
   delete next.id
   delete next.createdAt
-  await db.books.update(id, next)
+
+  await db.transaction('rw', [db.books, db.readings], async () => {
+    const current = await db.books.get(id)
+    await db.books.update(id, next)
+
+    if (current && patch.status && patch.status !== current.status) {
+      await applyBookStatusChange({
+        bookId: id,
+        from: current.status,
+        to: patch.status,
+        finishedAt: patch.finishedAt,
+      })
+    }
+  })
 }
 
 export async function deleteBook(id: ID): Promise<void> {
@@ -86,12 +110,14 @@ export async function deleteBook(id: ID): Promise<void> {
 
   await db.transaction(
     'rw',
-    [db.books, db.sessions, db.quotes, db.journals, db.covers, db.tombstones],
+    [db.books, db.readings, db.sessions, db.quotes, db.journals, db.covers, db.tombstones],
     async () => {
+      const readingIds = await db.readings.where('bookId').equals(id).primaryKeys()
       const sessionIds = await db.sessions.where('bookId').equals(id).primaryKeys()
       const quoteIds = await db.quotes.where('bookId').equals(id).primaryKeys()
       const journalIds = await db.journals.where('bookId').equals(id).primaryKeys()
 
+      await db.readings.bulkDelete(readingIds)
       await db.sessions.bulkDelete(sessionIds)
       await db.quotes.bulkDelete(quoteIds)
       await db.journals.bulkDelete(journalIds)
@@ -99,6 +125,7 @@ export async function deleteBook(id: ID): Promise<void> {
 
       const tombstones = [
         { entity: 'book' as EntityKind, entityId: id },
+        ...readingIds.map((entityId) => ({ entity: 'reading' as EntityKind, entityId })),
         ...sessionIds.map((entityId) => ({ entity: 'session' as EntityKind, entityId })),
         ...quoteIds.map((entityId) => ({ entity: 'quote' as EntityKind, entityId })),
         ...journalIds.map((entityId) => ({ entity: 'journal' as EntityKind, entityId })),

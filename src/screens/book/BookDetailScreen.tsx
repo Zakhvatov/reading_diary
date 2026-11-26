@@ -7,15 +7,31 @@ import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { Sheet } from '@/components/ui/Sheet'
 import { SpineProgress } from '@/components/ui/SpineProgress'
-import { useBook } from '@/db/live'
+import { useBook, useReadings } from '@/db/live'
 import { deleteBook, updateBook } from '@/db/repositories/books'
-import type { Book, BookStatus } from '@/db/types'
+import type { Book, BookStatus, Reading } from '@/db/types'
 import { BOOK_STATUSES, STATUS_LABELS } from '@/lib/bookStatus'
-import { today } from '@/lib/dates'
+import { formatDay, today } from '@/lib/dates'
 import { formatDuration, formatPercent } from '@/lib/format'
 import { bookProgress, finishBook, setBookStatus } from '@/lib/progress'
 
 type SheetKind = 'status' | 'delete' | null
+
+const READING_STATUS_LABELS: Record<Reading['status'], string> = {
+  reading: 'Читаю',
+  finished: 'Прочитано',
+  dnf: 'Брошено',
+}
+
+function readingDates(reading: Reading): string {
+  const start = reading.startedAt ? formatDay(reading.startedAt) : undefined
+  const finish = reading.finishedAt ? formatDay(reading.finishedAt) : undefined
+
+  if (start && finish) return start === finish ? start : `${start} — ${finish}`
+  if (start) return `с ${start}`
+  if (finish) return `до ${finish}`
+  return ''
+}
 
 function progressLabel(book: Book): string {
   if (book.progressMode === 'percent') {
@@ -30,6 +46,7 @@ function progressLabel(book: Book): string {
 export function BookDetailScreen() {
   const { bookId } = useParams()
   const book = useBook(bookId)
+  const readings = useReadings(bookId)
   const navigate = useNavigate()
   const [sheet, setSheet] = useState<SheetKind>(null)
   const [busy, setBusy] = useState(false)
@@ -120,6 +137,27 @@ export function BookDetailScreen() {
           </Button>
         ) : null}
       </div>
+
+      {readings && readings.length > 0 ? (
+        <section className="mt-8 border-t border-line pt-5">
+          <h2 className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
+            История чтения
+          </h2>
+          <ul className="mt-2 flex flex-col gap-2">
+            {[...readings].reverse().map((reading) => (
+              <li
+                key={reading.id}
+                className="flex items-baseline justify-between gap-3 text-[14px] leading-[20px]"
+              >
+                <span>{READING_STATUS_LABELS[reading.status]}</span>
+                <span className="shrink-0 text-[13px] leading-[18px] text-muted tabular-nums">
+                  {readingDates(reading)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {details.length > 0 || book.genres.length > 0 ? (
         <section className="mt-8 border-t border-line pt-5">

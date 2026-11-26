@@ -3,6 +3,7 @@ import { db } from './db'
 import { getBook, listBooks } from './repositories/books'
 import { getGoal } from './repositories/goals'
 import { listJournals } from './repositories/journals'
+import { listReadings } from './repositories/readings'
 import { listSessionsByBook } from './repositories/sessions'
 import { readSettings } from './repositories/settings'
 import type { BookStatus, ID } from './types'
@@ -17,6 +18,10 @@ export function useBook(id?: ID) {
 
 export function useSessionsByBook(bookId?: ID) {
   return useLiveQuery(() => (bookId ? listSessionsByBook(bookId) : []), [bookId])
+}
+
+export function useReadings(bookId?: ID) {
+  return useLiveQuery(() => (bookId ? listReadings(bookId) : []), [bookId])
 }
 
 export function useJournals() {

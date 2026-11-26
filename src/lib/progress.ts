@@ -61,7 +61,7 @@ export function setBookStatus(book: Book, status: Book['status'], day: ISODate):
   if (status === 'reading') {
     return {
       status,
-      startedAt: book.startedAt ?? day,
+      startedAt: day,
       finishedAt: undefined,
     }
   }

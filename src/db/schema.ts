@@ -9,7 +9,8 @@ export const bookStatusSchema = z.enum(['want', 'reading', 'finished', 'dnf'])
 export const progressModeSchema = z.enum(['pages', 'percent'])
 export const journalColorSchema = z.enum(['pine', 'amber', 'clay', 'sky', 'plum', 'moss'])
 export const sessionKindSchema = z.enum(['timer', 'manual'])
-export const entityKindSchema = z.enum(['book', 'session', 'quote', 'journal', 'goal'])
+export const readingStatusSchema = z.enum(['reading', 'finished', 'dnf'])
+export const entityKindSchema = z.enum(['book', 'reading', 'session', 'quote', 'journal', 'goal'])
 
 export const bookSchema = z.object({
   id: idSchema,
@@ -36,6 +37,16 @@ export const bookSchema = z.object({
   sessionCount: z.number().int().nonnegative(),
   pagesReadTotal: z.number().int().nonnegative(),
   metadataSource: z.enum(['openlibrary', 'googlebooks', 'manual']).optional(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
+})
+
+export const readingSchema = z.object({
+  id: idSchema,
+  bookId: idSchema,
+  status: readingStatusSchema,
+  startedAt: isoDateSchema.optional(),
+  finishedAt: isoDateSchema.optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
 })
@@ -119,6 +130,7 @@ export const coverMetaSchema = z.object({
 
 export const backupDataSchema = z.object({
   books: z.array(bookSchema),
+  readings: z.array(readingSchema).default([]),
   sessions: z.array(sessionSchema),
   quotes: z.array(quoteSchema),
   journals: z.array(journalEntrySchema),
