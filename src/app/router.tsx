@@ -1,6 +1,4 @@
 import {
-  BookOpen,
-  Books,
   CalendarDots,
   ChartBar,
   Info,
@@ -13,11 +11,16 @@ import {
 } from '@phosphor-icons/react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { AddBookScreen } from '@/screens/add/AddBookScreen'
 import { BackupScreen } from '@/screens/BackupScreen'
+import { BookDetailScreen } from '@/screens/book/BookDetailScreen'
+import { BookEditScreen } from '@/screens/book/BookEditScreen'
 import { HomeScreen } from '@/screens/HomeScreen'
 import { NotFoundScreen } from '@/screens/NotFoundScreen'
 import { PlaceholderScreen } from '@/screens/PlaceholderScreen'
 import { SettingsScreen } from '@/screens/SettingsScreen'
+import { ShelfDetailScreen } from '@/screens/shelves/ShelfDetailScreen'
+import { ShelvesScreen } from '@/screens/shelves/ShelvesScreen'
 import { RouteError } from './RouteError'
 import { routerBasename } from './basePath'
 
@@ -32,38 +35,15 @@ export const router = createBrowserRouter(
         { path: 'home', element: <HomeScreen /> },
         {
           path: 'shelves',
-          element: (
-            <PlaceholderScreen
-              title="Библиотека"
-              caption="Полки"
-              icon={<Books size={28} />}
-              description="Здесь появятся полки: хочу прочитать, читаю, прочитано и не дочитал."
-            />
-          ),
+          element: <ShelvesScreen />,
         },
         {
           path: 'shelves/:shelf',
-          element: (
-            <PlaceholderScreen
-              title="Полка"
-              caption="Библиотека"
-              back
-              icon={<Books size={28} />}
-              description="Книги этой полки появятся здесь, как только вы их добавите."
-            />
-          ),
+          element: <ShelfDetailScreen />,
         },
         {
           path: 'add',
-          element: (
-            <PlaceholderScreen
-              title="Новая книга"
-              caption="Библиотека"
-              back
-              icon={<BookOpen size={28} />}
-              description="Форма добавления книги — следующий шаг. Название, автор и страницы."
-            />
-          ),
+          element: <AddBookScreen />,
         },
         {
           path: 'scan',
@@ -79,27 +59,11 @@ export const router = createBrowserRouter(
         },
         {
           path: 'books/:bookId',
-          element: (
-            <PlaceholderScreen
-              title="Книга"
-              caption="Библиотека"
-              back
-              icon={<BookOpen size={28} />}
-              description="Карточка книги: обложка, прогресс, сессии и заметки."
-            />
-          ),
+          element: <BookDetailScreen />,
         },
         {
           path: 'books/:bookId/edit',
-          element: (
-            <PlaceholderScreen
-              title="Редактирование"
-              caption="Книга"
-              back
-              icon={<PencilSimple size={28} />}
-              description="Правка метаданных книги появится вместе с библиотекой."
-            />
-          ),
+          element: <BookEditScreen />,
         },
         {
           path: 'timer',

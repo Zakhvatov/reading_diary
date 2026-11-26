@@ -2,6 +2,10 @@ import { nowISO } from '@/lib/id'
 import { db } from '../db'
 import type { Settings } from '../types'
 
+export async function readSettings(): Promise<Settings | undefined> {
+  return db.settings.get('app')
+}
+
 export async function getSettings(): Promise<Settings> {
   const existing = await db.settings.get('app')
   if (existing) return existing
