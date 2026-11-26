@@ -6,7 +6,10 @@ export type QuoteInput = {
   bookId: ID
   text: string
   page?: number
+  chapter?: string
   note?: string
+  favorite?: boolean
+  shareable?: boolean
 }
 
 export async function createQuote(input: QuoteInput): Promise<Quote> {
@@ -15,11 +18,14 @@ export async function createQuote(input: QuoteInput): Promise<Quote> {
     id: crypto.randomUUID(),
     bookId: input.bookId,
     text: input.text.trim(),
+    favorite: input.favorite ?? false,
+    shareable: input.shareable ?? false,
     createdAt: now,
     updatedAt: now,
   }
 
   if (input.page !== undefined) quote.page = input.page
+  if (input.chapter) quote.chapter = input.chapter
   if (input.note) quote.note = input.note
 
   await db.quotes.add(quote)

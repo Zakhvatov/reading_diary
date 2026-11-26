@@ -1,7 +1,12 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../db'
+import { createBookLink } from '../repositories/bookLinks'
+import { createBookNote } from '../repositories/bookNotes'
 import { createBook } from '../repositories/books'
+import { createCharacter } from '../repositories/characters'
 import { saveCover } from '../repositories/covers'
+import { createJournal } from '../repositories/journals'
+import { createQuote } from '../repositories/quotes'
 import { getSettings } from '../repositories/settings'
 import { exportBackupJson, exportBackupZip } from './export'
 import { importBackup, readBackup } from './import'
@@ -52,6 +57,49 @@ describe('backup export', () => {
 
     expect(backup.data.covers).toHaveLength(1)
     expect(backup.covers.size).toBe(0)
+  })
+
+  it('exports and restores deep diary tables', async () => {
+    const book = await createBook({ title: 'Дневник' })
+    const character = await createCharacter({ bookId: book.id, name: 'Герой', note: 'Жив' })
+    const note = await createBookNote({ bookId: book.id, kind: 'plot', body: 'Завязка' })
+    const link = await createBookLink({
+      bookId: book.id,
+      targetTitle: 'Другая книга',
+      kind: 'similar',
+    })
+    const quote = await createQuote({ bookId: book.id, text: 'Цитата' })
+    const journal = await createJournal({
+      title: 'Мысль',
+      body: '',
+      color: 'pine',
+      entryDate: '2026-02-01',
+    })
+
+    const file = await exportBackupJson()
+    const parsed = await readBackup(file)
+
+    expect(parsed.manifest.counts).toMatchObject({
+      characters: 1,
+      bookNotes: 1,
+      bookLinks: 1,
+    })
+    expect(parsed.data.characters).toHaveLength(1)
+    expect(parsed.data.bookNotes).toHaveLength(1)
+    expect(parsed.data.bookLinks).toHaveLength(1)
+
+    await db.delete()
+    await db.open()
+    await importBackup(file, 'replace')
+
+    expect(await db.characters.get(character.id)).toMatchObject({ name: 'Герой', note: 'Жив' })
+    expect(await db.bookNotes.get(note.id)).toMatchObject({ kind: 'plot', body: 'Завязка' })
+    expect(await db.bookLinks.get(link.id)).toMatchObject({
+      targetTitle: 'Другая книга',
+      kind: 'similar',
+    })
+    expect(await db.quotes.get(quote.id)).toMatchObject({ favorite: false, shareable: false })
+    expect(await db.journals.get(journal.id)).toMatchObject({ tags: [], shareable: false })
   })
 
   it('exports and restores reading history', async () => {

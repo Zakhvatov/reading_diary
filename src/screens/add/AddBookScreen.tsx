@@ -63,6 +63,14 @@ export function AddBookScreen() {
         description: values.description,
         language: values.language,
         status: values.status,
+        tags: values.tags,
+        moods: values.moods,
+        format: values.format,
+        acquisition: values.acquisition,
+        colorLabel: values.colorLabel,
+        diaryTemplate: values.diaryTemplate,
+        shareable: values.shareable,
+        ratingScale: settings?.defaultRatingScale,
         metadataSource: draft?.source ?? 'manual',
       })
 
@@ -192,6 +200,7 @@ export function AddBookScreen() {
           submitLabel="Сохранить книгу"
           initialValues={manualPrefill}
           defaultStatus={settings?.defaultStatus}
+          defaultTemplate={settings?.defaultTemplate}
           busy={busy}
           error={error}
           onSubmit={handleSubmit}
@@ -222,6 +231,7 @@ export function AddBookScreen() {
             initialValues={draftValues(draft)}
             coverPreviewUrl={draft.coverUrl}
             defaultStatus={settings?.defaultStatus}
+            defaultTemplate={settings?.defaultTemplate}
             busy={busy}
             error={error}
             onSubmit={handleSubmit}

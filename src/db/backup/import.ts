@@ -32,6 +32,9 @@ const TABLES = [
   db.sessions,
   db.quotes,
   db.journals,
+  db.characters,
+  db.bookNotes,
+  db.bookLinks,
   db.goals,
   db.covers,
   db.tombstones,
@@ -58,11 +61,11 @@ function parseManifest(raw: unknown): BackupManifest {
   return manifest
 }
 
-function parseData(raw: unknown): BackupData {
+function parseData(raw: unknown, schemaVersion: number): BackupData {
   if (!isRecord(raw) || !Object.values(raw).some(Array.isArray)) {
     throw new Error('В файле нет таблиц бэкапа')
   }
-  return backupDataSchema.parse(normalizeBackup(raw))
+  return backupDataSchema.parse(normalizeBackup(raw, schemaVersion))
 }
 
 function isZip(bytes: Uint8Array): boolean {
@@ -79,7 +82,7 @@ function readZipBackup(bytes: Uint8Array): ReadResult {
   }
 
   const manifest = parseManifest(parseJson(strFromU8(manifestEntry)))
-  const data = parseData(parseJson(strFromU8(dataEntry)))
+  const data = parseData(parseJson(strFromU8(dataEntry)), manifest.schemaVersion)
   const covers = new Map<string, Blob>()
 
   for (const [name, entry] of Object.entries(entries)) {
@@ -96,9 +99,10 @@ function readJsonBackup(bytes: Uint8Array): ReadResult {
   if (!isRecord(parsed)) throw new Error('Файл не является бэкапом')
   if (!isRecord(parsed.data)) throw new Error('В файле нет данных бэкапа')
 
+  const manifest = parseManifest(parsed.manifest)
   return {
-    manifest: parseManifest(parsed.manifest),
-    data: parseData(parsed.data),
+    manifest,
+    data: parseData(parsed.data, manifest.schemaVersion),
     covers: new Map(),
   }
 }
@@ -115,6 +119,9 @@ function emptyCounts(): Record<string, number> {
     sessions: 0,
     quotes: 0,
     journals: 0,
+    characters: 0,
+    bookNotes: 0,
+    bookLinks: 0,
     goals: 0,
     tombstones: 0,
   }
@@ -362,6 +369,8 @@ async function touchSettings(): Promise<void> {
     id: 'app',
     onboardingDone: true,
     defaultStatus: 'want',
+    defaultTemplate: 'lite',
+    defaultRatingScale: 'stars5',
     dailyGoalMinutes: 0,
     lastBackupAt: now,
     persistGranted: false,
@@ -377,6 +386,9 @@ async function replaceAll(data: BackupData, covers: Map<string, Blob>): Promise<
   await db.sessions.clear()
   await db.quotes.clear()
   await db.journals.clear()
+  await db.characters.clear()
+  await db.bookNotes.clear()
+  await db.bookLinks.clear()
   await db.goals.clear()
   await db.covers.clear()
   await db.tombstones.clear()
@@ -386,6 +398,9 @@ async function replaceAll(data: BackupData, covers: Map<string, Blob>): Promise<
   await db.sessions.bulkPut(data.sessions)
   await db.quotes.bulkPut(data.quotes)
   await db.journals.bulkPut(data.journals)
+  await db.characters.bulkPut(data.characters)
+  await db.bookNotes.bulkPut(data.bookNotes)
+  await db.bookLinks.bulkPut(data.bookLinks)
   await db.goals.bulkPut(data.goals)
   await db.tombstones.bulkPut(data.tombstones)
 
@@ -402,6 +417,9 @@ async function replaceAll(data: BackupData, covers: Map<string, Blob>): Promise<
       sessions: data.sessions.length,
       quotes: data.quotes.length,
       journals: data.journals.length,
+      characters: data.characters.length,
+      bookNotes: data.bookNotes.length,
+      bookLinks: data.bookLinks.length,
       goals: data.goals.length,
       tombstones: data.tombstones.length,
     },
@@ -422,6 +440,9 @@ async function mergeAll(data: BackupData, covers: Map<string, Blob>): Promise<Im
   const sessions = await mergeSessions(data.sessions, affected)
   const quotes = await mergeNewer(data.quotes, db.quotes)
   const journals = await mergeNewer(data.journals, db.journals)
+  const characters = await mergeNewer(data.characters, db.characters)
+  const bookNotes = await mergeNewer(data.bookNotes, db.bookNotes)
+  const bookLinks = await mergeNewer(data.bookLinks, db.bookLinks)
   const goals = await mergeGoals(data.goals)
   const tombstones = await mergeTombstones(data.tombstones)
 
@@ -431,6 +452,9 @@ async function mergeAll(data: BackupData, covers: Map<string, Blob>): Promise<Im
     ['sessions', sessions],
     ['quotes', quotes],
     ['journals', journals],
+    ['characters', characters],
+    ['bookNotes', bookNotes],
+    ['bookLinks', bookLinks],
     ['goals', goals],
     ['tombstones', tombstones],
   ]

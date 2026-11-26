@@ -1,24 +1,20 @@
 import type { BookStatus } from '@/db/types'
 import { STATUS_LABELS } from '@/lib/bookStatus'
-
-const toneClasses: Record<BookStatus, string> = {
-  reading: 'bg-accent text-accent-ink',
-  want: 'bg-butter text-butter-ink',
-  finished: 'bg-sky text-sky-ink',
-  dnf: 'bg-rose text-rose-ink',
-}
+import { STATUS_TONE } from './statusTone'
 
 type StatusChipProps = {
   status: BookStatus
+  size?: 'md' | 'sm'
   className?: string
 }
 
-export function StatusChip({ status, className }: StatusChipProps) {
+export function StatusChip({ status, size = 'md', className }: StatusChipProps) {
   return (
     <span
       className={[
-        'inline-flex h-7 items-center rounded-[var(--radius-pill)] px-3 text-[12px] font-medium leading-none',
-        toneClasses[status],
+        'inline-flex items-center rounded-[var(--radius-pill)] font-medium leading-none',
+        size === 'sm' ? 'h-5 px-2 text-[10px]' : 'h-7 px-3 text-[12px]',
+        STATUS_TONE[status].chip,
         className,
       ]
         .filter(Boolean)

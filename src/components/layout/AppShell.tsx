@@ -1,12 +1,20 @@
+import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { QuickCapture } from '@/components/capture/QuickCapture'
+import { maybeCreateSnapshot } from '@/lib/snapshot'
 import { Fab } from './Fab'
 import { TabBar } from './TabBar'
+import { UpdatePrompt } from './UpdatePrompt'
 
 const fullscreenRoutes = new Set(['/scan'])
 
 export function AppShell() {
   const { pathname } = useLocation()
   const fullscreen = fullscreenRoutes.has(pathname)
+
+  useEffect(() => {
+    void maybeCreateSnapshot()
+  }, [])
 
   return (
     <div className="min-h-[100dvh]">
@@ -20,6 +28,8 @@ export function AppShell() {
         <Outlet />
       </main>
       <Fab />
+      <QuickCapture />
+      <UpdatePrompt />
       {fullscreen ? null : <TabBar />}
     </div>
   )

@@ -1,0 +1,128 @@
+/*
+ * Печать и «Сохранить в PDF» через window.print().
+ *
+ * Контракт: видимым на бумаге остаётся только содержимое элементов
+ * с атрибутом data-print. Всё остальное — таб-бар, кнопки, оболочка
+ * приложения — скрывается. Компонент DiaryExport документирует это
+ * рядом с разметкой.
+ */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 18mm 16mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  [data-print] {
+    position: absolute !important;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    display: block !important;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    color: #000000;
+    background: #ffffff;
+    font-family: 'Literata', ui-serif, Georgia, serif;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  [data-print],
+  [data-print] * {
+    visibility: visible;
+  }
+
+  [data-print] h1 {
+    margin: 0 0 4mm;
+    font-size: 24pt;
+    line-height: 1.2;
+  }
+
+  [data-print] h2 {
+    margin: 8mm 0 2mm;
+    padding-bottom: 1mm;
+    border-bottom: 0.4pt solid #999999;
+    font-size: 15pt;
+    line-height: 1.3;
+  }
+
+  [data-print] h3 {
+    margin: 5mm 0 1mm;
+    font-size: 12pt;
+    line-height: 1.35;
+  }
+
+  [data-print] p,
+  [data-print] ul,
+  [data-print] dl,
+  [data-print] blockquote {
+    margin: 0 0 3mm;
+  }
+
+  [data-print] ul {
+    padding-left: 6mm;
+  }
+
+  [data-print] dl > div {
+    display: flex;
+    gap: 3mm;
+  }
+
+  [data-print] dt {
+    min-width: 34mm;
+    color: #444444;
+  }
+
+  [data-print] dd {
+    margin: 0;
+  }
+
+  [data-print] blockquote {
+    padding-left: 4mm;
+    border-left: 1.5pt solid #1e5c45;
+    font-style: italic;
+  }
+
+  [data-print] blockquote footer {
+    margin-top: 1mm;
+    color: #444444;
+    font-size: 9pt;
+    font-style: normal;
+  }
+
+  [data-print] a {
+    color: #000000;
+    text-decoration: none;
+  }
+
+  [data-print] h1,
+  [data-print] h2,
+  [data-print] h3 {
+    break-after: avoid;
+  }
+
+  [data-print] blockquote,
+  [data-print] li,
+  [data-print] dl > div {
+    break-inside: avoid;
+  }
+
+  nav,
+  button,
+  [data-no-print] {
+    display: none !important;
+  }
+}

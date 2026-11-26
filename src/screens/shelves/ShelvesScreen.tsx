@@ -1,13 +1,14 @@
 import { BookOpen, MagnifyingGlass } from '@phosphor-icons/react'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookGrid } from '@/components/book/BookGrid'
+import { STATUS_TONE } from '@/components/book/statusTone'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { useBooks } from '@/db/live'
 import type { Book, BookStatus } from '@/db/types'
-import { BOOK_STATUSES, SHELF_TITLES } from '@/lib/bookStatus'
+import { BOOK_STATUSES, SHELF_TITLES, shelfOf, STATUS_SHORT } from '@/lib/bookStatus'
 import { pluralRu } from '@/lib/format'
 import { normalizeText } from '@/lib/text'
 
@@ -23,7 +24,7 @@ function matchesQuery(book: Book, query: string): boolean {
 
 function SkeletonGrid() {
   return (
-    <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-6" aria-hidden>
+    <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-7" aria-hidden>
       {SKELETON_KEYS.map((key) => (
         <div key={key} className="animate-pulse">
           <div className="aspect-[2/3] rounded-[10px] bg-line/60" />
@@ -35,33 +36,58 @@ function SkeletonGrid() {
   )
 }
 
-const SHELF_DOTS: Record<BookStatus, string> = {
-  reading: 'bg-accent',
-  want: 'bg-butter-ink',
-  finished: 'bg-sky-ink',
-  dnf: 'bg-rose-ink',
+function SummaryStrip({ books }: { books: Book[] }) {
+  const rows = BOOK_STATUSES.map((status) => ({
+    status,
+    count: books.filter((book) => shelfOf(book.status) === status).length,
+  })).filter((row) => row.status !== 'dnf' && row.count > 0)
+
+  if (rows.length === 0) return null
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-x-0.5 rounded-[var(--radius-control)] border border-line bg-surface px-2 py-1">
+      {rows.map(({ status, count }, index) => (
+        <Fragment key={status}>
+          {index > 0 ? (
+            <span className="px-0.5 text-[12px] text-muted" aria-hidden>
+              ·
+            </span>
+          ) : null}
+          <Link
+            to={`/shelves/${status}`}
+            className="flex h-11 items-center gap-1.5 rounded-full px-2.5 active:bg-accent-soft"
+          >
+            <span className={`size-1.5 rounded-full ${STATUS_TONE[status].dot}`} aria-hidden />
+            <span className="text-[13px] leading-[18px] text-muted">{STATUS_SHORT[status]}</span>
+            <span className="text-[13px] leading-[18px] font-medium text-ink tabular-nums">
+              {count}
+            </span>
+          </Link>
+        </Fragment>
+      ))}
+    </div>
+  )
 }
 
 function ShelfSection({ status, books }: { status: BookStatus; books: Book[] }) {
   return (
     <section className="mt-8">
-      <div className="flex items-baseline justify-between gap-3">
-        <div className="flex min-w-0 items-baseline gap-2">
-          <span
-            className={`size-2 shrink-0 self-center rounded-full ${SHELF_DOTS[status]}`}
-            aria-hidden
-          />
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className={`size-2 shrink-0 rounded-full ${STATUS_TONE[status].dot}`} aria-hidden />
           <h2 className="truncate font-display text-[22px] leading-[28px] font-medium">
             {SHELF_TITLES[status]}
           </h2>
-          <span className="shrink-0 text-[13px] leading-[18px] text-muted">
+          <span
+            className={`inline-flex h-6 shrink-0 items-center rounded-[var(--radius-pill)] px-2.5 text-[12px] leading-none font-medium ${STATUS_TONE[status].chip}`}
+          >
             {bookCount(books.length)}
           </span>
         </div>
         {books.length > 4 ? (
           <Link
             to={`/shelves/${status}`}
-            className="shrink-0 text-[14px] leading-[20px] font-medium text-accent"
+            className="flex h-11 shrink-0 items-center text-[14px] leading-[20px] font-medium text-accent"
           >
             Все
           </Link>
@@ -103,6 +129,8 @@ export function ShelvesScreen() {
         />
       </div>
 
+      {hasBooks && !hasSearch ? <SummaryStrip books={allBooks} /> : null}
+
       {books === undefined ? <SkeletonGrid /> : null}
 
       {books !== undefined && allBooks.length === 0 ? (
@@ -139,7 +167,7 @@ export function ShelvesScreen() {
 
       {hasBooks && !hasSearch
         ? BOOK_STATUSES.map((status) => {
-            const shelfBooks = allBooks.filter((book) => book.status === status)
+            const shelfBooks = allBooks.filter((book) => shelfOf(book.status) === status)
             return shelfBooks.length > 0 ? (
               <ShelfSection key={status} status={status} books={shelfBooks} />
             ) : null

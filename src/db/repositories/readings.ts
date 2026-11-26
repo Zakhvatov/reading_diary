@@ -101,6 +101,7 @@ export async function applyBookStatusChange(input: {
 
   switch (input.to) {
     case 'reading':
+    case 'rereading':
       await startReading(input.bookId, day)
       return
     case 'finished':

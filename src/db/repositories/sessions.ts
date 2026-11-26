@@ -19,8 +19,8 @@ export type SessionInput = {
 }
 
 export async function addSession(input: SessionInput): Promise<Session> {
-  if (input.durationMs <= 0) {
-    throw new Error('Длительность сессии должна быть больше нуля')
+  if (input.durationMs < 0) {
+    throw new Error('Длительность сессии не может быть отрицательной')
   }
 
   return db.transaction('rw', [db.books, db.readings, db.sessions, db.tombstones], async () => {

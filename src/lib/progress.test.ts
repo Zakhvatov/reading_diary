@@ -12,6 +12,12 @@ function book(overrides: Partial<Book> = {}): Book {
     progressMode: 'pages',
     currentPage: 0,
     percent: 0,
+    ratingScale: 'stars5',
+    tags: [],
+    moods: [],
+    colorLabel: 'none',
+    diaryTemplate: 'lite',
+    shareable: false,
     totalReadingMs: 0,
     sessionCount: 0,
     pagesReadTotal: 0,
@@ -82,6 +88,24 @@ describe('status changes', () => {
 
     expect(setBookStatus(finished, 'reading', '2026-03-02')).toEqual({
       status: 'reading',
+      startedAt: '2026-03-02',
+      finishedAt: undefined,
+    })
+  })
+
+  it('resets progress for a rereading but keeps the rating', () => {
+    const finished = book({
+      status: 'finished',
+      finishedAt: '2026-03-01',
+      currentPage: 120,
+      percent: 100,
+      rating: 8,
+    })
+
+    expect(setBookStatus(finished, 'rereading', '2026-03-02')).toEqual({
+      status: 'rereading',
+      currentPage: 0,
+      percent: 0,
       startedAt: '2026-03-02',
       finishedAt: undefined,
     })

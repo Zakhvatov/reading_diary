@@ -48,6 +48,11 @@
   --signal: var(--color-signal);
   --signal-soft: var(--color-signal-soft);
 
+  --mark-red: #a9503c;
+  --mark-amber: #b8853c;
+  --mark-green: #4e7a5c;
+  --mark-blue: #4c6e85;
+
   --tab-h: 64px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);

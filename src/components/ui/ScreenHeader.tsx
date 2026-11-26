@@ -7,9 +7,16 @@ type ScreenHeaderProps = {
   caption?: string
   back?: boolean
   action?: ReactNode
+  captionClassName?: string
 }
 
-export function ScreenHeader({ title, caption, back = false, action }: ScreenHeaderProps) {
+export function ScreenHeader({
+  title,
+  caption,
+  back = false,
+  action,
+  captionClassName,
+}: ScreenHeaderProps) {
   const navigate = useNavigate()
 
   return (
@@ -27,7 +34,12 @@ export function ScreenHeader({ title, caption, back = false, action }: ScreenHea
         ) : null}
         <div className="min-w-0">
           {caption ? (
-            <p className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted">
+            <p
+              className={[
+                'text-[11px] font-medium uppercase tracking-[0.08em]',
+                captionClassName ?? 'text-muted',
+              ].join(' ')}
+            >
               {caption}
             </p>
           ) : null}

@@ -1,7 +1,11 @@
 import { afterAll, beforeEach, describe, expect, it } from 'vitest'
 import { db } from '../db'
+import { createBookLink } from './bookLinks'
+import { createBookNote } from './bookNotes'
 import { addSession } from './sessions'
+import { createCharacter } from './characters'
 import { createBook, deleteBook, findSimilarBook, getBook, listBooks, updateBook } from './books'
+import { createQuote } from './quotes'
 
 beforeEach(async () => {
   await db.delete()
@@ -72,5 +76,24 @@ describe('books repository', () => {
     expect(await db.sessions.where('bookId').equals(book.id).count()).toBe(0)
     expect(await db.tombstones.where('entity').equals('book').count()).toBe(1)
     expect(await db.tombstones.where('entity').equals('session').count()).toBe(1)
+  })
+
+  it('cascades deep diary tables and writes tombstones on delete', async () => {
+    const book = await createBook({ title: 'Книга' })
+    await createCharacter({ bookId: book.id, name: 'Герой' })
+    await createBookNote({ bookId: book.id, kind: 'insight', body: 'Мысль' })
+    await createBookLink({ bookId: book.id, targetTitle: 'Другая', kind: 'sequel' })
+    await createQuote({ bookId: book.id, text: 'Цитата' })
+
+    await deleteBook(book.id)
+
+    expect(await db.characters.count()).toBe(0)
+    expect(await db.bookNotes.count()).toBe(0)
+    expect(await db.bookLinks.count()).toBe(0)
+    expect(await db.quotes.count()).toBe(0)
+
+    for (const entity of ['character', 'bookNote', 'bookLink', 'quote'] as const) {
+      expect(await db.tombstones.where('entity').equals(entity).count()).toBe(1)
+    }
   })
 })

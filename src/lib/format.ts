@@ -34,3 +34,15 @@ export function formatDuration(ms: number): string {
 export function formatPercent(value: number): string {
   return `${Math.round(Math.min(Math.max(value, 0), 1) * 100)}%`
 }
+
+const BYTE_UNITS = ['Б', 'КБ', 'МБ', 'ГБ', 'ТБ']
+
+export function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes) || bytes <= 0) return '0 Б'
+
+  const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), BYTE_UNITS.length - 1)
+  const value = bytes / 1024 ** exponent
+  const rounded = exponent === 0 || value >= 10 ? Math.round(value) : Math.round(value * 10) / 10
+
+  return `${rounded} ${BYTE_UNITS[exponent] ?? 'Б'}`
+}
