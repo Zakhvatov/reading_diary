@@ -88,3 +88,24 @@
   height: 3px;
   background: #b08a4f;
 }
+
+.theme-preview-leopard-pink {
+  background-color: #f4c6e2;
+  background-image:
+    radial-gradient(circle at 8px 9px, #1a0d14 0 2.6px, #c2187f 2.6px 4.4px, transparent 5px),
+    radial-gradient(circle at 26px 6px, #1a0d14 0 2.2px, #c2187f 2.2px 3.8px, transparent 4.5px),
+    radial-gradient(circle at 44px 14px, #1a0d14 0 2.8px, #c2187f 2.8px 4.6px, transparent 5.2px),
+    radial-gradient(circle at 16px 24px, #1a0d14 0 2.4px, #c2187f 2.4px 4px, transparent 4.8px),
+    radial-gradient(circle at 36px 30px, #1a0d14 0 2.6px, #c2187f 2.6px 4.4px, transparent 5px);
+  background-size: 54px 40px;
+}
+
+.theme-preview-leopard-pink::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: #c2187f;
+}

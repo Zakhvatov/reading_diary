@@ -53,7 +53,7 @@ export function BookCover({ book, className, plain = false }: BookCoverProps) {
   return (
     <div
       className={[
-        'relative aspect-[2/3] overflow-hidden rounded-[6px] border border-black/10',
+        'book-cover relative aspect-[2/3] overflow-hidden rounded-[6px] border border-black/10',
         url ? 'bg-line/60' : tone,
         className,
       ]

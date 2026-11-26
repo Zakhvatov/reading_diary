@@ -10,6 +10,6 @@ export function HomeScreen() {
   const theme = data.settings?.theme ?? bootTheme ?? 'shelf'
 
   if (theme === 'diary') return <DiaryHome data={data} />
-  if (theme === 'leopard') return <LeopardHome data={data} />
+  if (theme === 'leopard' || theme === 'leopard-pink') return <LeopardHome data={data} />
   return <ShelfHome data={data} />
 }

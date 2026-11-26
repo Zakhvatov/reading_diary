@@ -14,7 +14,7 @@
         try {
           var raw = localStorage.getItem('reading-diary:appearance')
           var saved = raw ? JSON.parse(raw) : {}
-          var themes = ['shelf', 'diary', 'leopard']
+          var themes = ['shelf', 'diary', 'leopard', 'leopard-pink']
           var theme = themes.indexOf(saved.theme) >= 0 ? saved.theme : 'shelf'
           var mode =
             saved.themeMode === 'dark' ||
@@ -26,13 +26,15 @@
             mode === 'dark' ||
             (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
           var root = document.documentElement
-          root.dataset.theme = theme
+          root.dataset.theme = theme === 'leopard-pink' ? 'leopard' : theme
+          if (theme === 'leopard-pink') root.dataset.leopard = 'pink'
           root.dataset.mode = dark ? 'dark' : 'light'
           root.style.colorScheme = dark ? 'dark' : 'light'
           var colors = {
             shelf: ['#F2E9D9', '#171210'],
             diary: ['#F8F2E4', '#1E1B15'],
             leopard: ['#F3EBDD', '#14100E'],
+            'leopard-pink': ['#F4C6E2', '#160B12'],
           }
           root.style.backgroundColor = colors[theme][dark ? 1 : 0]
           var meta = document.querySelector('meta[name="theme-color"]')

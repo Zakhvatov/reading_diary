@@ -196,6 +196,11 @@ html[data-theme='diary'][data-mode='dark'] .diary-holes i {
   color: var(--color-ink);
 }
 
+.diary-page.has-reading .diary-title,
+.diary-page.has-reading .diary-author {
+  padding-right: 84px;
+}
+
 .diary-author {
   margin-top: 3px;
   font-size: 10px;
@@ -416,10 +421,13 @@ html[data-theme='diary'][data-mode='dark'] .diary-holes i {
   color: var(--color-accent);
 }
 
+.diary-quote-slot {
+  margin-top: auto;
+  padding-top: 28px;
+}
+
 .diary-quote {
   position: relative;
-  margin-top: auto;
-  padding-top: 14px;
   padding: 14px 14px 12px;
   transform: rotate(0.7deg);
   background: var(--color-surface);

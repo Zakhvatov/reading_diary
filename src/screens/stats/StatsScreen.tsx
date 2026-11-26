@@ -68,7 +68,7 @@ function chartLabel(period: Period, day: ISODate): string {
 
 function MetricTile({ tone, label, value }: { tone: string; label: string; value: string }) {
   return (
-    <div className={`rounded-[var(--radius-card)] px-3 py-3 ${tone}`}>
+    <div className={`metric-tile rounded-[var(--radius-card)] px-3 py-3 ${tone}`}>
       <p className="text-[11px] leading-[14px] opacity-70">{label}</p>
       <p className="mt-1 font-display text-[24px] leading-[28px] font-medium tabular-nums">
         {value}
@@ -262,7 +262,7 @@ function StatsContent({
 
   return (
     <>
-      <div className="mt-6 rounded-[var(--radius-card)] bg-sage px-4 py-4 text-sage-ink">
+      <div className="stats-lead mt-6 rounded-[var(--radius-card)] bg-sage px-4 py-4 text-sage-ink">
         <p className="text-[11px] leading-[14px] font-medium tracking-[0.08em] uppercase opacity-70">
           Минут за {periodWord(period)}
         </p>

@@ -19,7 +19,7 @@ export function JournalCard({ entry }: JournalCardProps) {
   return (
     <Link
       to={`/journals/${entry.id}`}
-      className={`relative block overflow-hidden rounded-[var(--radius-card)] p-4 pl-5 ${tone.surface} ${tone.ink}`}
+      className={`journal-card relative block overflow-hidden rounded-[var(--radius-card)] p-4 pl-5 ${tone.surface} ${tone.ink}`}
     >
       <span aria-hidden className={`absolute inset-y-0 left-0 w-1.5 ${tone.stripe}`} />
       <span

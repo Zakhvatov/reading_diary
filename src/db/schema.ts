@@ -176,7 +176,7 @@ export const goalSchema = z.object({
   updatedAt: isoDateTimeSchema,
 })
 
-export const themeIdSchema = z.enum(['shelf', 'diary', 'leopard'])
+export const themeIdSchema = z.enum(['shelf', 'diary', 'leopard', 'leopard-pink'])
 export const themeModeSchema = z.enum(['light', 'dark', 'system'])
 
 export const settingsSchema = z.object({

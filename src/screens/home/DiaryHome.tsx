@@ -63,7 +63,7 @@ export function DiaryHome({ data }: { data: HomeData }) {
             <i />
           </div>
 
-          <div className="diary-page">
+          <div className={`diary-page${current ? ' has-reading' : ''}`}>
             <header className="diary-head">
               <p className="diary-weekday">{weekday.toLowerCase()}</p>
               <p className="diary-date">{date}</p>
@@ -194,21 +194,23 @@ export function DiaryHome({ data }: { data: HomeData }) {
               )}
             </p>
 
-            {latestJournal ? (
-              <Link to={`/journals/${latestJournal.id}`} className="diary-quote block">
-                <p>«{excerpt(latestJournal.body || latestJournal.title)}»</p>
-                <span className="diary-quote-src">
-                  {latestJournal.title} · {formatDayShort(latestJournal.entryDate)} →
-                </span>
-              </Link>
-            ) : (
-              <Link to="/journals/new" className="diary-quote block">
-                <p>«Здесь появится первая запись этого дня.»</p>
-                <span className="diary-quote-src">
-                  Записать мысль <ArrowRight size={12} aria-hidden />
-                </span>
-              </Link>
-            )}
+            <div className="diary-quote-slot">
+              {latestJournal ? (
+                <Link to={`/journals/${latestJournal.id}`} className="diary-quote block">
+                  <p>«{excerpt(latestJournal.body || latestJournal.title)}»</p>
+                  <span className="diary-quote-src">
+                    {latestJournal.title} · {formatDayShort(latestJournal.entryDate)} →
+                  </span>
+                </Link>
+              ) : (
+                <Link to="/journals/new" className="diary-quote block">
+                  <p>«Здесь появится первая запись этого дня.»</p>
+                  <span className="diary-quote-src">
+                    Записать мысль <ArrowRight size={12} aria-hidden />
+                  </span>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}

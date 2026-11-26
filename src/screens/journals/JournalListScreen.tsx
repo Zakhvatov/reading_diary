@@ -127,7 +127,7 @@ export function JournalListScreen() {
 
       {view === 'entries' && journals !== undefined ? (
         entries.length === 0 ? (
-          <section className="mt-8 rounded-[var(--radius-card)] bg-sage p-6 text-sage-ink">
+          <section className="journal-empty mt-8 rounded-[var(--radius-card)] bg-sage p-6 text-sage-ink">
             <Notebook size={28} aria-hidden />
             <h2 className="mt-4 font-display text-[22px] leading-[28px] font-medium">
               Здесь будут записи

@@ -1,4 +1,4 @@
-export type ThemeId = 'shelf' | 'diary' | 'leopard'
+export type ThemeId = 'shelf' | 'diary' | 'leopard' | 'leopard-pink'
 export type ThemeMode = 'light' | 'dark' | 'system'
 
 export type ThemeInfo = {
@@ -9,7 +9,7 @@ export type ThemeInfo = {
   color: { light: string; dark: string }
 }
 
-export const THEME_IDS: ThemeId[] = ['shelf', 'diary', 'leopard']
+export const THEME_IDS: ThemeId[] = ['shelf', 'diary', 'leopard', 'leopard-pink']
 
 export const THEMES: ThemeInfo[] = [
   {
@@ -29,6 +29,12 @@ export const THEMES: ThemeInfo[] = [
     name: 'Леопард',
     description: 'Сливочная бумага, чёрный лак и золото.',
     color: { light: '#F3EBDD', dark: '#14100E' },
+  },
+  {
+    id: 'leopard-pink',
+    name: 'Розовый леопард',
+    description: 'Розовый шёлк, чёрные розетки и фуксия.',
+    color: { light: '#F4C6E2', dark: '#160B12' },
   },
 ]
 
@@ -91,7 +97,9 @@ export function applyAppearance(theme: ThemeId, mode: ThemeMode): 'light' | 'dar
 
   const resolved = resolveMode(mode)
   const root = document.documentElement
-  root.dataset.theme = theme
+  root.dataset.theme = theme === 'leopard-pink' ? 'leopard' : theme
+  if (theme === 'leopard-pink') root.dataset.leopard = 'pink'
+  else delete root.dataset.leopard
   root.dataset.mode = resolved
   root.style.colorScheme = resolved
 

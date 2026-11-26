@@ -7,7 +7,7 @@ type BackupBannerProps = {
 
 export function BackupBanner({ onDismiss }: BackupBannerProps) {
   return (
-    <section className="mt-5 flex items-start gap-3 rounded-[var(--radius-card)] bg-butter p-4 text-butter-ink">
+    <section className="backup-banner mt-5 flex items-start gap-3 rounded-[var(--radius-card)] bg-butter p-4 text-butter-ink">
       <CloudWarning size={22} aria-hidden className="mt-0.5 shrink-0" />
 
       <div className="min-w-0 flex-1">

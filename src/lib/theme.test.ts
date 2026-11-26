@@ -13,6 +13,7 @@ describe('theme', () => {
     expect(isThemeId('shelf')).toBe(true)
     expect(isThemeId('diary')).toBe(true)
     expect(isThemeId('leopard')).toBe(true)
+    expect(isThemeId('leopard-pink')).toBe(true)
     expect(isThemeId('classic')).toBe(false)
     expect(isThemeId(undefined)).toBe(false)
   })

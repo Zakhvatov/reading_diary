@@ -20,7 +20,7 @@ export function ScreenHeader({
   const navigate = useNavigate()
 
   return (
-    <header className="flex items-start justify-between gap-4">
+    <header className="screen-head flex items-start justify-between gap-4">
       <div className="flex min-w-0 items-start gap-1">
         {back ? (
           <button
@@ -35,6 +35,7 @@ export function ScreenHeader({
         <div className="min-w-0">
           {caption ? (
             <p
+              data-custom={captionClassName ? 'true' : undefined}
               className={[
                 'text-[10px] font-semibold uppercase tracking-[0.14em]',
                 captionClassName ?? 'text-muted/80',

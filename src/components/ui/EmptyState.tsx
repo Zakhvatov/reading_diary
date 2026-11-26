@@ -19,7 +19,7 @@ type EmptyStateProps = {
 
 export function EmptyState({ icon, title, description, action, tone = 'sage' }: EmptyStateProps) {
   return (
-    <section className="rounded-[var(--radius-card)] border border-line bg-surface p-6">
+    <section className="empty-state rounded-[var(--radius-card)] border border-line bg-surface p-6">
       <div
         className={`inline-flex size-14 items-center justify-center rounded-[var(--radius-control)] ${toneClasses[tone]}`}
         aria-hidden
