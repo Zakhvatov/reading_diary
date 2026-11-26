@@ -6,7 +6,6 @@ import type { Book } from '@/db/types'
 import { SpineProgress } from '@/components/ui/SpineProgress'
 import { ColorLabelDot } from '@/components/diary/ColorLabelPicker'
 import { BookCover } from './BookCover'
-import { StatusChip } from './StatusChip'
 
 type BookCardProps = {
   book: Book
@@ -54,16 +53,15 @@ export function BookCard({ book }: BookCardProps) {
             className="absolute right-2 bottom-2 ring-2 ring-paper"
           />
         ) : null}
-        <StatusChip status={book.status} size="sm" className="absolute top-2 right-2" />
       </div>
-      <h3 className="mt-2.5 line-clamp-2 font-display text-[17px] leading-[22px] font-medium text-ink">
+      <h3 className="mt-2.5 line-clamp-2 font-display text-[16px] leading-[21px] font-medium tracking-[-0.01em] text-ink">
         {book.title}
       </h3>
-      <p className="mt-1 line-clamp-1 text-[13px] leading-[18px] text-muted">
+      <p className="mt-1 line-clamp-1 text-[12px] leading-[17px] text-muted">
         {formatAuthors(book.authors, true)}
       </p>
       {meta ? (
-        <p className="mt-1.5 text-[12px] leading-[16px] text-muted tabular-nums">{meta}</p>
+        <p className="mt-1.5 text-[11px] leading-[15px] text-muted tabular-nums">{meta}</p>
       ) : null}
       {book.status === 'reading' ? <SpineProgress value={progress} className="mt-2" /> : null}
     </Link>

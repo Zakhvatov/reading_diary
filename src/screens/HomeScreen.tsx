@@ -57,28 +57,28 @@ function CurrentBook({ book }: { book: Book }) {
   return (
     <Link
       to={`/books/${book.id}`}
-      className="mt-4 flex gap-4 rounded-[var(--radius-card)] bg-peach p-4 text-peach-ink active:brightness-[0.98]"
+      className="mt-4 flex gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-4 text-ink active:bg-accent-soft/30"
     >
       <BookCover book={book} className="w-24 shrink-0" />
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-medium tracking-[0.08em] uppercase opacity-70">
+        <p className="text-[10px] font-semibold tracking-[0.14em] uppercase text-accent">
           Сейчас читаю
         </p>
-        <h2 className="mt-1 line-clamp-2 font-display text-[23px] leading-[29px] font-medium">
+        <h2 className="mt-1 line-clamp-2 font-display text-[22px] leading-[28px] font-medium">
           {book.title}
         </h2>
-        <p className="mt-0.5 line-clamp-1 text-[13px] leading-[18px] opacity-80">
+        <p className="mt-0.5 line-clamp-1 text-[13px] leading-[18px] text-muted">
           {formatAuthors(book.authors, true)}
         </p>
         <SpineProgress value={progress} className="mt-3" />
-        <p className="mt-2 text-[13px] leading-[18px] opacity-80">
+        <p className="mt-2 text-[13px] leading-[18px] text-muted">
           {book.pageCount
             ? `${book.currentPage} из ${book.pageCount} стр.`
             : `${book.currentPage} стр.`}{' '}
           · {Math.round(progress * 100)}%
         </p>
         {hasReadingTime || hasSessions ? (
-          <p className="mt-1 text-[12px] leading-[16px] opacity-60">
+          <p className="mt-1 text-[12px] leading-[16px] text-muted">
             {hasReadingTime ? `Всего ${formatDuration(book.totalReadingMs)}` : null}
             {hasReadingTime && hasSessions ? ' · ' : null}
             {hasSessions

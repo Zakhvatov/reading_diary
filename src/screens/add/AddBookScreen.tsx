@@ -5,6 +5,7 @@ import { BookSearchPanel } from '@/components/book/BookSearchPanel'
 import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { createBook, findSimilarBook, updateBook } from '@/db/repositories/books'
+import { isBookStatus, shelfOf, SHELF_TITLES } from '@/lib/bookStatus'
 import { saveCover } from '@/db/repositories/covers'
 import { useSettings } from '@/db/live'
 import { METADATA_SOURCE_LABELS, type BookDraft } from '@/db/metadata/types'
@@ -45,6 +46,9 @@ export function AddBookScreen() {
 
   const tab = searchParams.get('tab') === 'search' ? 'search' : 'manual'
   const isbnParam = searchParams.get('isbn') ?? ''
+  const statusParam = searchParams.get('status') ?? undefined
+  const presetStatus = isBookStatus(statusParam) ? statusParam : undefined
+  const shelfParams: Record<string, string> = presetStatus ? { status: presetStatus } : {}
 
   async function persist(values: BookFormValues, coverFile: File | null) {
     setBusy(true)
@@ -99,7 +103,9 @@ export function AddBookScreen() {
         }
       }
 
-      navigate(`/books/${book.id}`, { replace: true })
+      navigate(presetStatus ? `/shelves/${shelfOf(values.status)}` : `/books/${book.id}`, {
+        replace: true,
+      })
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Не удалось сохранить книгу')
       setBusy(false)
@@ -126,7 +132,9 @@ export function AddBookScreen() {
     setDuplicate(null)
     setDraft(null)
     setManualPrefill({})
-    setSearchParams(next === 'search' ? { tab: 'search' } : {}, { replace: true })
+    setSearchParams(next === 'search' ? { tab: 'search', ...shelfParams } : shelfParams, {
+      replace: true,
+    })
   }
 
   function selectDraft(next: BookDraft) {
@@ -141,7 +149,7 @@ export function AddBookScreen() {
       normalized ? { isbn13: normalized.isbn13, isbn10: normalized.isbn10 } : { title: text },
     )
     setDraft(null)
-    setSearchParams({}, { replace: true })
+    setSearchParams(shelfParams, { replace: true })
   }
 
   const duplicateNotice = duplicate ? (
@@ -161,7 +169,11 @@ export function AddBookScreen() {
 
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title="Новая книга" caption="Библиотека" back />
+      <ScreenHeader
+        title="Новая книга"
+        caption={presetStatus ? SHELF_TITLES[presetStatus] : 'Библиотека'}
+        back
+      />
 
       <div className="mt-5 grid grid-cols-3 gap-1 rounded-[var(--radius-control)] border border-line bg-surface p-1">
         <button
@@ -199,7 +211,7 @@ export function AddBookScreen() {
           key={`manual:${manualPrefill.title ?? ''}:${manualPrefill.isbn13 ?? ''}`}
           submitLabel="Сохранить книгу"
           initialValues={manualPrefill}
-          defaultStatus={settings?.defaultStatus}
+          defaultStatus={presetStatus ?? settings?.defaultStatus}
           defaultTemplate={settings?.defaultTemplate}
           busy={busy}
           error={error}
@@ -218,7 +230,7 @@ export function AddBookScreen() {
               type="button"
               onClick={() => {
                 setDraft(null)
-                setSearchParams({ tab: 'search' }, { replace: true })
+                setSearchParams({ tab: 'search', ...shelfParams }, { replace: true })
               }}
               className="mt-2 text-[13px] leading-[18px] text-accent"
             >
@@ -230,7 +242,7 @@ export function AddBookScreen() {
             submitLabel="Сохранить книгу"
             initialValues={draftValues(draft)}
             coverPreviewUrl={draft.coverUrl}
-            defaultStatus={settings?.defaultStatus}
+            defaultStatus={presetStatus ?? settings?.defaultStatus}
             defaultTemplate={settings?.defaultTemplate}
             busy={busy}
             error={error}

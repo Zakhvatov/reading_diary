@@ -1,4 +1,4 @@
-import { Books } from '@phosphor-icons/react'
+import { Books, Plus } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { BookGrid } from '@/components/book/BookGrid'
@@ -14,9 +14,9 @@ import { pluralRu } from '@/lib/format'
 type SortKey = 'recent' | 'title' | 'author'
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
-  { value: 'recent', label: 'Сначала недавние' },
-  { value: 'title', label: 'По названию' },
-  { value: 'author', label: 'По автору' },
+  { value: 'recent', label: 'Недавние' },
+  { value: 'title', label: 'Название' },
+  { value: 'author', label: 'Автор' },
 ]
 
 const SKELETON_KEYS = ['a', 'b', 'c']
@@ -53,6 +53,15 @@ export function ShelfDetailScreen() {
         caption="Библиотека"
         back
         captionClassName={STATUS_TONE[status].caption}
+        action={
+          <Link
+            to={`/add?status=${status}`}
+            aria-label={`Добавить книгу на полку «${SHELF_TITLES[status]}»`}
+            className="flex size-11 items-center justify-center rounded-full border border-line bg-surface text-ink active:bg-accent-soft"
+          >
+            <Plus size={20} aria-hidden />
+          </Link>
+        }
       />
 
       <div className="-mx-5 mt-4 flex gap-2 overflow-x-auto px-5 pb-1">
@@ -98,7 +107,7 @@ export function ShelfDetailScreen() {
         <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-7" aria-hidden>
           {SKELETON_KEYS.map((key) => (
             <div key={key} className="animate-pulse">
-              <div className="aspect-[2/3] rounded-[10px] bg-line/60" />
+              <div className="aspect-[2/3] rounded-[6px] bg-line/60" />
               <div className="mt-2 h-4 w-3/4 rounded bg-line/60" />
               <div className="mt-2 h-3 w-1/2 rounded bg-line/60" />
             </div>
@@ -113,7 +122,7 @@ export function ShelfDetailScreen() {
             title="На полке пусто"
             description="Книги этого статуса появятся здесь."
             tone={STATUS_TONE[status].tone}
-            action={<Button to="/add">Добавить книгу</Button>}
+            action={<Button to={`/add?status=${status}`}>Добавить книгу</Button>}
           />
         </div>
       ) : null}

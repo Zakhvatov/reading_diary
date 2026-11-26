@@ -36,14 +36,14 @@ export function ScreenHeader({
           {caption ? (
             <p
               className={[
-                'text-[11px] font-medium uppercase tracking-[0.08em]',
-                captionClassName ?? 'text-muted',
+                'text-[10px] font-semibold uppercase tracking-[0.14em]',
+                captionClassName ?? 'text-muted/80',
               ].join(' ')}
             >
               {caption}
             </p>
           ) : null}
-          <h1 className="mt-1 font-display text-[32px] leading-[38px] font-medium text-ink">
+          <h1 className="mt-1 font-display text-[30px] leading-[36px] font-medium tracking-[-0.02em] text-ink">
             {title}
           </h1>
         </div>

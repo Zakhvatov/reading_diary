@@ -99,7 +99,9 @@ function StreakCard({ streak }: { streak: StreakInfo }) {
     <section className="mt-6 rounded-[var(--radius-card)] border border-line bg-surface p-5">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-display text-[22px] leading-[28px] font-medium">
-          {streak.current} Day Streak
+          {streak.current > 0
+            ? `${streak.current} ${pluralRu(streak.current, ['день', 'дня', 'дней'])} подряд`
+            : 'Серия дней'}
         </h2>
         {streak.longest > 0 ? (
           <span className="shrink-0 text-[13px] leading-[18px] text-muted">
