@@ -1,4 +1,3 @@
-import { Check } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/Button'
 import { Sheet } from '@/components/ui/Sheet'
 import { MAX_JOURNAL_STICKERS } from '@/lib/journal'
@@ -7,56 +6,38 @@ import { Sticker } from './Sticker'
 
 type StickerPickerProps = {
   open: boolean
-  selected: StickerId[]
-  onToggle: (id: StickerId) => void
+  count: number
+  onAdd: (id: StickerId) => void
   onClose: () => void
 }
 
-export function StickerPicker({ open, selected, onToggle, onClose }: StickerPickerProps) {
-  const atLimit = selected.length >= MAX_JOURNAL_STICKERS
+/** Лист наклеек: нажатие добавляет копию на страницу, её потом можно подвинуть. */
+export function StickerPicker({ open, count, onAdd, onClose }: StickerPickerProps) {
+  const atLimit = count >= MAX_JOURNAL_STICKERS
 
   return (
     <Sheet open={open} onClose={onClose} title="Стикеры">
       <p className="text-[13px] leading-[18px] text-muted">
-        Наклейки лягут на запись стопкой. Их можно убрать в любой момент.
+        Нажмите на наклейку — она появится на странице. Потом её можно перетащить пальцем.
       </p>
 
       <div className="mt-4 grid grid-cols-4 gap-2">
-        {STICKER_IDS.map((id) => {
-          const active = selected.includes(id)
-          const disabled = atLimit && !active
-
-          return (
-            <button
-              key={id}
-              type="button"
-              aria-pressed={active}
-              aria-label={STICKER_LABELS[id]}
-              onClick={() => onToggle(id)}
-              disabled={disabled}
-              className={[
-                'relative flex aspect-square items-center justify-center rounded-[var(--radius-control)]',
-                active
-                  ? 'border-2 border-accent bg-accent-soft'
-                  : 'border border-line bg-surface active:bg-accent-soft/50',
-                disabled ? 'opacity-40' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-            >
-              <Sticker name={id} className="size-9" />
-              {active ? (
-                <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-accent text-accent-ink">
-                  <Check size={11} weight="bold" aria-hidden />
-                </span>
-              ) : null}
-            </button>
-          )
-        })}
+        {STICKER_IDS.map((id) => (
+          <button
+            key={id}
+            type="button"
+            aria-label={`Добавить стикер «${STICKER_LABELS[id]}»`}
+            onClick={() => onAdd(id)}
+            disabled={atLimit}
+            className="flex aspect-square items-center justify-center rounded-[var(--radius-control)] border border-line bg-surface active:bg-accent-soft/50 disabled:opacity-40"
+          >
+            <Sticker name={id} className="size-9" />
+          </button>
+        ))}
       </div>
 
       <p className="mt-3 text-[12px] leading-[16px] text-muted">
-        Выбрано {selected.length} из {MAX_JOURNAL_STICKERS}
+        На странице {count} из {MAX_JOURNAL_STICKERS}
       </p>
 
       <Button onClick={onClose} className="mt-4 w-full">

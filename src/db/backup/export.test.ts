@@ -75,7 +75,10 @@ describe('backup export', () => {
       color: 'pine',
       entryDate: '2026-02-01',
       photoIds: ['photo-1', 'photo-2'],
-      stickers: ['heart', 'star'],
+      stickers: [
+        { id: 'sticker-1', sticker: 'heart', x: 0.4, y: 0.2, rotate: -10 },
+        { id: 'sticker-2', sticker: 'star', x: 0.6, y: 0.3, rotate: 8 },
+      ],
     })
 
     const file = await exportBackupJson()
@@ -105,7 +108,10 @@ describe('backup export', () => {
       tags: [],
       shareable: false,
       photoIds: ['photo-1', 'photo-2'],
-      stickers: ['heart', 'star'],
+      stickers: [
+        { id: 'sticker-1', sticker: 'heart', x: 0.4, y: 0.2, rotate: -10 },
+        { id: 'sticker-2', sticker: 'star', x: 0.6, y: 0.3, rotate: 8 },
+      ],
     })
   })
 

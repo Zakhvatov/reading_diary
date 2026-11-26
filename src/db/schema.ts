@@ -17,6 +17,13 @@ export const colorLabelSchema = z.enum(['red', 'amber', 'green', 'blue', 'none']
 export const diaryTemplateIdSchema = z.enum(['lite', 'analyst', 'bookclub'])
 export const journalColorSchema = z.enum(['pine', 'amber', 'clay', 'sky', 'plum', 'moss'])
 export const stickerIdSchema = z.enum(STICKER_IDS)
+export const stickerPlacementSchema = z.object({
+  id: idSchema,
+  sticker: stickerIdSchema,
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  rotate: z.number().min(-180).max(180),
+})
 export const sessionKindSchema = z.enum(['timer', 'manual'])
 export const readingStatusSchema = z.enum(['reading', 'finished', 'dnf'])
 export const bookNoteKindSchema = z.enum(['plot', 'insight'])
@@ -117,7 +124,7 @@ export const journalEntrySchema = z.object({
   body: z.string(),
   color: journalColorSchema,
   photoIds: z.array(idSchema).max(MAX_JOURNAL_PHOTOS),
-  stickers: z.array(stickerIdSchema).max(MAX_JOURNAL_STICKERS),
+  stickers: z.array(stickerPlacementSchema).max(MAX_JOURNAL_STICKERS),
   entryDate: isoDateSchema,
   tags: z.array(z.string()),
   mood: z.string().optional(),

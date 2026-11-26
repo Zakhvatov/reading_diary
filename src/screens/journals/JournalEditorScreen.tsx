@@ -16,8 +16,6 @@ import { flushSync } from 'react-dom'
 import { useBlocker, useNavigate, useParams } from 'react-router-dom'
 import { JOURNAL_COLORS, JOURNAL_COLOR_STYLES } from '@/components/journal/colors'
 import { JournalPhoto } from '@/components/journal/JournalPhoto'
-import { Sticker, StickerCluster } from '@/components/journal/Sticker'
-import { StickerPicker } from '@/components/journal/StickerPicker'
 import { Button } from '@/components/ui/Button'
 import { ScreenHeader } from '@/components/ui/ScreenHeader'
 import { Sheet } from '@/components/ui/Sheet'
@@ -34,9 +32,8 @@ import {
   type HighlightColor,
 } from '@/lib/highlights'
 import { fileToCover } from '@/lib/image'
-import { MAX_JOURNAL_PHOTOS, MAX_JOURNAL_STICKERS } from '@/lib/journal'
+import { MAX_JOURNAL_PHOTOS } from '@/lib/journal'
 import { renderMarkdown } from '@/lib/markdown'
-import { STICKER_LABELS, type StickerId } from '@/lib/stickers'
 import { normalizeText } from '@/lib/text'
 
 const fieldBase =
@@ -176,8 +173,6 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
   const [photoIds, setPhotoIds] = useState<string[]>(entry?.photoIds ?? [])
   const [newPhotos, setNewPhotos] = useState<File[]>([])
   const [removedPhotoIds, setRemovedPhotoIds] = useState<string[]>([])
-  const [stickers, setStickers] = useState<StickerId[]>(entry?.stickers ?? [])
-  const [stickerPickerOpen, setStickerPickerOpen] = useState(false)
   const [photoError, setPhotoError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -201,7 +196,6 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
     photoIds,
     newPhotos: newPhotos.map((file) => `${file.name}:${file.size}`),
     removedPhotoIds,
-    stickers,
   })
   const [baseline, setBaseline] = useState(() => currentSnapshot)
   const isDirty = currentSnapshot !== baseline
@@ -338,7 +332,7 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
     setError(null)
 
     const date = entryDate || today()
-    const input = { title: trimmedTitle, body, color, entryDate: date, bookId, stickers }
+    const input = { title: trimmedTitle, body, color, entryDate: date, bookId }
 
     try {
       let id = entryId
@@ -528,48 +522,6 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
         ) : null}
       </div>
 
-      <div className="mt-5">
-        <div className="flex items-baseline justify-between gap-3">
-          <p className="text-[13px] leading-[18px] font-medium text-muted">Стикеры</p>
-          <button
-            type="button"
-            onClick={() => setStickerPickerOpen(true)}
-            disabled={busy}
-            className="min-h-11 text-[13px] leading-[18px] font-medium text-accent"
-          >
-            {stickers.length > 0 ? 'Изменить' : 'Выбрать'}
-          </button>
-        </div>
-
-        {stickers.length > 0 ? (
-          <div className="mt-1 flex flex-wrap items-center gap-1.5">
-            {stickers.map((sticker, index) => (
-              <span
-                key={`${sticker}-${index}`}
-                className="relative flex size-12 items-center justify-center rounded-[10px] border border-line bg-surface"
-              >
-                <Sticker name={sticker} className="size-9" />
-                <button
-                  type="button"
-                  aria-label={`Убрать стикер «${STICKER_LABELS[sticker]}»`}
-                  onClick={() =>
-                    setStickers((current) => current.filter((_, itemIndex) => itemIndex !== index))
-                  }
-                  disabled={busy}
-                  className="absolute -top-1 -right-1 flex size-6 items-center justify-center rounded-full bg-ink text-paper after:absolute after:-inset-2.5 after:content-['']"
-                >
-                  <X size={12} aria-hidden />
-                </button>
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="mt-1 text-[13px] leading-[18px] text-muted">
-            Наклейка на запись — как в бумажном дневнике.
-          </p>
-        )}
-      </div>
-
       <section className="mt-6">
         <div className="flex items-center justify-between gap-3">
           <p className="text-[13px] leading-[18px] font-medium text-muted">Текст</p>
@@ -650,9 +602,8 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
             </p>
           </>
         ) : (
-          <div className="relative mt-2 min-h-[140px] rounded-[var(--radius-control)] border border-line bg-surface px-4 py-3">
+          <div className="mt-2 min-h-[140px] rounded-[var(--radius-control)] border border-line bg-surface px-4 py-3">
             {renderMarkdown(body) ?? <p className="text-[15px] text-muted">Пока пусто</p>}
-            <StickerCluster stickers={stickers} className="absolute right-3 -bottom-4" />
           </div>
         )}
       </section>
@@ -677,19 +628,6 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
           Удалить запись
         </button>
       ) : null}
-
-      <StickerPicker
-        open={stickerPickerOpen}
-        selected={stickers}
-        onToggle={(id) =>
-          setStickers((current) => {
-            if (current.includes(id)) return current.filter((sticker) => sticker !== id)
-            if (current.length >= MAX_JOURNAL_STICKERS) return current
-            return [...current, id]
-          })
-        }
-        onClose={() => setStickerPickerOpen(false)}
-      />
 
       {bookPickerOpen ? (
         <BookPickerSheet

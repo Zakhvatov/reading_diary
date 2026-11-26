@@ -19,7 +19,7 @@ export async function getSettings(): Promise<Settings> {
     defaultRatingScale: 'stars5',
     dailyGoalMinutes: 0,
     persistGranted: false,
-    schemaVersion: 4,
+    schemaVersion: 5,
     createdAt: now,
     updatedAt: now,
   }
