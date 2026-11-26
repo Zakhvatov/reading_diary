@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie'
+import { toStickerPlacements } from '@/lib/stickerLayout'
 import type { DiaryTemplateId } from '@/lib/templates'
 import type {
   Book,
@@ -157,6 +158,24 @@ export class ReadingDiaryDB extends Dexie {
         const settingsTable = transaction.table('settings')
         if (await settingsTable.get('app')) {
           await settingsTable.update('app', { schemaVersion: 4 })
+        }
+      })
+
+    this.version(5)
+      .stores({
+        journals: 'id, bookId, entryDate, createdAt, *tags',
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table('journals')
+          .toCollection()
+          .modify((entry: Partial<JournalEntry>) => {
+            entry.stickers = toStickerPlacements(entry.stickers)
+          })
+
+        const settingsTable = transaction.table('settings')
+        if (await settingsTable.get('app')) {
+          await settingsTable.update('app', { schemaVersion: 5 })
         }
       })
   }

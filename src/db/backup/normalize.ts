@@ -1,8 +1,8 @@
 import { toDay } from '@/lib/dates'
-import { MAX_JOURNAL_PHOTOS, MAX_JOURNAL_STICKERS } from '@/lib/journal'
-import { isStickerId } from '@/lib/stickers'
+import { MAX_JOURNAL_PHOTOS } from '@/lib/journal'
+import { toStickerPlacements } from '@/lib/stickerLayout'
 
-export const BACKUP_SCHEMA_VERSION = 4
+export const BACKUP_SCHEMA_VERSION = 5
 
 type JsonRecord = Record<string, unknown>
 
@@ -162,7 +162,7 @@ function normalizeJournal(record: JsonRecord): JsonRecord | null {
     body: str(record.body),
     color: str(record.color, 'pine'),
     photoIds: photoIds.slice(0, MAX_JOURNAL_PHOTOS),
-    stickers: stringList(record.stickers).filter(isStickerId).slice(0, MAX_JOURNAL_STICKERS),
+    stickers: toStickerPlacements(record.stickers),
     entryDate: str(record.entryDate) || dayOf(createdAt, toDay(new Date())),
     tags: stringList(record.tags),
     shareable: typeof record.shareable === 'boolean' ? record.shareable : false,

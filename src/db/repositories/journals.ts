@@ -1,5 +1,5 @@
 import { nowISO } from '@/lib/id'
-import type { StickerId } from '@/lib/stickers'
+import type { StickerPlacement } from '@/lib/stickers'
 import { db } from '../db'
 import type { ID, JournalEntry } from '../types'
 
@@ -10,7 +10,7 @@ export type JournalInput = {
   entryDate: string
   bookId?: ID
   photoIds?: ID[]
-  stickers?: StickerId[]
+  stickers?: StickerPlacement[]
   tags?: string[]
   mood?: string
   shareable?: boolean

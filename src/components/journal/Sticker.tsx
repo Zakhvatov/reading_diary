@@ -92,33 +92,3 @@ export function Sticker({ name, className, style }: StickerProps) {
     </svg>
   )
 }
-
-const STICKER_ROTATIONS = [-14, 10, -6, 16, -10, 7]
-
-type StickerClusterProps = {
-  stickers: StickerId[]
-  className?: string
-}
-
-/** Стопка наклеек на краю записи: чуть повёрнуты, как наклеенные руками. */
-export function StickerCluster({ stickers, className }: StickerClusterProps) {
-  if (stickers.length === 0) return null
-
-  return (
-    <div
-      className={['pointer-events-none flex items-end -space-x-2.5', className]
-        .filter(Boolean)
-        .join(' ')}
-      aria-hidden
-    >
-      {stickers.map((sticker, index) => (
-        <Sticker
-          key={`${sticker}-${index}`}
-          name={sticker}
-          className="size-11 shrink-0"
-          style={{ transform: `rotate(${STICKER_ROTATIONS[index % STICKER_ROTATIONS.length]}deg)` }}
-        />
-      ))}
-    </div>
-  )
-}
