@@ -1,0 +1,30 @@
+# --- build / deps ---
+node_modules/
+dist/
+dist-ssr/
+coverage/
+playwright-report/
+test-results/
+*.local
+.DS_Store
+
+# --- secrets ---
+.env
+.env.*
+!.env.example
+
+# --- internal, not for the public repo ---
+# Working docs, research, plans, ADRs
+docs/
+# Agent/task infrastructure
+.beads/
+.beads.gate.lock*
+.plan/
+.agents/
+.claude/
+.codex/
+.cursor/
+AGENTS.md
+CLAUDE.md
+.dolt/
+*.db
