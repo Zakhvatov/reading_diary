@@ -40,6 +40,7 @@ export function BookEditScreen() {
         isbn13: values.isbn13,
         isbn10: values.isbn10,
         description: values.description,
+        language: values.language,
         status: values.status,
       })
 

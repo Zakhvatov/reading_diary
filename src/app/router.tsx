@@ -4,7 +4,6 @@ import {
   Info,
   Notebook,
   PencilSimple,
-  Scan,
   Sparkle,
   Target,
   Timer,
@@ -18,6 +17,7 @@ import { BookEditScreen } from '@/screens/book/BookEditScreen'
 import { HomeScreen } from '@/screens/HomeScreen'
 import { NotFoundScreen } from '@/screens/NotFoundScreen'
 import { PlaceholderScreen } from '@/screens/PlaceholderScreen'
+import { ScanScreen } from '@/screens/scan/ScanScreen'
 import { SettingsScreen } from '@/screens/SettingsScreen'
 import { ShelfDetailScreen } from '@/screens/shelves/ShelfDetailScreen'
 import { ShelvesScreen } from '@/screens/shelves/ShelvesScreen'
@@ -47,15 +47,7 @@ export const router = createBrowserRouter(
         },
         {
           path: 'scan',
-          element: (
-            <PlaceholderScreen
-              title="Сканер ISBN"
-              caption="Новая книга"
-              back
-              icon={<Scan size={28} />}
-              description="Сканирование штрихкода появится после ручного добавления книг."
-            />
-          ),
+          element: <ScanScreen />,
         },
         {
           path: 'books/:bookId',
