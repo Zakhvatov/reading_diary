@@ -185,7 +185,8 @@ export function BookSearchPanel({ initialIsbn, onSelect, onManual }: BookSearchP
 
       {!key ? (
         <p className="mt-4 text-[13px] leading-[18px] text-muted">
-          Введите хотя бы два символа. Поиск идёт по Open Library, при неудаче — по Google Books.
+          Введите хотя бы два символа: название, автора или ISBN. Если сервис не ответил, книгу
+          можно добавить вручную.
         </p>
       ) : null}
     </div>

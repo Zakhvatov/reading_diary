@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapGoogleVolumes, mapOpenLibraryDocs } from './map'
+import { mapGoogleFeed, mapGoogleVolumes, mapOpenLibraryDocs } from './map'
 
 describe('mapOpenLibraryDocs', () => {
   const doc = {
@@ -156,5 +156,92 @@ describe('mapGoogleVolumes', () => {
       items: [{ id: 'y', volumeInfo: { title: 'Книга', publishedDate: 'скоро' } }],
     })
     expect(draft?.publishedYear).toBeUndefined()
+  })
+})
+
+describe('mapGoogleFeed', () => {
+  const entry = {
+    id: { $t: 'http://www.google.com/books/feeds/volumes/hlcrEQAAQBAJ' },
+    title: { type: 'text', $t: 'Мастер и Маргарита' },
+    link: [
+      {
+        rel: 'http://schemas.google.com/books/2008/thumbnail',
+        href: 'http://books.google.com/books/content?id=hlcrEQAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl',
+      },
+      { rel: 'alternate', href: 'http://books.google.com/books?id=hlcrEQAAQBAJ' },
+    ],
+    dc$creator: [{ $t: 'Михаил Булгаков' }],
+    dc$date: [{ $t: '2024-10-21' }],
+    dc$description: [{ $t: 'Один из самых таинственных романов ХХ века.' }],
+    dc$format: [{ $t: '350 pages' }, { $t: 'book' }],
+    dc$identifier: [
+      { $t: 'hlcrEQAAQBAJ' },
+      { $t: 'ISBN:9785389263024' },
+      { $t: 'ISBN:5389263022' },
+    ],
+    dc$language: [{ $t: 'ru' }],
+    dc$publisher: [{ $t: 'Азбука-Аттикус' }],
+    dc$subject: [{ $t: 'Fiction' }, { $t: 'Классика' }, { $t: 'Fiction' }],
+  }
+
+  it('maps a feed entry into a book draft', () => {
+    const [draft] = mapGoogleFeed({ feed: { entry: [entry] } })
+
+    expect(draft).toEqual({
+      source: 'googlebooks',
+      sourceId: 'hlcrEQAAQBAJ',
+      title: 'Мастер и Маргарита',
+      authors: ['Михаил Булгаков'],
+      isbn13: '9785389263024',
+      pageCount: 350,
+      publishedYear: 2024,
+      publisher: 'Азбука-Аттикус',
+      language: 'ru',
+      genres: ['Fiction', 'Классика'],
+      description: 'Один из самых таинственных романов ХХ века.',
+      coverUrl:
+        'https://books.google.com/books/content?id=hlcrEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl',
+    })
+  })
+
+  it('accepts a single entry object and a missing feed', () => {
+    const [draft] = mapGoogleFeed({ feed: { entry } })
+    expect(draft?.title).toBe('Мастер и Маргарита')
+
+    expect(mapGoogleFeed(null)).toEqual([])
+    expect(mapGoogleFeed({})).toEqual([])
+    expect(mapGoogleFeed({ feed: 'nope' })).toEqual([])
+  })
+
+  it('skips broken entries and invalid numbers', () => {
+    const drafts = mapGoogleFeed({
+      feed: {
+        entry: [
+          null,
+          42,
+          {},
+          { title: { $t: '   ' } },
+          {
+            id: { $t: 'https://www.google.com/books/feeds/volumes/x' },
+            title: { $t: 'Книга' },
+            dc$date: [{ $t: 'скоро' }],
+            dc$format: [{ $t: 'book' }],
+            dc$identifier: [{ $t: 'нет' }],
+          },
+        ],
+      },
+    })
+
+    expect(drafts).toHaveLength(1)
+    expect(drafts[0]).toMatchObject({
+      sourceId: 'x',
+      title: 'Книга',
+      authors: [],
+      genres: [],
+    })
+    expect(drafts[0]?.publishedYear).toBeUndefined()
+    expect(drafts[0]?.pageCount).toBeUndefined()
+    expect(drafts[0]?.isbn13).toBeUndefined()
+    expect(drafts[0]?.coverUrl).toBeUndefined()
   })
 })

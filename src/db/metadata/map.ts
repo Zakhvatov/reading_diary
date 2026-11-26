@@ -166,6 +166,129 @@ export function mapOpenLibraryDocs(payload: unknown): BookDraft[] {
   return drafts
 }
 
+function gdataText(value: unknown): string | undefined {
+  if (typeof value === 'string') return asString(value)
+  const record = asRecord(value)
+  return record ? asString(record.$t) : undefined
+}
+
+function gdataFirstText(value: unknown): string | undefined {
+  for (const entry of gdataList(value)) {
+    const text = gdataText(entry)
+    if (text) return text
+  }
+
+  return undefined
+}
+
+function gdataList(value: unknown): unknown[] {
+  if (value === undefined || value === null) return []
+  return Array.isArray(value) ? value : [value]
+}
+
+function gdataTextList(value: unknown, limit: number): string[] {
+  const items: string[] = []
+
+  for (const entry of gdataList(value)) {
+    const text = gdataText(entry)
+    if (text) items.push(text)
+    if (items.length >= limit) break
+  }
+
+  return [...new Set(items)]
+}
+
+function gdataPageCount(value: unknown): number | undefined {
+  for (const entry of gdataList(value)) {
+    const text = gdataText(entry)
+    const match = text ? /^(\d+)\s+pages?$/i.exec(text) : null
+    if (!match) continue
+
+    const pages = asPositiveInteger(Number(match[1]))
+    if (pages) return pages
+  }
+
+  return undefined
+}
+
+function gdataCoverUrl(links: unknown): string | undefined {
+  for (const entry of gdataList(links)) {
+    const link = asRecord(entry)
+    const rel = link ? asString(link.rel) : undefined
+    if (!rel || !rel.endsWith('thumbnail')) continue
+
+    const href = link ? asString(link.href) : undefined
+    if (!href) continue
+
+    return href.replace(/^http:\/\//i, 'https://').replace(/([?&])zoom=5\b/, '$1zoom=1')
+  }
+
+  return undefined
+}
+
+function gdataSourceId(entry: JsonObject, title: string): string {
+  const id = gdataText(entry.id)
+  if (!id) return title
+  const parts = id.split('/')
+  return asString(parts[parts.length - 1]) ?? title
+}
+
+/**
+ * Старый Atom-feed Google Books (`books.google.com/books/feeds/volumes`).
+ * Отдаёт JSON с `alt=json` и CORS, API-ключ не нужен — единственный источник,
+ * который работает без ключа, когда квота публичного Books API исчерпана.
+ */
+export function mapGoogleFeed(payload: unknown): BookDraft[] {
+  const root = asRecord(payload)
+  const feed = root ? asRecord(root.feed) : null
+  const entries = feed ? feed.entry : undefined
+
+  const drafts: BookDraft[] = []
+
+  for (const entry of gdataList(entries)) {
+    const item = asRecord(entry)
+    if (!item) continue
+
+    const title = gdataText(item.title)
+    if (!title) continue
+
+    const draft: BookDraft = {
+      source: 'googlebooks',
+      sourceId: gdataSourceId(item, title),
+      title,
+      authors: gdataTextList(item['dc$creator'], AUTHOR_LIMIT),
+      genres: gdataTextList(item['dc$subject'], GENRE_LIMIT),
+    }
+
+    const isbn13 = pickIsbn13(
+      gdataTextList(item['dc$identifier'], 8).map((value) => value.replace(/^ISBN:/i, '')),
+    )
+    if (isbn13) draft.isbn13 = isbn13
+
+    const pageCount = gdataPageCount(item['dc$format'])
+    if (pageCount) draft.pageCount = pageCount
+
+    const publishedYear = parsePublishedYear(gdataFirstText(item['dc$date']))
+    if (publishedYear) draft.publishedYear = publishedYear
+
+    const publisher = gdataFirstText(item['dc$publisher'])
+    if (publisher) draft.publisher = publisher
+
+    const language = mapGoogleLanguage(gdataFirstText(item['dc$language']))
+    if (language) draft.language = language
+
+    const description = gdataFirstText(item['dc$description'])
+    if (description) draft.description = description
+
+    const coverUrl = gdataCoverUrl(item.link)
+    if (coverUrl) draft.coverUrl = coverUrl
+
+    drafts.push(draft)
+  }
+
+  return drafts
+}
+
 export function mapGoogleVolumes(payload: unknown): BookDraft[] {
   const root = asRecord(payload)
   const items = root ? root.items : undefined
