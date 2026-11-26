@@ -3,7 +3,6 @@ import {
   Books,
   CalendarDots,
   ChartBar,
-  GearSix,
   Info,
   Notebook,
   PencilSimple,
@@ -11,13 +10,14 @@ import {
   Sparkle,
   Target,
   Timer,
-  UploadSimple,
 } from '@phosphor-icons/react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { BackupScreen } from '@/screens/BackupScreen'
 import { HomeScreen } from '@/screens/HomeScreen'
 import { NotFoundScreen } from '@/screens/NotFoundScreen'
 import { PlaceholderScreen } from '@/screens/PlaceholderScreen'
+import { SettingsScreen } from '@/screens/SettingsScreen'
 import { RouteError } from './RouteError'
 import { routerBasename } from './basePath'
 
@@ -183,26 +183,11 @@ export const router = createBrowserRouter(
         },
         {
           path: 'settings',
-          element: (
-            <PlaceholderScreen
-              title="Настройки"
-              caption="Приложение"
-              icon={<GearSix size={28} />}
-              description="Хранилище, резервные копии и внешний вид."
-            />
-          ),
+          element: <SettingsScreen />,
         },
         {
           path: 'settings/backup',
-          element: (
-            <PlaceholderScreen
-              title="Резервная копия"
-              caption="Настройки"
-              back
-              icon={<UploadSimple size={28} />}
-              description="Экспорт и импорт файла со всеми книгами, сессиями и заметками."
-            />
-          ),
+          element: <BackupScreen />,
         },
         {
           path: 'about',

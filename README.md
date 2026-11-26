@@ -4,7 +4,7 @@
 статистика, цель и заметки. Одна ссылка, один интерфейс на iPhone и Android —
 ничего устанавливать не нужно.
 
-**Открыть:** https://zakhvatov.github.io/reading_diary/ (появится после первого деплоя)
+**Открыть:** https://zakhvatov.github.io/reading_diary/
 
 ## Что внутри
 

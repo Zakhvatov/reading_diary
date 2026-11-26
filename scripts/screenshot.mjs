@@ -94,6 +94,26 @@ try {
   await cdp.send('Page.navigate', { url })
   await new Promise((resolve) => setTimeout(resolve, 1500))
 
+  if (process.env.OFFLINE === '1') {
+    await cdp.send('Runtime.enable')
+    await cdp.send('Runtime.evaluate', {
+      expression: 'navigator.serviceWorker.ready.then(() => true)',
+      awaitPromise: true,
+      timeout: 15000,
+    })
+    await cdp.send('Page.reload')
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    await cdp.send('Network.enable')
+    await cdp.send('Network.emulateNetworkConditions', {
+      offline: true,
+      latency: 0,
+      downloadThroughput: 0,
+      uploadThroughput: 0,
+    })
+    await cdp.send('Page.reload')
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+  }
+
   const { data } = await cdp.send('Page.captureScreenshot', { format: 'png' })
   await writeFile(out, Buffer.from(data, 'base64'))
   cdp.close()
