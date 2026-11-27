@@ -217,6 +217,21 @@ export class ReadingDiaryDB extends Dexie {
           await settingsTable.update('app', { theme: 'lavender' })
         }
       })
+
+    // Декоративные стикеры возвращаются как настоящее поле записи; у старых
+    // записей оно пустое — их украшения уже переехали в заметки в версии 6.
+    this.version(8)
+      .stores({
+        journals: 'id, bookId, entryDate, createdAt, *tags',
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table('journals')
+          .toCollection()
+          .modify((entry: Partial<JournalEntry>) => {
+            entry.stickers ??= []
+          })
+      })
   }
 }
 

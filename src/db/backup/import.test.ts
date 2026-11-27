@@ -250,6 +250,43 @@ describe('backup import', () => {
     expect(await db.journals.get('old-journal')).not.toHaveProperty('photoId')
   })
 
+  it('keeps new stickers and folds legacy ones into notes from a backup', async () => {
+    const journal = {
+      id: 'mixed-journal',
+      title: 'Запись',
+      body: '',
+      color: 'pine',
+      board: [{ id: 'real-note', color: 'sky', text: 'Мысль', x: 0.4, y: 0.4 }],
+      stickers: [
+        { id: 'sticker-1', kind: 'heart', tone: 'rose', surface: 'board', x: 0.5, y: 0.5, rot: 6 },
+        { id: 'sticker-2', kind: 'tape', tone: 'sky', surface: 'page', x: 0.9, y: 0.1, rot: 90 },
+        'star',
+      ],
+      entryDate: '2026-01-01',
+      tags: [],
+      shareable: false,
+      createdAt: nowISO(),
+      updatedAt: nowISO(),
+    }
+
+    await importBackup(
+      backupFile({ ...EMPTY, journals: [journal] } as unknown as BackupData),
+      'replace',
+    )
+
+    expect(await db.journals.get('mixed-journal')).toMatchObject({
+      board: [
+        { id: 'real-note', color: 'sky', text: 'Мысль', x: 0.4, y: 0.4 },
+        // Древнее украшение без вида возвращается пустой заметкой на своё место.
+        { id: 'note-1', color: 'sky', text: '', x: 0.74, y: 0.06 },
+      ],
+      stickers: [
+        { id: 'sticker-1', kind: 'heart', tone: 'rose', surface: 'board', x: 0.5, y: 0.5, rot: 6 },
+        { id: 'sticker-2', kind: 'tape', tone: 'sky', surface: 'page', x: 0.9, y: 0.1, rot: 45 },
+      ],
+    })
+  })
+
   it('keeps a canonical rating from a v3 backup as is', async () => {
     const book = makeBook({ id: 'new-book', rating: 8 })
 

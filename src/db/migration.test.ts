@@ -119,7 +119,9 @@ describe('dexie v2 to v3 migration', () => {
         ],
       })
       expect(await upgraded.journals.get('journal-1')).not.toHaveProperty('photoId')
-      expect(await upgraded.journals.get('journal-1')).not.toHaveProperty('stickers')
+      // Стикеры в версии 6 складываются в заметки, а в версии 8 поле
+      // возвращается уже пустым: это новый формат украшений.
+      expect(await upgraded.journals.get('journal-1')).toMatchObject({ stickers: [] })
       expect(await upgraded.settings.get('app')).toMatchObject({
         schemaVersion: 6,
         defaultTemplate: 'analyst',
