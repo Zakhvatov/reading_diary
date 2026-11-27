@@ -1,6 +1,7 @@
 import { toDay } from '@/lib/dates'
 import { toBoardNotes } from '@/lib/board'
 import { MAX_JOURNAL_PHOTOS } from '@/lib/journal'
+import { isStickerKind, normalizeStickers, type Sticker } from '@/lib/stickers'
 
 export const BACKUP_SCHEMA_VERSION = 6
 
@@ -144,6 +145,25 @@ function normalizeQuote(record: JsonRecord): JsonRecord | null {
   }
 }
 
+/**
+ * Делит старое поле stickers на два потока: новые стикеры с валидным видом
+ * остаются стикерами, древние украшения (строки и объекты без вида) идут
+ * назад в заметки на тех же местах.
+ */
+function splitStickers(value: unknown): { legacy: unknown[]; stickers: Sticker[] } {
+  if (!Array.isArray(value)) return { legacy: [], stickers: [] }
+
+  const legacy: unknown[] = []
+  const fresh: unknown[] = []
+
+  for (const item of value) {
+    if (isRecord(item) && isStickerKind(item.kind)) fresh.push(item)
+    else legacy.push(item)
+  }
+
+  return { legacy, stickers: normalizeStickers(fresh) }
+}
+
 function normalizeJournal(record: JsonRecord): JsonRecord | null {
   const id = str(record.id)
   if (!id) return null
@@ -155,6 +175,13 @@ function normalizeJournal(record: JsonRecord): JsonRecord | null {
     : legacyPhotoId
       ? [legacyPhotoId]
       : []
+  const { legacy, stickers } = splitStickers(record.stickers)
+  const boardSource =
+    legacy.length > 0 && Array.isArray(record.board)
+      ? [...record.board, ...legacy]
+      : legacy.length > 0
+        ? legacy
+        : record.board
   const next: JsonRecord = {
     ...record,
     id,
@@ -162,7 +189,8 @@ function normalizeJournal(record: JsonRecord): JsonRecord | null {
     body: str(record.body),
     color: str(record.color, 'pine'),
     photoIds: photoIds.slice(0, MAX_JOURNAL_PHOTOS),
-    board: toBoardNotes(record.board ?? record.stickers),
+    board: toBoardNotes(boardSource),
+    stickers,
     entryDate: str(record.entryDate) || dayOf(createdAt, toDay(new Date())),
     tags: stringList(record.tags),
     shareable: typeof record.shareable === 'boolean' ? record.shareable : false,
@@ -171,7 +199,6 @@ function normalizeJournal(record: JsonRecord): JsonRecord | null {
   }
 
   delete next.photoId
-  delete next.stickers
   return next
 }
 

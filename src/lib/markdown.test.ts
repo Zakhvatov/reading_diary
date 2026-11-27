@@ -66,7 +66,7 @@ describe('markdown', () => {
     const html = render('Это =={rose}важная мысль== на память.')
 
     expect(html).toContain('<mark')
-    expect(html).toContain('bg-rose')
+    expect(html).toContain('bg-stab-rose')
     expect(html).toContain('важная мысль')
     expect(html).not.toContain('==')
     expect(html).not.toContain('{rose}')
@@ -75,7 +75,7 @@ describe('markdown', () => {
   it('falls back to amber for a bare highlight', () => {
     const html = render('Просто ==выделено==.')
 
-    expect(html).toContain('bg-butter')
+    expect(html).toContain('bg-stab-amber')
     expect(html).toContain('выделено')
   })
 

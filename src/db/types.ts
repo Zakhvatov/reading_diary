@@ -1,7 +1,9 @@
 import type { BoardNote } from '@/lib/board'
+import type { Sticker } from '@/lib/stickers'
 import type { DiaryTemplateId } from '@/lib/templates'
 
 export type { BoardNote, BoardNoteColor } from '@/lib/board'
+export type { Sticker, StickerKind, StickerSurface, StickerTone } from '@/lib/stickers'
 export type { DiaryTemplateId } from '@/lib/templates'
 
 export type ID = string
@@ -114,6 +116,8 @@ export interface JournalEntry {
   photoIds: ID[]
   /** Заметки на доске записи: порядок массива — порядок наложения. */
   board: BoardNote[]
+  /** Декоративные стикеры доски и страницы: до 24 на запись. */
+  stickers: Sticker[]
   entryDate: ISODate
   tags: string[]
   mood?: string

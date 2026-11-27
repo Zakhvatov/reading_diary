@@ -567,7 +567,7 @@ function JournalEditor({ entry, books, lastReading }: JournalEditorProps) {
                 <ListBullets size={19} aria-hidden />
               </ToolbarButton>
 
-              <div className="mt-1 flex w-full items-center gap-1 border-t border-line/70 px-1 pt-1">
+              <div className="mt-1 flex w-full flex-wrap items-center gap-1 border-t border-line/70 px-1 pt-1">
                 <span className="px-1 text-muted" aria-hidden>
                   <Highlighter size={18} />
                 </span>

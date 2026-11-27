@@ -1,12 +1,19 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { BOARD_NOTE_MARGIN, BOARD_NOTE_SIZE, clampNotePosition, type BoardNote } from '@/lib/board'
+import type { Sticker } from '@/lib/stickers'
 import { BoardNoteView } from './BoardNoteView'
+import { StickerLayer } from './StickerLayer'
 
 type BoardCanvasProps = {
   notes: BoardNote[]
+  /** Декоративные стикеры этой же поверхности: слой ниже заметок. */
+  stickers?: Sticker[]
   selectedId: string | null
+  stickerSelectedId?: string | null
   onSelect: (id: string | null) => void
+  onSelectSticker?: (id: string | null) => void
   onMove: (id: string, x: number, y: number) => void
+  onMoveSticker?: (id: string, x: number, y: number) => void
   onEdit: (id: string) => void
 }
 
@@ -32,7 +39,17 @@ const NOTE_EDGE = BOARD_NOTE_SIZE / 2 + BOARD_NOTE_MARGIN
  * Поле с заметками. Тап выбирает, движение после порога — перетаскивает:
  * касание больше не сдвигает заметку на пару пикселей.
  */
-export function BoardCanvas({ notes, selectedId, onSelect, onMove, onEdit }: BoardCanvasProps) {
+export function BoardCanvas({
+  notes,
+  stickers = [],
+  selectedId,
+  stickerSelectedId = null,
+  onSelect,
+  onSelectSticker,
+  onMove,
+  onMoveSticker,
+  onEdit,
+}: BoardCanvasProps) {
   const frameRef = useRef<HTMLDivElement>(null)
   const gesture = useRef<Gesture | null>(null)
   const dragRef = useRef<DragPosition | null>(null)
@@ -119,6 +136,16 @@ export function BoardCanvas({ notes, selectedId, onSelect, onMove, onEdit }: Boa
         if (event.target === event.currentTarget) onSelect(null)
       }}
     >
+      {stickers.length > 0 && onSelectSticker && onMoveSticker ? (
+        <StickerLayer
+          stickers={stickers}
+          editable
+          selectedId={stickerSelectedId}
+          onSelect={onSelectSticker}
+          onMove={onMoveSticker}
+        />
+      ) : null}
+
       {notes.length === 0 ? (
         <p className="pointer-events-none absolute inset-x-8 top-1/2 -translate-y-1/2 text-center text-[13px] leading-[19px] text-muted">
           Нажмите цвет внизу или перетащите его сюда — появится заметка.

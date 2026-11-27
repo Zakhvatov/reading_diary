@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { BOARD_NOTE_COLORS, BOARD_NOTE_MAX_LENGTH, MAX_BOARD_NOTES } from '@/lib/board'
 import { MAX_JOURNAL_PHOTOS } from '@/lib/journal'
+import { MAX_STICKERS, STICKER_KINDS, STICKER_SURFACES, STICKER_TONES } from '@/lib/stickers'
 
 const idSchema = z.string().min(1)
 const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -23,6 +24,18 @@ export const boardNoteSchema = z.object({
   text: z.string().max(BOARD_NOTE_MAX_LENGTH),
   x: z.number().min(0).max(1),
   y: z.number().min(0).max(1),
+})
+export const stickerKindSchema = z.enum(STICKER_KINDS)
+export const stickerToneSchema = z.enum(STICKER_TONES)
+export const stickerSurfaceSchema = z.enum(STICKER_SURFACES)
+export const stickerSchema = z.object({
+  id: idSchema,
+  kind: stickerKindSchema,
+  tone: stickerToneSchema,
+  surface: stickerSurfaceSchema,
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  rot: z.number().min(-45).max(45),
 })
 export const sessionKindSchema = z.enum(['timer', 'manual'])
 export const readingStatusSchema = z.enum(['reading', 'finished', 'dnf'])
@@ -125,6 +138,7 @@ export const journalEntrySchema = z.object({
   color: journalColorSchema,
   photoIds: z.array(idSchema).max(MAX_JOURNAL_PHOTOS),
   board: z.array(boardNoteSchema).max(MAX_BOARD_NOTES),
+  stickers: z.array(stickerSchema).max(MAX_STICKERS).default([]),
   entryDate: isoDateSchema,
   tags: z.array(z.string()),
   mood: z.string().optional(),

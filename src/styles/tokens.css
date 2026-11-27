@@ -33,6 +33,31 @@
   --color-rose: #f4e3e3;
   --color-rose-ink: #763740;
 
+  /*
+   * Палитра выделения «Stabilo Candy» — канцелярские цвета,
+   * одинаковые во всех темах и режимах. Прошивка: bg-stab-*.
+   */
+  --color-stab-rose: #f7bbc5;
+  --color-stab-rose-ink: #5c2e3a;
+  --color-stab-peach: #ffa895;
+  --color-stab-peach-ink: #7a3426;
+  --color-stab-lime: #ecf7bb;
+  --color-stab-lime-ink: #5b6414;
+  --color-stab-sky: #dee5f8;
+  --color-stab-sky-ink: #2f3a6b;
+  --color-stab-sage: #c5e1d2;
+  --color-stab-sage-ink: #2e5243;
+  --color-stab-aqua: #bdebe9;
+  --color-stab-aqua-ink: #1e5f58;
+  --color-stab-lilac: #e9cdec;
+  --color-stab-lilac-ink: #5a3568;
+  --color-stab-blush: #f7d7e2;
+  --color-stab-blush-ink: #6d3a4b;
+  --color-stab-apricot: #fdd0be;
+  --color-stab-apricot-ink: #7a4530;
+  --color-stab-amber: #fcf2b4;
+  --color-stab-amber-ink: #6b5211;
+
   --color-cover-forest: #33402f;
   --color-cover-clay: #7a3f32;
   --color-cover-navy: #2c3a4e;
