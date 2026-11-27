@@ -100,7 +100,11 @@ export function JournalListScreen() {
 
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title="Дневник" caption={view === 'entries' ? 'Записи' : 'По книгам'} />
+      <ScreenHeader
+        title="Дневник"
+        caption={view === 'entries' ? 'Записи' : 'По книгам'}
+        hero
+      />
 
       <div
         className="mt-6 grid grid-cols-2 gap-1 rounded-[var(--radius-pill)] border border-line bg-surface p-1"

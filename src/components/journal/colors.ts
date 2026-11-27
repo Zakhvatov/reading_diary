@@ -13,7 +13,7 @@ export const JOURNAL_COLORS: JournalColor[] = ['pine', 'amber', 'clay', 'sky', '
 /** Пастель — только фон и текст в паре; насыщенный тон — полоса и выбранный кружок. */
 export const JOURNAL_COLOR_STYLES: Record<JournalColor, JournalColorStyle> = {
   pine: {
-    label: 'Хвоя',
+    label: 'Ирис',
     surface: 'bg-accent-soft',
     ink: 'text-accent',
     stripe: 'bg-accent',
@@ -48,7 +48,7 @@ export const JOURNAL_COLOR_STYLES: Record<JournalColor, JournalColorStyle> = {
     swatch: 'bg-lilac-ink',
   },
   moss: {
-    label: 'Мох',
+    label: 'Лаванда',
     surface: 'bg-sage',
     ink: 'text-sage-ink',
     stripe: 'bg-sage-ink',

@@ -109,3 +109,30 @@
   height: 3px;
   background: #c2187f;
 }
+
+.theme-preview-lavender {
+  background: linear-gradient(165deg, #c9c8f2 0%, #efe9f7 58%, #f7d9e2 100%);
+}
+
+.theme-preview-lavender::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 9px;
+  height: 17px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.theme-preview-lavender::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  right: 20px;
+  bottom: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(46, 42, 74, 0.22);
+}

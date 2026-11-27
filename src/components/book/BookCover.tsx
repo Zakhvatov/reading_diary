@@ -80,7 +80,7 @@ export function BookCover({ book, className, plain = false }: BookCoverProps) {
         <div className="relative flex h-full flex-col justify-between gap-2 p-2.5 pl-3 text-cover-ink [container-type:inline-size]">
           <span className="absolute inset-y-0 left-0 w-[4px] bg-cover-ink/25" aria-hidden />
           {book.authors[0] ? (
-            <span className="line-clamp-1 text-[clamp(6.5px,3.1cqw,10px)] tracking-[0.08em] uppercase text-cover-ink/60">
+            <span className="cover-author line-clamp-1 text-[clamp(8px,3.1cqw,10px)] tracking-[0.08em] uppercase text-cover-ink/60">
               {book.authors[0]}
             </span>
           ) : (

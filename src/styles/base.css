@@ -127,3 +127,9 @@
     }
   }
 }
+
+@container (max-width: 109px) {
+  .cover-author {
+    display: none;
+  }
+}

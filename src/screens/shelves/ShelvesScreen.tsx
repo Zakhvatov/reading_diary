@@ -69,7 +69,7 @@ export function ShelvesScreen() {
 
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title="Библиотека" />
+      <ScreenHeader title="Библиотека" hero />
 
       <div className="relative mt-5">
         <MagnifyingGlass

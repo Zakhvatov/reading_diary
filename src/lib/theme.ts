@@ -1,4 +1,4 @@
-export type ThemeId = 'shelf' | 'diary' | 'leopard' | 'leopard-pink'
+export type ThemeId = 'lavender' | 'shelf' | 'diary' | 'leopard' | 'leopard-pink'
 export type ThemeMode = 'light' | 'dark' | 'system'
 
 export type ThemeInfo = {
@@ -9,9 +9,21 @@ export type ThemeInfo = {
   color: { light: string; dark: string }
 }
 
-export const THEME_IDS: ThemeId[] = ['shelf', 'diary', 'leopard', 'leopard-pink']
+export const THEME_IDS: ThemeId[] = [
+  'lavender',
+  'shelf',
+  'diary',
+  'leopard',
+  'leopard-pink',
+]
 
 export const THEMES: ThemeInfo[] = [
+  {
+    id: 'lavender',
+    name: 'Лавандовое поле',
+    description: 'Прохладное стекло, пастель и крупная антиква.',
+    color: { light: '#C9C8F2', dark: '#171326' },
+  },
   {
     id: 'shelf',
     name: 'Полка',
@@ -38,7 +50,7 @@ export const THEMES: ThemeInfo[] = [
   },
 ]
 
-export const DEFAULT_THEME: ThemeId = 'shelf'
+export const DEFAULT_THEME: ThemeId = 'lavender'
 export const DEFAULT_MODE: ThemeMode = 'light'
 
 export const APPEARANCE_KEY = 'reading-diary:appearance'

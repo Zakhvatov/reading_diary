@@ -2,6 +2,8 @@ import { Plus } from '@phosphor-icons/react'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { openQuickCapture } from '@/components/capture/quickCaptureStore'
+import { useSettings } from '@/db/live'
+import { DEFAULT_THEME } from '@/lib/theme'
 
 const fabRoutes = new Set(['/home', '/shelves'])
 
@@ -10,6 +12,8 @@ const MOVE_TOLERANCE_PX = 10
 
 export function Fab() {
   const { pathname } = useLocation()
+  const settings = useSettings()
+  const theme = settings?.theme ?? DEFAULT_THEME
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const longPressed = useRef(false)
   const origin = useRef<{ x: number; y: number } | null>(null)
@@ -29,6 +33,12 @@ export function Fab() {
   useEffect(() => clearTimer, [])
 
   if (!fabRoutes.has(pathname)) {
+    return null
+  }
+
+  // На главной лаванды добавление живёт в «Библиотеке»: кнопка не должна
+  // висеть над лентой обложек.
+  if (theme === 'lavender' && pathname === '/home') {
     return null
   }
 
@@ -70,7 +80,7 @@ export function Fab() {
       onContextMenu={(event) => event.preventDefault()}
       className="fixed right-5 z-40 flex size-14 touch-manipulation items-center justify-center rounded-full bg-accent text-accent-ink shadow-none transition-transform duration-150 select-none active:scale-[0.96]"
       style={{
-        bottom: 'calc(var(--tab-h) + var(--safe-bottom) + 16px)',
+        bottom: 'calc(var(--tab-h) + var(--safe-bottom) + 16px + var(--fab-extra, 0px))',
         WebkitTouchCallout: 'none',
       }}
     >

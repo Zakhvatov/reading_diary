@@ -372,7 +372,7 @@ async function touchSettings(): Promise<void> {
     defaultTemplate: 'lite',
     defaultRatingScale: 'stars5',
     dailyGoalMinutes: 0,
-    theme: 'shelf',
+    theme: 'lavender',
     themeMode: 'light',
     lastBackupAt: now,
     persistGranted: false,

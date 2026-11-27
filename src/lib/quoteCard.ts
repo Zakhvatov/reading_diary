@@ -17,17 +17,17 @@ type QuoteCardPalette = {
 const THEMES: Record<QuoteCardTheme, QuoteCardPalette> = {
   paper: {
     background: '#F4F1E9',
-    foreground: '#1C241E',
-    muted: '#6A7167',
+    foreground: '#2A2620',
+    muted: '#6F6A60',
     line: '#DED9CC',
-    accent: '#1E5C45',
+    accent: '#3A3A4A',
   },
   ink: {
-    background: '#1C241E',
+    background: '#1E1930',
     foreground: '#F4F1E9',
-    muted: '#A7AFA2',
-    line: '#3A443C',
-    accent: '#7FB99A',
+    muted: '#A79DBB',
+    line: '#3A2E52',
+    accent: '#B9A0FF',
   },
 }
 
