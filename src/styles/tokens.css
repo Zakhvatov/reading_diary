@@ -57,6 +57,103 @@
   --radius-pill: 999px;
 }
 
+/* «Лавандовое поле» — пастельное поле и стекло */
+html[data-theme='lavender'] {
+  --color-paper: #efedfc;
+  --color-board: #f6f3ff;
+  --color-surface: rgba(255, 255, 255, 0.62);
+  --color-ink: #2e2a4a;
+  --color-muted: #5f5b7a;
+  --color-line: rgba(46, 42, 74, 0.14);
+  --color-accent: #6c5ce7;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: rgba(228, 225, 251, 0.9);
+  --color-gold: #b57a1f;
+  --color-signal: #c2456e;
+  --color-signal-soft: #fbe3ea;
+  --color-on-signal: #ffffff;
+
+  --color-sage: rgba(226, 230, 251, 0.78);
+  --color-sage-ink: #3e427a;
+  --color-butter: rgba(255, 241, 214, 0.82);
+  --color-butter-ink: #6b5211;
+  --color-sky: rgba(221, 232, 251, 0.8);
+  --color-sky-ink: #2c4a6e;
+  --color-peach: rgba(251, 228, 216, 0.82);
+  --color-peach-ink: #7a4530;
+  --color-lilac: rgba(237, 231, 251, 0.86);
+  --color-lilac-ink: #493d74;
+  --color-rose: rgba(251, 228, 234, 0.84);
+  --color-rose-ink: #7a3b4e;
+
+  --color-cover-forest: #3f3d7a;
+  --color-cover-clay: #8b5e83;
+  --color-cover-navy: #394b7a;
+  --color-cover-ochre: #7b6aa8;
+  --color-cover-plum: #6c5ce7;
+  --color-cover-teal: #4e6e9e;
+  --color-cover-slate: #4a4a60;
+  --color-cover-wine: #a64d72;
+  --color-cover-ink: #f7f4ff;
+
+  --mark-red: #c2456e;
+  --mark-amber: #b57a1f;
+  --mark-green: #4e5a8a;
+  --mark-blue: #3e6fa5;
+
+  --font-display: 'Literata', ui-serif, Georgia, serif;
+  --font-sans: 'Golos Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-hand: 'Caveat', 'Segoe Script', cursive;
+  --radius-card: 18px;
+  --radius-control: 10px;
+  --shell-extra: 20px;
+  --fab-extra: 12px;
+}
+
+html[data-theme='lavender'][data-mode='dark'] {
+  --color-paper: #171326;
+  --color-board: #1f1a33;
+  --color-surface: #231d3b;
+  --color-ink: #ece7ff;
+  --color-muted: #a9a1c9;
+  --color-line: #352e52;
+  --color-accent: #b9a0ff;
+  --color-accent-ink: #1a1230;
+  --color-accent-soft: #2f2751;
+  --color-gold: #d9b36a;
+  --color-signal: #f089a8;
+  --color-signal-soft: #3a2330;
+  --color-on-signal: #1a0e14;
+
+  --color-sage: #262b47;
+  --color-sage-ink: #c9d2f2;
+  --color-butter: #332c1e;
+  --color-butter-ink: #e8ce95;
+  --color-sky: #232b44;
+  --color-sky-ink: #bfd2f0;
+  --color-peach: #33251f;
+  --color-peach-ink: #e9bfa8;
+  --color-lilac: #2b2547;
+  --color-lilac-ink: #d6c9f5;
+  --color-rose: #362230;
+  --color-rose-ink: #edb9c8;
+
+  --color-cover-forest: #4a4788;
+  --color-cover-clay: #9a6b93;
+  --color-cover-navy: #445884;
+  --color-cover-ochre: #8c7bbc;
+  --color-cover-plum: #7c6bf0;
+  --color-cover-teal: #5b7dae;
+  --color-cover-slate: #565670;
+  --color-cover-wine: #b85c82;
+  --color-cover-ink: #f7f4ff;
+
+  --mark-red: #f089a8;
+  --mark-amber: #d9b36a;
+  --mark-green: #8e9ac8;
+  --mark-blue: #7fa6d8;
+}
+
 /* «Полка» — тёплая библиотека */
 html[data-theme='shelf'] {
   --color-paper: #f2e9d9;

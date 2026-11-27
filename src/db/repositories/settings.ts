@@ -5,7 +5,7 @@ import type { Settings } from '../types'
 function withAppearance(settings: Settings): Settings {
   return {
     ...settings,
-    theme: settings.theme ?? 'shelf',
+    theme: settings.theme ?? 'lavender',
     themeMode: settings.themeMode ?? 'light',
   }
 }
@@ -34,7 +34,7 @@ export async function getSettings(): Promise<Settings> {
     defaultTemplate: 'lite',
     defaultRatingScale: 'stars5',
     dailyGoalMinutes: 0,
-    theme: 'shelf',
+    theme: 'lavender',
     themeMode: 'light',
     persistGranted: false,
     schemaVersion: 6,

@@ -366,6 +366,7 @@ export function StatsScreen() {
       <ScreenHeader
         title="Статистика"
         caption={rangeLabel(period, range.start, range.end)}
+        hero
         action={
           <Link
             to="/calendar"

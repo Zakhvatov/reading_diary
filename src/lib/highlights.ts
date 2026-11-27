@@ -6,7 +6,7 @@ export const HIGHLIGHT_LABELS: Record<HighlightColor, string> = {
   amber: 'янтарным',
   rose: 'розовым',
   sky: 'голубым',
-  sage: 'зелёным',
+  sage: 'светлым',
   lilac: 'сиреневым',
 }
 

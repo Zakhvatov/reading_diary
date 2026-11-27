@@ -204,6 +204,19 @@ export class ReadingDiaryDB extends Dexie {
           await settingsTable.update('app', { schemaVersion: 6 })
         }
       })
+
+    // «Лавандовое поле» становится темой по умолчанию: один раз переводим
+    // сохранённый выбор на неё, дальше пользователь меняет тему сам.
+    this.version(7)
+      .stores({
+        settings: 'id',
+      })
+      .upgrade(async (transaction) => {
+        const settingsTable = transaction.table('settings')
+        if (await settingsTable.get('app')) {
+          await settingsTable.update('app', { theme: 'lavender' })
+        }
+      })
   }
 }
 

@@ -111,7 +111,7 @@ export function SettingsScreen() {
 
   return (
     <div className="pad-x pt-[calc(var(--safe-top)+20px)]">
-      <ScreenHeader title="Настройки" caption="Приложение" />
+      <ScreenHeader title="Настройки" caption="Приложение" hero />
 
       <section className="mt-8">
         <h2 className="font-display text-[20px] leading-[26px] font-medium">Оформление</h2>

@@ -23,7 +23,7 @@ export function AppShell() {
         className={
           fullscreen
             ? 'pb-[calc(var(--safe-bottom)+24px)]'
-            : 'pb-[calc(var(--tab-h)+var(--safe-bottom)+24px)]'
+            : 'pb-[calc(var(--tab-h)+var(--safe-bottom)+24px+var(--shell-extra,0px))]'
         }
       >
         <Outlet />

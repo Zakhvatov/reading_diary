@@ -10,6 +10,7 @@ describe('theme', () => {
   })
 
   it('accepts only the bundled themes', () => {
+    expect(isThemeId('lavender')).toBe(true)
     expect(isThemeId('shelf')).toBe(true)
     expect(isThemeId('diary')).toBe(true)
     expect(isThemeId('leopard')).toBe(true)
@@ -26,7 +27,7 @@ describe('theme', () => {
   })
 
   it('has a safe default', () => {
-    expect(DEFAULT_THEME).toBe('shelf')
+    expect(DEFAULT_THEME).toBe('lavender')
     expect(DEFAULT_MODE).toBe('light')
   })
 })

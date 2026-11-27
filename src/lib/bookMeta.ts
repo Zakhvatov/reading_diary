@@ -16,7 +16,7 @@ export const ACQUISITION_LABELS: Record<Acquisition, string> = {
 export const COLOR_LABEL_NAMES: Record<ColorLabel, string> = {
   red: 'Красный',
   amber: 'Янтарный',
-  green: 'Зелёный',
+  green: 'Графит',
   blue: 'Синий',
   none: 'Без ярлыка',
 }
